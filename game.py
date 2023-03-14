@@ -12,7 +12,7 @@ class UnoGame:
         self.deck = deck
         self.currentCard = None
 
-    # 게임 시작
+    # 게임 시작 (deck 활용)
     def startGame(self):
         pass
 
