@@ -83,7 +83,7 @@ class StartScreen:
 
     def draw_alert(self, screen, text):
         view = get_small_font().render(text, True, COLOR_RED)
-        rect = get_rect(view, self.get_width() // 2, self.get_height() - view.get_height())
+        rect = get_rect(view, self.get_width() // 2, self.get_height() - view.get_height() - get_margin())
         screen.blit(view, rect)
 
     def get_width(self):
