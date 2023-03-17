@@ -4,7 +4,7 @@ class Setting:
         self.screen_height = 600
         self.blind_mode = False
 
-    def getResoulition(self):
+    def get_resolution(self):
         return (self.screen_width, self.screen_height)
     
     def setResolution(self, width, height):
