@@ -1,3 +1,6 @@
+from player import Player
+from deck import Deck
+
 class UnoGame:
     def __init__(self, deck, players):
         self.timer = 5000
@@ -12,7 +15,7 @@ class UnoGame:
         self.deck = deck
         self.currentCard = None
 
-    # 게임 시작 (deck 활용)
+    # 게임 시작
     def startGame(self):
         pass
 
