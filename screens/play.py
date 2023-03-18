@@ -53,6 +53,7 @@ class PlayScreen:
 
         # 임시 플레이어 생성
         players = [Player([1, 2, 3, 4, 5]), Player([1, 2, 3]), Player([1, 2, 3, 2, 3, 2, 3]), Player([1]), Player([1, 2, 3, 2, 3, 2, 3])]
+        self.current_player_index = 2 # 임시
         self.draw_players_layout(screen, players)
 
         if self.escape_dialog_enabled:
@@ -141,6 +142,9 @@ class PlayScreen:
         self.player_list = []
         for idx, player in enumerate(players):
             player_layout = pygame.draw.rect(screen, COLOR_PLAYER, (self.players_layout.left + get_small_margin(), get_small_margin() + (player_height + get_small_margin()) * idx, self.players_layout.width - get_small_margin() * 2, player_height))
+            # 현재 플레이어 스트로크
+            if idx == self.current_player_index:
+                pygame.draw.rect(screen, COLOR_RED, (self.players_layout.left + get_small_margin(), get_small_margin() + (player_height + get_small_margin()) * idx, self.players_layout.width - get_small_margin() * 2, player_height), 2)
             self.draw_cards(screen, player_layout, player.cards)
             
     # 카드
