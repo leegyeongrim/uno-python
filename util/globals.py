@@ -6,7 +6,7 @@ COLOR_BLACK = (0, 0, 0)
 COLOR_RED = (255, 0, 0)
 
 COLOR_BOARD = (8, 64, 21)
-COLOR_MY_CARDS = (40, 120, 58)
+COLOR_PLAYER = (40, 120, 58)
 
 TYPE_START = "start"
 TYPE_SETTING = "setting"

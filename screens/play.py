@@ -126,7 +126,7 @@ class PlayScreen:
 
     # 나의 카드 레이아웃
     def draw_my_cards_layout(self, screen):
-        self.my_cards_layout = pygame.draw.rect(screen, COLOR_MY_CARDS, (0, self.board_layout.bottom, self.board_layout.right, self.my_cards_layout_height))
+        self.my_cards_layout = pygame.draw.rect(screen, COLOR_PLAYER, (0, self.board_layout.bottom, self.board_layout.right, self.my_cards_layout_height))
 
     # 플레이어 목록 레이아웃
     def draw_players_layout(self, screen, players):
@@ -140,7 +140,7 @@ class PlayScreen:
 
         self.player_list = []
         for idx, player in enumerate(players):
-            player_layout = pygame.draw.rect(screen, COLOR_WHITE, (self.players_layout.left + get_small_margin(), get_small_margin() + (player_height + get_small_margin()) * idx, self.players_layout.width - get_small_margin() * 2, player_height))
+            player_layout = pygame.draw.rect(screen, COLOR_PLAYER, (self.players_layout.left + get_small_margin(), get_small_margin() + (player_height + get_small_margin()) * idx, self.players_layout.width - get_small_margin() * 2, player_height))
             self.draw_cards(screen, player_layout, player.cards)
             
     # 카드
