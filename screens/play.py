@@ -124,6 +124,20 @@ class PlayScreen:
     # 보드 레이아웃
     def draw_board_layout(self, screen):
         self.board_layout = pygame.draw.rect(screen, COLOR_BOARD, (0, 0, screen.get_width() - self.players_layout_width, self.board_layout_height))
+        self.draw_deck(screen)
+        self.draw_current_card(screen)
+
+    def draw_deck(self, screen):
+        deck_layout = pygame.image.load('./card_back.png') # TODO: 카드 수정
+        deck_layout = pygame.transform.scale(deck_layout, (get_card_width() * 2, get_card_height() * 2))
+        deck_layout_rect = get_center_rect(deck_layout, self.board_layout, -deck_layout.get_width() // 2 - get_medium_margin())
+        self.deck_layout = screen.blit(deck_layout, deck_layout_rect)
+
+    def draw_current_card(self, screen):
+        current_card_layout = pygame.image.load('./card_back.png')
+        current_card_layout = pygame.transform.scale(current_card_layout, (get_card_width() * 2, get_card_height() * 2))
+        current_card_layout_rect = get_center_rect(current_card_layout, self.board_layout, current_card_layout.get_width() // 2 + get_medium_margin())
+        screen.blit(current_card_layout, current_card_layout_rect)
 
     # 나의 카드 레이아웃
     def draw_my_cards_layout(self, screen):
@@ -151,11 +165,11 @@ class PlayScreen:
     def draw_cards(self, screen, player_layout, cards):
         for idx, card in enumerate(cards):
             card_layout = pygame.image.load('./card_back.png')
-            card_layout = pygame.transform.scale(card_layout, (30, 45))
+            card_layout = pygame.transform.scale(card_layout, (get_card_width(), get_card_height()))
             card_rect = card_layout.get_rect().topleft = (player_layout.left  + get_extra_small_margin() + (card_layout.get_width() // 2) * idx, player_layout.bottom - card_layout.get_height() - get_extra_small_margin())
             temp = screen.blit(card_layout, card_rect)
 
         # 카드 개수 표시 (45 변수로 설정해야 함)
         txt_card_cnt = get_small_font().render(str(len(cards)), True, COLOR_BLACK)
-        txt_card_cnt_rect = txt_card_cnt.get_rect().topleft = (player_layout.left + get_extra_small_margin(), player_layout.bottom - 45 - txt_card_cnt.get_height() - get_extra_small_margin())
+        txt_card_cnt_rect = txt_card_cnt.get_rect().topleft = (player_layout.left + get_extra_small_margin(), player_layout.bottom - get_card_height() - txt_card_cnt.get_height() - get_extra_small_margin())
         screen.blit(txt_card_cnt, txt_card_cnt_rect)

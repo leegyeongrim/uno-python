@@ -22,8 +22,17 @@ DIMEN_MARGIN_MEDIUM = 20
 DIMEN_MARGIN_SMALL = 10
 DIMEN_MARGIN_EXTRA_SMALL = 5
 
+CARD_WIDTH = 30
+CARD_HEIGHT = 45
+
 def get_rect(view, x, y):
     return view.get_rect(center = (x, y + view.get_height() // 2))
+
+def get_center_rect(view, parent, x = 0, y = 0):
+    if type(parent) is pygame.Rect:
+        return view.get_rect(center = (parent.left + parent.width // 2 + x, parent.top + parent.height // 2 + y))
+    else:
+        return None
 
 def get_large_font(percent = 1):
     return pygame.font.Font('./font/pretendard_regular.otf', DIMEN_LARGE * percent)
@@ -37,6 +46,7 @@ def get_small_font(percent = 1):
 def get_extra_small_font(percent = 1):
     return pygame.font.Font('./font/pretendard_regular.otf', DIMEN_EXTRA_SMALL * percent)
 
+
 def get_medium_margin(percent = 1):
     return DIMEN_MARGIN_MEDIUM * percent
 
@@ -45,3 +55,10 @@ def get_small_margin(percent = 1):
 
 def get_extra_small_margin(percent = 1):
     return DIMEN_MARGIN_EXTRA_SMALL * percent
+
+
+def get_card_width(percent = 1):
+    return CARD_WIDTH * percent
+
+def get_card_height(percent = 1):
+    return CARD_HEIGHT * percent
