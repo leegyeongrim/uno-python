@@ -52,7 +52,7 @@ class PlayScreen:
         self.draw_my_cards_layout(screen)
 
         # 임시 플레이어 생성
-        players = [Player([1, 2, 3]), Player([1, 2, 3]), Player([1, 2, 3]), Player([1, 2, 3]), Player([1, 2, 3])]
+        players = [Player([1, 2, 3, 4, 5]), Player([1, 2, 3]), Player([1, 2, 3, 2, 3, 2, 3]), Player([1]), Player([1, 2, 3, 2, 3, 2, 3])]
         self.draw_players_layout(screen, players)
 
         if self.escape_dialog_enabled:
@@ -130,7 +130,7 @@ class PlayScreen:
 
     # 플레이어 목록 레이아웃
     def draw_players_layout(self, screen, players):
-        self.player_layout = pygame.draw.rect(screen, COLOR_GRAY, (screen.get_width() - self.players_layout_width, 0, self.players_layout_width, screen.get_height()))
+        self.players_layout = pygame.draw.rect(screen, COLOR_GRAY, (screen.get_width() - self.players_layout_width, 0, self.players_layout_width, screen.get_height()))
         self.draw_player(screen, players)
 
     # 플레이어
@@ -140,4 +140,13 @@ class PlayScreen:
 
         self.player_list = []
         for idx, player in enumerate(players):
-            temp = pygame.draw.rect(screen, COLOR_WHITE, (self.player_layout.left + get_small_margin(), get_small_margin() + (player_height + get_small_margin()) * idx, self.player_layout.width - get_small_margin() * 2, player_height))
+            player_layout = pygame.draw.rect(screen, COLOR_WHITE, (self.players_layout.left + get_small_margin(), get_small_margin() + (player_height + get_small_margin()) * idx, self.players_layout.width - get_small_margin() * 2, player_height))
+            self.draw_cards(screen, player_layout, player.cards)
+            
+    # 카드
+    def draw_cards(self, screen, player_layout, cards):
+        for idx, card in enumerate(cards):
+            card_layout = pygame.image.load('./card_back.png')
+            card_layout = pygame.transform.scale(card_layout, (30, 45))
+            card_rect = card_layout.get_rect().topleft = (player_layout.left  + get_extra_small_margin() + (card_layout.get_width() // 2) * idx, player_layout.bottom - card_layout.get_height() - get_extra_small_margin())
+            temp = screen.blit(card_layout, card_rect)

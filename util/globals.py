@@ -19,6 +19,7 @@ DIMEN_SMALL = 20
 
 DIMEN_MARGIN_MEDIUM = 20
 DIMEN_MARGIN_SMALL = 10
+DIMEN_MARGIN_EXTRA_SMALL = 5
 
 def get_rect(view, x, y):
     return view.get_rect(center = (x, y + view.get_height() // 2))
@@ -35,6 +36,8 @@ def get_small_font(percent = 1):
 def get_medium_margin(percent = 1):
     return DIMEN_MARGIN_MEDIUM * percent
 
-
 def get_small_margin(percent = 1):
     return DIMEN_MARGIN_SMALL * percent
+
+def get_extra_small_margin(percent = 1):
+    return DIMEN_MARGIN_EXTRA_SMALL * percent
