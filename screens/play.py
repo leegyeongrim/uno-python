@@ -5,12 +5,26 @@ class PlayScreen:
     def __init__(self, controller):
         self.ctr = controller
 
-        self.player_width = 200
 
-        self.init_escape_dialog()
+        self.init_my_cards_layout(self.ctr.screen)
+        self.init_board_layout(self.ctr.screen)
+        self.init_players_layout(self.ctr.screen)
+        self.init_escape_dialog(self.ctr.screen)
 
+    # 나의 카드 레이아웃 초기화
+    def init_my_cards_layout(self, screen):
+        self.my_cards_layout_height = screen.get_height() // 5
 
-    def init_escape_dialog(self):
+    # 보드 레이아웃 초기화
+    def init_board_layout(self, screen):
+        self.board_layout_height = screen.get_height() - self.my_cards_layout_height
+
+    # 플레이어 레이아웃 초기화
+    def init_players_layout(self, screen):
+        self.players_layout_width = 200
+
+    # 일시정지 다이얼로그 초기화
+    def init_escape_dialog(self, screen):
         self.escape_dialog_enabled = False
 
         self.escape_dialog_width = 500
@@ -26,19 +40,23 @@ class PlayScreen:
             }
         ]
 
-    # 초기화 함수
+    # 초기화 함수 (게임 종료 후 다시 들어왔을 때 호출)
     def init(self):
         self.escape_dialog_enabled = False
         self.escape_menu_index = 0
 
+    # 모든 View
     def draw(self, screen):
         screen.fill(COLOR_WHITE)
 
-        self.draw_players(screen)
+        self.draw_board_layout(screen)
+        self.draw_my_cards_layout(screen)
+        self.draw_players_layout(screen)
 
         if self.escape_dialog_enabled:
-            self.draw_escpe_dialog(screen)
+            self.draw_escpe_dialog_layout(screen)
 
+    # 이벤트 처리 함수
     def process_events(self, events):
         for event in events:
             if event.type == pygame.KEYDOWN:
@@ -55,7 +73,7 @@ class PlayScreen:
         if self.escape_dialog_enabled:
             self.run_esacpe_key_event(key)
 
-    # ESC 키보드 입력 이벤트 처리
+    # 일시정지 메뉴 키 이벤트
     def run_esacpe_key_event(self, key):
         if key == pygame.K_UP:
             self.escape_menu_index = (self.escape_menu_index - 1) % len(self.esacpe_menus)
@@ -64,19 +82,23 @@ class PlayScreen:
         elif key == pygame.K_RETURN:
             self.esacpe_menus[self.escape_menu_index]['action']()
 
+    # 클릭 이벤트
     def process_click_event(self, pos):
         if self.escape_dialog_enabled:
             self.run_esacpe_click_event(pos)
 
+    # 일시정지 메뉴 클릭 이벤트
     def run_esacpe_click_event(self, pos):
         for menu in self.esacpe_menus:
             if menu['rect'] and menu['rect'].collidepoint(pos):
                 menu['action']()
 
+    # 다이얼로그 표시 상태 변경
     def toggle_escape_dialog(self):
         self.escape_dialog_enabled = not self.escape_dialog_enabled
 
-    def draw_escpe_dialog(self, screen):
+    # 일시정지 다이얼로그 레이아웃
+    def draw_escpe_dialog_layout(self, screen):
         # background solid
         self.escape_box = pygame.draw.rect(screen, COLOR_WHITE, ((screen.get_width() - self.escape_dialog_width) // 2, (screen.get_height() - self.escape_dialog_height) // 2, self.escape_dialog_width, self.escape_dialog_height))
         # background outline
@@ -87,8 +109,8 @@ class PlayScreen:
         screen.blit(title, title_rect)
 
         self.draw_esacpe_menu(screen)
-        
-
+    
+    # 일시정지 메뉴
     def draw_esacpe_menu(self, screen):
         for index, menu in enumerate(self.esacpe_menus):
             text = get_medium_font().render(menu['text'], True, COLOR_GRAY if  index != self.escape_menu_index else COLOR_BLACK)
@@ -96,5 +118,14 @@ class PlayScreen:
             menu.update({'view': text, 'rect': rect})
             screen.blit(text, rect)
 
-    def draw_players(self, screen):
-        pygame.draw.rect(screen, COLOR_GRAY, (screen.get_width() - self.player_width, 0, self.player_width, screen.get_height()))
+    # 보드 레이아웃
+    def draw_board_layout(self, screen):
+        self.board_layout = pygame.draw.rect(screen, COLOR_BOARD, (0, 0, screen.get_width() - self.players_layout_width, self.board_layout_height))
+
+    # 나의 카드 레이아웃
+    def draw_my_cards_layout(self, screen):
+        self.my_cards_layout = pygame.draw.rect(screen, COLOR_MY_CARDS, (0, self.board_layout.bottom, self.board_layout.right, self.my_cards_layout_height))
+
+    # 플레이어 목록 레이아웃
+    def draw_players_layout(self, screen):
+        pygame.draw.rect(screen, COLOR_GRAY, (screen.get_width() - self.players_layout_width, 0, self.players_layout_width, screen.get_height()))
