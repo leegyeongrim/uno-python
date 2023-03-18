@@ -44,6 +44,9 @@ class PlayScreen:
             if event.type == pygame.KEYDOWN:
                 self.process_key_event(event.key)
 
+            elif event.type == pygame.MOUSEBUTTONUP:
+                self.process_click_event(pygame.mouse.get_pos())
+
     # 키보드 입력 이벤트 처리
     def process_key_event(self, key):
         if key == pygame.K_ESCAPE:
@@ -60,6 +63,15 @@ class PlayScreen:
             self.escape_menu_index = (self.escape_menu_index + 1) % len(self.esacpe_menus)
         elif key == pygame.K_RETURN:
             self.esacpe_menus[self.escape_menu_index]['action']()
+
+    def process_click_event(self, pos):
+        if self.escape_dialog_enabled:
+            self.run_esacpe_click_event(pos)
+
+    def run_esacpe_click_event(self, pos):
+        for menu in self.esacpe_menus:
+            if menu['rect'] and menu['rect'].collidepoint(pos):
+                menu['action']()
 
     def toggle_escape_dialog(self):
         self.escape_dialog_enabled = not self.escape_dialog_enabled

@@ -14,7 +14,7 @@ DIMEN_LARGE = 40
 DIMEN_MEDIUM = 30
 DIMEN_SMALL = 20
 
-DIMEN_MARGIN = 10
+DIMEN_MARGIN = 20
 
 def get_rect(view, x, y):
     return view.get_rect(center = (x, y + view.get_height() // 2))
