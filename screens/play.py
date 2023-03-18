@@ -124,9 +124,17 @@ class PlayScreen:
     # 보드 레이아웃
     def draw_board_layout(self, screen):
         self.board_layout = pygame.draw.rect(screen, COLOR_BOARD, (0, 0, screen.get_width() - self.players_layout_width, self.board_layout_height))
+        self.draw_current_color(screen)
         self.draw_deck(screen)
         self.draw_current_card(screen)
         self.draw_uno_btn(screen)
+
+    # 현재 색상 표시
+    def draw_current_color(self, screen):
+        # TODO: 색상 동적으로 변경
+        ratio = 4
+        # rect = (self.board_layout.width // ratio, self.board_layout.height // ratio, self.board_layout.width - self.board_layout.width // ratio * 2, self.board_layout.height - self.board_layout.height // ratio * 2)
+        pygame.draw.circle(screen, COLOR_RED, self.board_layout.center, self.board_layout.width // ratio, 20)
 
     # 덱 레이아웃
     def draw_deck(self, screen):
