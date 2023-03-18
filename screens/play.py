@@ -126,18 +126,28 @@ class PlayScreen:
         self.board_layout = pygame.draw.rect(screen, COLOR_BOARD, (0, 0, screen.get_width() - self.players_layout_width, self.board_layout_height))
         self.draw_deck(screen)
         self.draw_current_card(screen)
+        self.draw_uno_btn(screen)
 
+    # 덱 레이아웃
     def draw_deck(self, screen):
-        deck_layout = pygame.image.load('./card_back.png') # TODO: 카드 수정
+        deck_layout = pygame.image.load('./resource/card_back.png') # TODO: 카드 수정
         deck_layout = pygame.transform.scale(deck_layout, (get_card_width() * 2, get_card_height() * 2))
         deck_layout_rect = get_center_rect(deck_layout, self.board_layout, -deck_layout.get_width() // 2 - get_medium_margin())
         self.deck_layout = screen.blit(deck_layout, deck_layout_rect)
 
+    # 현재 카드 레이아웃
     def draw_current_card(self, screen):
-        current_card_layout = pygame.image.load('./card_back.png')
+        current_card_layout = pygame.image.load('./resource/card_back.png')
         current_card_layout = pygame.transform.scale(current_card_layout, (get_card_width() * 2, get_card_height() * 2))
         current_card_layout_rect = get_center_rect(current_card_layout, self.board_layout, current_card_layout.get_width() // 2 + get_medium_margin())
-        screen.blit(current_card_layout, current_card_layout_rect)
+        self.current_card_layout = screen.blit(current_card_layout, current_card_layout_rect)
+
+    # 우노 버튼
+    def draw_uno_btn(self, screen):
+        uno_btn = pygame.image.load('./resource/uno_btn.png')
+        uno_btn = pygame.transform.scale(uno_btn, (get_uno_width(), get_uno_height()))
+        uno_btn_rect = get_center_rect(uno_btn, self.board_layout, y = (self.current_card_layout.height + uno_btn.get_height()) // 2 + get_medium_margin())
+        self.uno_btn = screen.blit(uno_btn, uno_btn_rect)
 
     # 나의 카드 레이아웃
     def draw_my_cards_layout(self, screen):
@@ -164,7 +174,7 @@ class PlayScreen:
     # 카드
     def draw_cards(self, screen, player_layout, cards):
         for idx, card in enumerate(cards):
-            card_layout = pygame.image.load('./card_back.png')
+            card_layout = pygame.image.load('./resource/card_back.png')
             card_layout = pygame.transform.scale(card_layout, (get_card_width(), get_card_height()))
             card_rect = card_layout.get_rect().topleft = (player_layout.left  + get_extra_small_margin() + (card_layout.get_width() // 2) * idx, player_layout.bottom - card_layout.get_height() - get_extra_small_margin())
             temp = screen.blit(card_layout, card_rect)

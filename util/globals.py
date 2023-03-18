@@ -25,6 +25,9 @@ DIMEN_MARGIN_EXTRA_SMALL = 5
 CARD_WIDTH = 30
 CARD_HEIGHT = 45
 
+UNO_WIDTH = 50
+UNO_HEIGHT = 50
+
 def get_rect(view, x, y):
     return view.get_rect(center = (x, y + view.get_height() // 2))
 
@@ -62,3 +65,9 @@ def get_card_width(percent = 1):
 
 def get_card_height(percent = 1):
     return CARD_HEIGHT * percent
+
+def get_uno_width(percent = 1):
+    return UNO_WIDTH * percent
+
+def get_uno_height(percent = 1):
+    return UNO_HEIGHT * percent
