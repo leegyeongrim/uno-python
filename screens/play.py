@@ -1,10 +1,9 @@
 from util.globals import *
-
+from player import Player
 class PlayScreen:
 
     def __init__(self, controller):
         self.ctr = controller
-
 
         self.init_my_cards_layout(self.ctr.screen)
         self.init_board_layout(self.ctr.screen)
@@ -51,7 +50,10 @@ class PlayScreen:
 
         self.draw_board_layout(screen)
         self.draw_my_cards_layout(screen)
-        self.draw_players_layout(screen)
+
+        # 임시 플레이어 생성
+        players = [Player([1, 2, 3]), Player([1, 2, 3]), Player([1, 2, 3]), Player([1, 2, 3]), Player([1, 2, 3])]
+        self.draw_players_layout(screen, players)
 
         if self.escape_dialog_enabled:
             self.draw_escpe_dialog_layout(screen)
@@ -105,7 +107,7 @@ class PlayScreen:
         pygame.draw.rect(screen, COLOR_BLACK, ((screen.get_width() - self.escape_dialog_width) // 2, (screen.get_height() - self.escape_dialog_height) // 2, self.escape_dialog_width, self.escape_dialog_height), 1)
 
         title = get_large_font().render("일시정지", True, COLOR_BLACK)
-        title_rect = get_rect(title, screen.get_width() // 2, self.escape_box.y + get_margin())
+        title_rect = get_rect(title, screen.get_width() // 2, self.escape_box.y + get_medium_margin())
         screen.blit(title, title_rect)
 
         self.draw_esacpe_menu(screen)
@@ -127,5 +129,15 @@ class PlayScreen:
         self.my_cards_layout = pygame.draw.rect(screen, COLOR_MY_CARDS, (0, self.board_layout.bottom, self.board_layout.right, self.my_cards_layout_height))
 
     # 플레이어 목록 레이아웃
-    def draw_players_layout(self, screen):
-        pygame.draw.rect(screen, COLOR_GRAY, (screen.get_width() - self.players_layout_width, 0, self.players_layout_width, screen.get_height()))
+    def draw_players_layout(self, screen, players):
+        self.player_layout = pygame.draw.rect(screen, COLOR_GRAY, (screen.get_width() - self.players_layout_width, 0, self.players_layout_width, screen.get_height()))
+        self.draw_player(screen, players)
+
+    # 플레이어
+    def draw_player(self, screen, players):
+        
+        player_height = (screen.get_height() - get_small_margin() * 6) // 5
+
+        self.player_list = []
+        for idx, player in enumerate(players):
+            temp = pygame.draw.rect(screen, COLOR_WHITE, (self.player_layout.left + get_small_margin(), get_small_margin() + (player_height + get_small_margin()) * idx, self.player_layout.width - get_small_margin() * 2, player_height))
