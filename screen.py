@@ -13,6 +13,7 @@ class ScreenController:
         pygame.init()
         pygame.display.set_icon(pygame.image.load("./icon.png"))
         pygame.display.set_caption("Uno Game")
+        pygame.mouse.set_visible(False)
 
         self.screen_type = TYPE_START
         self.running = True
@@ -58,6 +59,14 @@ class ScreenController:
     # 화면 선택
     def display_screen(self):
         self.get_screen().draw(self.screen)
+        self.draw_cursor()
+
+    # 마우스 커서
+    def draw_cursor(self):
+        cursor = pygame.image.load('./cursor.svg')
+        # cursor = pygame.transform.scale(cursor, (35, 40))
+        cursor_rect = cursor.get_rect().topleft = pygame.mouse.get_pos()
+        self.screen.blit(cursor, cursor_rect)
     
     # 이벤트 선택
     def process_events(self):
@@ -69,6 +78,7 @@ class ScreenController:
             if event.type == pygame.QUIT: # 종료 이벤트
                 self.running = False
 
+        # 화면애 따른 이벤트 처리
         self.get_screen().process_events(events)
 
 # 테스트 코드
