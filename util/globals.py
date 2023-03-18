@@ -16,6 +16,7 @@ DIMEN_EXTRA_LARGE = 50
 DIMEN_LARGE = 40
 DIMEN_MEDIUM = 30
 DIMEN_SMALL = 20
+DIMEN_EXTRA_SMALL = 10
 
 DIMEN_MARGIN_MEDIUM = 20
 DIMEN_MARGIN_SMALL = 10
@@ -32,6 +33,9 @@ def get_medium_font(percent = 1):
 
 def get_small_font(percent = 1):
     return pygame.font.Font('./font/pretendard_regular.otf', DIMEN_SMALL * percent)
+
+def get_extra_small_font(percent = 1):
+    return pygame.font.Font('./font/pretendard_regular.otf', DIMEN_EXTRA_SMALL * percent)
 
 def get_medium_margin(percent = 1):
     return DIMEN_MARGIN_MEDIUM * percent

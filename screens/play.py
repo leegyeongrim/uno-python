@@ -150,3 +150,8 @@ class PlayScreen:
             card_layout = pygame.transform.scale(card_layout, (30, 45))
             card_rect = card_layout.get_rect().topleft = (player_layout.left  + get_extra_small_margin() + (card_layout.get_width() // 2) * idx, player_layout.bottom - card_layout.get_height() - get_extra_small_margin())
             temp = screen.blit(card_layout, card_rect)
+
+        # 카드 개수 표시 (45 변수로 설정해야 함)
+        txt_card_cnt = get_small_font().render(str(len(cards)), True, COLOR_BLACK)
+        txt_card_cnt_rect = txt_card_cnt.get_rect().topleft = (player_layout.left + get_extra_small_margin(), player_layout.bottom - 45 - txt_card_cnt.get_height() - get_extra_small_margin())
+        screen.blit(txt_card_cnt, txt_card_cnt_rect)
