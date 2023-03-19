@@ -16,6 +16,7 @@ class PlayScreen:
 
         self.my_cards_select_enabled = True # 카드 선택 가능 상태
         self.my_cards_selected_index = 0
+        self.cards_line_size = 0 # 한 줄 당 카드 개수
 
     # 보드 레이아웃 초기화
     def init_board_layout(self, screen):
@@ -166,7 +167,12 @@ class PlayScreen:
             # 카드가 보드 넘어가는 경우 위로 쌓음
             if start_x + (card_image.get_width() // card_overlap_percent + get_extra_small_margin()) * (idx - temp_idx) + card_image.get_width() >= self.board_layout.width:
                 start_y -= card_image.get_height() + get_extra_small_margin()
+
+                if temp_idx == 0:
+                    self.cards_line_size = idx
+                
                 temp_idx = idx
+        
 
             # 카드 시작 위치
             card_start = start_x + (card_image.get_width() // card_overlap_percent + get_extra_small_margin()) * (idx - temp_idx)
@@ -285,6 +291,12 @@ class PlayScreen:
             self.my_cards_selected_index = (self.my_cards_selected_index - 1) % len(self.players[self.my_player_index].cards)
         elif key == pygame.K_RIGHT:
             self.my_cards_selected_index = (self.my_cards_selected_index + 1) % len(self.players[self.my_player_index].cards)
+        elif key == pygame.K_UP:
+            if self.cards_line_size != 0 and self.my_cards_selected_index + self.cards_line_size < len(self.players[self.my_player_index].cards):
+                self.my_cards_selected_index = self.my_cards_selected_index + self.cards_line_size
+        elif key == pygame.K_DOWN:
+            if self.cards_line_size != 0 and self.my_cards_selected_index - self.cards_line_size >= 0:
+                self.my_cards_selected_index = self.my_cards_selected_index - self.cards_line_size
         elif key == pygame.K_RETURN:
             self.on_card_selected(self.my_cards_selected_index)
 
