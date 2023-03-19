@@ -20,6 +20,13 @@ class PlayScreen:
 
     # 플레이어 레이아웃 초기화
     def init_players_layout(self, screen):
+
+        self.players = [Player([1, 2, 3, 4, 5]), Player([1, 2, 3]), Player([1, 2, 3, 2, 3, 2, 3]), Player([1]), Player([1, 2, 3, 2, 3, 2, 3])]
+
+        self.current_player_index = 2 # TODO: 게임에서 받아와야 함
+        self.players_selected_index = 0
+        self.players_select_enabled = True
+
         self.players_layout_width = 200
 
     # 일시정지 다이얼로그 초기화
@@ -44,6 +51,14 @@ class PlayScreen:
         self.escape_dialog_enabled = False
         self.escape_menu_index = 0
 
+    # 다이얼로그 표시 상태 변경
+    def toggle_escape_dialog(self):
+        self.escape_dialog_enabled = not self.escape_dialog_enabled
+
+    # 플레이어 선택 상태 변경
+    def toggle_players_select(self):
+        self.players_select_enabled = not self.players_select_enabled
+
     # 모든 View
     def draw(self, screen):
         screen.fill(COLOR_WHITE)
@@ -51,54 +66,10 @@ class PlayScreen:
         self.draw_board_layout(screen)
         self.draw_my_cards_layout(screen)
 
-        # 임시 플레이어 생성
-        players = [Player([1, 2, 3, 4, 5]), Player([1, 2, 3]), Player([1, 2, 3, 2, 3, 2, 3]), Player([1]), Player([1, 2, 3, 2, 3, 2, 3])]
-        self.current_player_index = 2 # 임시
-        self.draw_players_layout(screen, players)
+        self.draw_players_layout(screen, self.players)
 
         if self.escape_dialog_enabled:
             self.draw_escpe_dialog_layout(screen)
-
-    # 이벤트 처리 함수
-    def process_events(self, events):
-        for event in events:
-            if event.type == pygame.KEYDOWN:
-                self.process_key_event(event.key)
-
-            elif event.type == pygame.MOUSEBUTTONUP:
-                self.process_click_event(pygame.mouse.get_pos())
-
-    # 키보드 입력 이벤트 처리
-    def process_key_event(self, key):
-        if key == pygame.K_ESCAPE:
-            self.toggle_escape_dialog()
-
-        if self.escape_dialog_enabled:
-            self.run_esacpe_key_event(key)
-
-    # 일시정지 메뉴 키 이벤트
-    def run_esacpe_key_event(self, key):
-        if key == pygame.K_UP:
-            self.escape_menu_index = (self.escape_menu_index - 1) % len(self.esacpe_menus)
-        elif key == pygame.K_DOWN:
-            self.escape_menu_index = (self.escape_menu_index + 1) % len(self.esacpe_menus)
-        elif key == pygame.K_RETURN:
-            self.esacpe_menus[self.escape_menu_index]['action']()
-
-    # 클릭 이벤트
-    def process_click_event(self, pos):
-        if self.escape_dialog_enabled:
-            self.run_esacpe_click_event(pos)
-
-    # 일시정지 메뉴 클릭 이벤트
-    def run_esacpe_click_event(self, pos):
-        for menu in self.esacpe_menus:
-            if menu['rect'] and menu['rect'].collidepoint(pos):
-                menu['action']()
-
-    # 다이얼로그 표시 상태 변경
-    def toggle_escape_dialog(self):
-        self.escape_dialog_enabled = not self.escape_dialog_enabled
 
     # 일시정지 다이얼로그 레이아웃
     def draw_escpe_dialog_layout(self, screen):
@@ -173,10 +144,21 @@ class PlayScreen:
 
         self.player_list = []
         for idx, player in enumerate(players):
+            # 배경
             player_layout = pygame.draw.rect(screen, COLOR_PLAYER, (self.players_layout.left + get_small_margin(), get_small_margin() + (player_height + get_small_margin()) * idx, self.players_layout.width - get_small_margin() * 2, player_height))
+            
+            # 선택된 플레이어 스트로크
+            if self.players_select_enabled and idx == self.players_selected_index:
+                # 투명 색상 적용
+                surface = pygame.Surface((self.players_layout.width - get_small_margin() * 2, player_height), pygame.SRCALPHA)
+                surface.fill(COLOR_TRANSPARENT_WHITE)
+                screen.blit(surface, (self.players_layout.left + get_small_margin(), get_small_margin() + (player_height + get_small_margin()) * idx))
+
             # 현재 플레이어 스트로크
             if idx == self.current_player_index:
                 pygame.draw.rect(screen, COLOR_RED, (self.players_layout.left + get_small_margin(), get_small_margin() + (player_height + get_small_margin()) * idx, self.players_layout.width - get_small_margin() * 2, player_height), 2)
+
+            # 카드
             self.draw_cards(screen, player_layout, player.cards)
             
     # 카드
@@ -191,3 +173,52 @@ class PlayScreen:
         txt_card_cnt = get_small_font().render(str(len(cards)), True, COLOR_BLACK)
         txt_card_cnt_rect = txt_card_cnt.get_rect().topleft = (player_layout.left + get_extra_small_margin(), player_layout.bottom - get_card_height() - txt_card_cnt.get_height() - get_extra_small_margin())
         screen.blit(txt_card_cnt, txt_card_cnt_rect)
+
+    # 이벤트 처리 함수
+    def process_events(self, events):
+        for event in events:
+            if event.type == pygame.KEYDOWN:
+                self.process_key_event(event.key)
+
+            elif event.type == pygame.MOUSEBUTTONUP:
+                self.process_click_event(pygame.mouse.get_pos())
+
+    # 키보드 입력 이벤트 처리
+    def process_key_event(self, key):
+        if key == pygame.K_ESCAPE:
+            self.toggle_escape_dialog()
+
+        if self.escape_dialog_enabled:
+            self.run_esacpe_key_event(key)
+
+        elif self.players_select_enabled:
+            self.run_players_select_key_event(key)
+
+    # 일시정지 메뉴 키 이벤트
+    def run_esacpe_key_event(self, key):
+        if key == pygame.K_UP:
+            self.escape_menu_index = (self.escape_menu_index - 1) % len(self.esacpe_menus)
+        elif key == pygame.K_DOWN:
+            self.escape_menu_index = (self.escape_menu_index + 1) % len(self.esacpe_menus)
+        elif key == pygame.K_RETURN:
+            self.esacpe_menus[self.escape_menu_index]['action']()
+
+    # 플레이어 선택 키 이벤트
+    def run_players_select_key_event(self, key):
+        if key == pygame.K_UP:
+            self.players_selected_index = (self.players_selected_index - 1) % len(self.players)
+        elif key == pygame.K_DOWN:
+            self.players_selected_index = (self.players_selected_index + 1) % len(self.players)
+        elif key == pygame.K_RETURN:
+            pass # TODO: 확인
+
+    # 클릭 이벤트
+    def process_click_event(self, pos):
+        if self.escape_dialog_enabled:
+            self.run_esacpe_click_event(pos)
+
+    # 일시정지 메뉴 클릭 이벤트
+    def run_esacpe_click_event(self, pos):
+        for menu in self.esacpe_menus:
+            if menu['rect'] and menu['rect'].collidepoint(pos):
+                menu['action']()
