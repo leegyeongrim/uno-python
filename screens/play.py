@@ -1,20 +1,34 @@
 from util.globals import *
 from player import Player
+import time
+
+
 class PlayScreen:
 
     def __init__(self, controller):
         self.ctr = controller
+        
+        self.start_time = time.time() # 게임 시작 시간
+
+        # 턴 시간 (초단위)
+        self.turn_time = 3
+
+        self.init_game()
 
         self.init_my_cards_layout(self.ctr.screen)
         self.init_board_layout(self.ctr.screen)
         self.init_players_layout(self.ctr.screen)
         self.init_escape_dialog(self.ctr.screen)
 
+    # 게임 시작 시 초기화 필요한 변수
+    def init_game(self):
+        self.turn_start_time = time.time()
+
     # 나의 카드 레이아웃 초기화
     def init_my_cards_layout(self, screen):
         self.my_cards_layout_height = screen.get_height() // 3
 
-        self.my_cards_select_enabled = True # 카드 선택 가능 상태
+        self.my_cards_select_enabled = False # 카드 선택 가능 상태
         self.my_cards_selected_index = 0
         self.cards_line_size = 0 # 한 줄 당 카드 개수
 
@@ -68,6 +82,7 @@ class PlayScreen:
     # 모든 View
     def draw(self, screen):
         screen.fill(COLOR_WHITE)
+        self.check_turn()
 
         self.draw_board_layout(screen)
         self.draw_my_cards_layout(screen, self.players[self.my_player_index])
@@ -76,6 +91,15 @@ class PlayScreen:
 
         if self.escape_dialog_enabled:
             self.draw_escpe_dialog_layout(screen)
+
+    def check_turn(self):
+        if (time.time() - self.turn_start_time) > self.turn_time:
+            self.current_player_index = (self.current_player_index + 1) % len(self.players)
+            self.turn_start_time = time.time()
+        self.check_my_turn()
+
+    def check_my_turn(self):
+        self.my_cards_select_enabled = self.my_player_index == self.current_player_index
 
     # 일시정지 다이얼로그 레이아웃
     def draw_escpe_dialog_layout(self, screen):

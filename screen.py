@@ -15,6 +15,9 @@ class ScreenController:
         pygame.display.set_caption("Uno Game")
         pygame.mouse.set_visible(False)
 
+        self.clock = pygame.time.Clock()
+        self.fps = 30
+
         self.screen_type = TYPE_START
         self.running = True
 
@@ -39,6 +42,8 @@ class ScreenController:
     # 화면 시작
     def run(self):
         while self.running:
+            self.dt = self.clock.tick(self.fps)
+
             self.display_screen()
             self.process_events()
             pygame.display.update()
