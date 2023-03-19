@@ -28,6 +28,7 @@ class PlayScreen:
         self.players_select_enabled = True
 
         self.players_layout_width = 200
+        self.player_layout_height = (screen.get_height() - get_small_margin() * 6) // 5
 
     # 일시정지 다이얼로그 초기화
     def init_escape_dialog(self, screen):
@@ -139,27 +140,30 @@ class PlayScreen:
 
     # 플레이어
     def draw_player(self, screen, players):
-        
-        player_height = (screen.get_height() - get_small_margin() * 6) // 5
 
         self.player_list = []
+        temp_player_list = []
+
         for idx, player in enumerate(players):
             # 배경
-            player_layout = pygame.draw.rect(screen, COLOR_PLAYER, (self.players_layout.left + get_small_margin(), get_small_margin() + (player_height + get_small_margin()) * idx, self.players_layout.width - get_small_margin() * 2, player_height))
-            
+            player_layout = pygame.draw.rect(screen, COLOR_PLAYER, (self.players_layout.left + get_small_margin(), get_small_margin() + (self.player_layout_height + get_small_margin()) * idx, self.players_layout.width - get_small_margin() * 2, self.player_layout_height))
+            temp_player_list.append(player_layout)
+
             # 선택된 플레이어 스트로크
             if self.players_select_enabled and idx == self.players_selected_index:
                 # 투명 색상 적용
-                surface = pygame.Surface((self.players_layout.width - get_small_margin() * 2, player_height), pygame.SRCALPHA)
+                surface = pygame.Surface((self.players_layout.width - get_small_margin() * 2, self.player_layout_height), pygame.SRCALPHA)
                 surface.fill(COLOR_TRANSPARENT_WHITE)
-                screen.blit(surface, (self.players_layout.left + get_small_margin(), get_small_margin() + (player_height + get_small_margin()) * idx))
+                screen.blit(surface, (self.players_layout.left + get_small_margin(), get_small_margin() + (self.player_layout_height + get_small_margin()) * idx))
 
             # 현재 플레이어 스트로크
             if idx == self.current_player_index:
-                pygame.draw.rect(screen, COLOR_RED, (self.players_layout.left + get_small_margin(), get_small_margin() + (player_height + get_small_margin()) * idx, self.players_layout.width - get_small_margin() * 2, player_height), 2)
+                pygame.draw.rect(screen, COLOR_RED, (self.players_layout.left + get_small_margin(), get_small_margin() + (self.player_layout_height + get_small_margin()) * idx, self.players_layout.width - get_small_margin() * 2, self.player_layout_height), 2)
 
             # 카드
             self.draw_cards(screen, player_layout, player.cards)
+
+        self.player_list = temp_player_list
             
     # 카드
     def draw_cards(self, screen, player_layout, cards):
@@ -210,15 +214,28 @@ class PlayScreen:
         elif key == pygame.K_DOWN:
             self.players_selected_index = (self.players_selected_index + 1) % len(self.players)
         elif key == pygame.K_RETURN:
-            pass # TODO: 확인
+            self.on_player_selected(self.players_selected_index)
 
     # 클릭 이벤트
     def process_click_event(self, pos):
         if self.escape_dialog_enabled:
             self.run_esacpe_click_event(pos)
+        
+        elif self.players_select_enabled:
+            self.run_players_select_click_evnet(pos)
 
     # 일시정지 메뉴 클릭 이벤트
     def run_esacpe_click_event(self, pos):
         for menu in self.esacpe_menus:
             if menu['rect'] and menu['rect'].collidepoint(pos):
                 menu['action']()
+
+    # 플레이어 선택 클릭 이벤트
+    def run_players_select_click_evnet(self, pos):
+        for idx, player in enumerate(self.player_list):
+            if player.collidepoint(pos):
+                self.on_player_selected(idx)
+
+    # 플레이어 선택 종류 분기
+    def on_player_selected(self, idx):
+        print(f"{idx}번 플레이어 선택")
