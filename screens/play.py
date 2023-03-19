@@ -21,7 +21,7 @@ class PlayScreen:
     # 플레이어 레이아웃 초기화
     def init_players_layout(self, screen):
 
-        self.players = [Player([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 ,13, 14]), Player([1, 2, 3]), Player([1, 2, 3, 2, 3, 2, 3]), Player([1]), Player([1, 2, 3, 2, 3, 2, 3])]
+        self.players = [Player([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 ,13, 14, 15, 16, 17, 18]), Player([1, 2, 3]), Player([1, 2, 3, 2, 3, 2, 3]), Player([1]), Player([1, 2, 3, 2, 3, 2, 3])]
         self.my_player_index = 0 # TODO: 나의 플레이어 인덱스
 
         self.current_player_index = 0 # TODO: 게임에서 받아와야 함
@@ -144,15 +144,30 @@ class PlayScreen:
 
     # 나의 카드
     def draw_my_cards(self, screen, cards):
+        card_percent = 1.5
+
+        # 카드 시작 좌표
+        start_x, start_y = get_extra_small_margin(), screen.get_height() - get_card_height() * card_percent - get_extra_small_margin()
+        temp_idx = 0
+
         for idx, card in enumerate(cards):
             card_layout = pygame.image.load('./resource/card_back.png')
-            card_layout = pygame.transform.scale(card_layout, (get_card_width() * 2, get_card_height() * 2))
-            card_rect = card_layout.get_rect().topleft = (get_extra_small_margin() + (card_layout.get_width() // 1.5) * idx, screen.get_height() - card_layout.get_height() - get_extra_small_margin())
+            card_layout = pygame.transform.scale(card_layout, (get_card_width() * card_percent, get_card_height() * card_percent))
+
+            # 카드가 보드 넘어가는 경우 위로 쌓음
+            if start_x + (card_layout.get_width() // card_percent) * (idx - temp_idx) + card_layout.get_width() >= self.board_layout.width:
+                start_y -= card_layout.get_height() + get_extra_small_margin()
+                temp_idx = idx
+
+            # 카드 시작 위치
+            card_start = start_x + (card_layout.get_width() // card_percent) * (idx - temp_idx)
+
+            card_rect = card_layout.get_rect().topleft = (card_start, start_y)
             temp = screen.blit(card_layout, card_rect)
 
-        # 카드 개수 표시 (45 변수로 설정해야 함)
-        txt_card_cnt = get_small_font().render(str(len(cards)), True, COLOR_BLACK)
-        txt_card_cnt_rect = txt_card_cnt.get_rect().topleft = (get_extra_small_margin(), screen.get_height() - card_layout.get_height() - txt_card_cnt.get_height() - get_extra_small_margin())
+        # 카드 개수 표시
+        txt_card_cnt = get_medium_font().render(str(len(cards)), True, COLOR_BLACK)
+        txt_card_cnt_rect = txt_card_cnt.get_rect().topleft = self.my_cards_layout.topleft
         screen.blit(txt_card_cnt, txt_card_cnt_rect)
 
     # 플레이어 목록 레이아웃
