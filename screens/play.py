@@ -126,7 +126,7 @@ class PlayScreen:
     def draw_uno_btn(self, screen):
         uno_btn = pygame.image.load('./resource/uno_btn.png')
         uno_btn = pygame.transform.scale(uno_btn, (get_uno_width(), get_uno_height()))
-        uno_btn_rect = get_center_rect(uno_btn, self.board_layout, y = (self.current_card_layout.height + uno_btn.get_height()) // 2 + get_medium_margin())
+        uno_btn_rect = get_center_rect(uno_btn, self.board_layout, y = self.board_layout.width // 4 - 10)
         self.uno_btn = screen.blit(uno_btn, uno_btn_rect)
 
     # 나의 카드 레이아웃
