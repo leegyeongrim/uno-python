@@ -12,7 +12,7 @@ class PlayScreen:
 
     # 나의 카드 레이아웃 초기화
     def init_my_cards_layout(self, screen):
-        self.my_cards_layout_height = screen.get_height() // 5
+        self.my_cards_layout_height = screen.get_height() // 3
 
     # 보드 레이아웃 초기화
     def init_board_layout(self, screen):
@@ -21,9 +21,10 @@ class PlayScreen:
     # 플레이어 레이아웃 초기화
     def init_players_layout(self, screen):
 
-        self.players = [Player([1, 2, 3, 4, 5]), Player([1, 2, 3]), Player([1, 2, 3, 2, 3, 2, 3]), Player([1]), Player([1, 2, 3, 2, 3, 2, 3])]
+        self.players = [Player([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 ,13, 14]), Player([1, 2, 3]), Player([1, 2, 3, 2, 3, 2, 3]), Player([1]), Player([1, 2, 3, 2, 3, 2, 3])]
+        self.my_player_index = 0 # TODO: 나의 플레이어 인덱스
 
-        self.current_player_index = 2 # TODO: 게임에서 받아와야 함
+        self.current_player_index = 0 # TODO: 게임에서 받아와야 함
         self.players_selected_index = 0
         self.players_select_enabled = True
 
@@ -65,7 +66,7 @@ class PlayScreen:
         screen.fill(COLOR_WHITE)
 
         self.draw_board_layout(screen)
-        self.draw_my_cards_layout(screen)
+        self.draw_my_cards_layout(screen, self.players[self.my_player_index])
 
         self.draw_players_layout(screen, self.players)
 
@@ -130,8 +131,29 @@ class PlayScreen:
         self.uno_btn = screen.blit(uno_btn, uno_btn_rect)
 
     # 나의 카드 레이아웃
-    def draw_my_cards_layout(self, screen):
+    def draw_my_cards_layout(self, screen, player):
+        # 배경
         self.my_cards_layout = pygame.draw.rect(screen, COLOR_PLAYER, (0, self.board_layout.bottom, self.board_layout.right, self.my_cards_layout_height))
+
+        # 나의 차례 스트로크
+        if self.my_player_index == self.current_player_index:
+            pygame.draw.rect(screen, COLOR_RED, (0, self.board_layout.bottom, self.board_layout.right, self.my_cards_layout_height), 2)
+
+        # 나의 카드
+        self.draw_my_cards(screen, player.cards)
+
+    # 나의 카드
+    def draw_my_cards(self, screen, cards):
+        for idx, card in enumerate(cards):
+            card_layout = pygame.image.load('./resource/card_back.png')
+            card_layout = pygame.transform.scale(card_layout, (get_card_width() * 2, get_card_height() * 2))
+            card_rect = card_layout.get_rect().topleft = (get_extra_small_margin() + (card_layout.get_width() // 1.5) * idx, screen.get_height() - card_layout.get_height() - get_extra_small_margin())
+            temp = screen.blit(card_layout, card_rect)
+
+        # 카드 개수 표시 (45 변수로 설정해야 함)
+        txt_card_cnt = get_small_font().render(str(len(cards)), True, COLOR_BLACK)
+        txt_card_cnt_rect = txt_card_cnt.get_rect().topleft = (get_extra_small_margin(), screen.get_height() - card_layout.get_height() - txt_card_cnt.get_height() - get_extra_small_margin())
+        screen.blit(txt_card_cnt, txt_card_cnt_rect)
 
     # 플레이어 목록 레이아웃
     def draw_players_layout(self, screen, players):
