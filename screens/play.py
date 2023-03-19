@@ -14,6 +14,9 @@ class PlayScreen:
     def init_my_cards_layout(self, screen):
         self.my_cards_layout_height = screen.get_height() // 3
 
+        self.my_cards_select_enabled = True # 카드 선택 가능 상태
+        self.my_cards_selected_index = 0
+
     # 보드 레이아웃 초기화
     def init_board_layout(self, screen):
         self.board_layout_height = screen.get_height() - self.my_cards_layout_height
@@ -26,7 +29,7 @@ class PlayScreen:
 
         self.current_player_index = 0 # TODO: 게임에서 받아와야 함
         self.players_selected_index = 0
-        self.players_select_enabled = True
+        self.players_select_enabled = False # 플레이어 선택 가능 상태
 
         self.players_layout_width = 200
         self.player_layout_height = (screen.get_height() - get_small_margin() * 6) // 5
@@ -144,26 +147,43 @@ class PlayScreen:
 
     # 나의 카드
     def draw_my_cards(self, screen, cards):
-        card_percent = 1.5
+
+        # 카드 레이아웃 (충돌 감지 목적)
+        self.card_list = []
+        temp_card_list = []
+
+        card_percent = 1.5 # 카드 배율
+        card_overlap_percent = 1 
 
         # 카드 시작 좌표
         start_x, start_y = get_extra_small_margin(), screen.get_height() - get_card_height() * card_percent - get_extra_small_margin()
         temp_idx = 0
 
         for idx, card in enumerate(cards):
-            card_layout = pygame.image.load('./resource/card_back.png')
-            card_layout = pygame.transform.scale(card_layout, (get_card_width() * card_percent, get_card_height() * card_percent))
+            card_image = pygame.image.load('./resource/card_back.png')
+            card_image = pygame.transform.scale(card_image, (get_card_width() * card_percent, get_card_height() * card_percent))
 
             # 카드가 보드 넘어가는 경우 위로 쌓음
-            if start_x + (card_layout.get_width() // card_percent) * (idx - temp_idx) + card_layout.get_width() >= self.board_layout.width:
-                start_y -= card_layout.get_height() + get_extra_small_margin()
+            if start_x + (card_image.get_width() // card_overlap_percent + get_extra_small_margin()) * (idx - temp_idx) + card_image.get_width() >= self.board_layout.width:
+                start_y -= card_image.get_height() + get_extra_small_margin()
                 temp_idx = idx
 
             # 카드 시작 위치
-            card_start = start_x + (card_layout.get_width() // card_percent) * (idx - temp_idx)
+            card_start = start_x + (card_image.get_width() // card_overlap_percent + get_extra_small_margin()) * (idx - temp_idx)
 
-            card_rect = card_layout.get_rect().topleft = (card_start, start_y)
-            temp = screen.blit(card_layout, card_rect)
+            card_rect = card_image.get_rect().topleft = (card_start, start_y)
+            card_layout = screen.blit(card_image, card_rect)
+            temp_card_list.append(card_layout)
+
+            # 선택된 카드 하이라이트
+            if self.my_cards_select_enabled and idx == self.my_cards_selected_index:
+                # 투명 색상 적용
+                surface = pygame.Surface((card_layout.width, card_layout.height), pygame.SRCALPHA)
+                surface.fill(COLOR_TRANSPARENT_WHITE)
+                screen.blit(surface, (card_layout.left, card_layout.top))
+
+        self.card_list = temp_card_list
+
 
         # 카드 개수 표시
         txt_card_cnt = get_medium_font().render(str(len(cards)), True, COLOR_BLACK)
@@ -186,7 +206,7 @@ class PlayScreen:
             player_layout = pygame.draw.rect(screen, COLOR_PLAYER, (self.players_layout.left + get_small_margin(), get_small_margin() + (self.player_layout_height + get_small_margin()) * idx, self.players_layout.width - get_small_margin() * 2, self.player_layout_height))
             temp_player_list.append(player_layout)
 
-            # 선택된 플레이어 스트로크
+            # 선택된 플레이어 하이라이트
             if self.players_select_enabled and idx == self.players_selected_index:
                 # 투명 색상 적용
                 surface = pygame.Surface((self.players_layout.width - get_small_margin() * 2, self.player_layout_height), pygame.SRCALPHA)
@@ -229,9 +249,15 @@ class PlayScreen:
         if key == pygame.K_ESCAPE:
             self.toggle_escape_dialog()
 
+        # 일시정지
         if self.escape_dialog_enabled:
             self.run_esacpe_key_event(key)
+        
+        # 카드 선택
+        elif self.my_cards_select_enabled:
+            self.run_my_cards_select_key_event(key)
 
+        # 플레이어 선택
         elif self.players_select_enabled:
             self.run_players_select_key_event(key)
 
@@ -253,13 +279,25 @@ class PlayScreen:
         elif key == pygame.K_RETURN:
             self.on_player_selected(self.players_selected_index)
 
+    # 카드 선택 키 이벤트
+    def run_my_cards_select_key_event(self, key):
+        if key == pygame.K_LEFT:
+            self.my_cards_selected_index = (self.my_cards_selected_index - 1) % len(self.players[self.my_player_index].cards)
+        elif key == pygame.K_RIGHT:
+            self.my_cards_selected_index = (self.my_cards_selected_index + 1) % len(self.players[self.my_player_index].cards)
+        elif key == pygame.K_RETURN:
+            self.on_card_selected(self.my_cards_selected_index)
+
     # 클릭 이벤트
     def process_click_event(self, pos):
         if self.escape_dialog_enabled:
             self.run_esacpe_click_event(pos)
+
+        elif self.my_cards_select_enabled:
+            self.run_cards_select_click_event(pos)
         
         elif self.players_select_enabled:
-            self.run_players_select_click_evnet(pos)
+            self.run_players_select_click_event(pos)
 
     # 일시정지 메뉴 클릭 이벤트
     def run_esacpe_click_event(self, pos):
@@ -268,11 +306,20 @@ class PlayScreen:
                 menu['action']()
 
     # 플레이어 선택 클릭 이벤트
-    def run_players_select_click_evnet(self, pos):
+    def run_players_select_click_event(self, pos):
         for idx, player in enumerate(self.player_list):
             if player.collidepoint(pos):
                 self.on_player_selected(idx)
 
+    # 카드 선택 클릭 이벤트
+    def run_cards_select_click_event(self, pos):
+        for idx, card in enumerate(self.card_list):
+            if card.collidepoint(pos):
+                self.on_card_selected(idx)
+
     # 플레이어 선택 종류 분기
     def on_player_selected(self, idx):
         print(f"{idx}번 플레이어 선택")
+
+    def on_card_selected(self, idx):
+        print(f"{idx}번 카드 선택")
