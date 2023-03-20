@@ -13,6 +13,11 @@ class PlayScreen:
         # 턴 시간 (초단위)
         self.turn_time = 15
 
+        self.animate_speed = (0, 0)
+        self.animate_view = None
+        self.animate_view_rect = None
+        self.animate_deck_to_player_enabled = False
+
         self.init_game()
 
         self.init_my_cards_layout(self.ctr.screen)
@@ -40,7 +45,7 @@ class PlayScreen:
     # 플레이어 레이아웃 초기화
     def init_players_layout(self, screen):
 
-        self.players = [Player([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 ,13, 14, 15, 16, 17, 18]), Player([1, 2, 3]), Player([1, 2, 3, 2, 3, 2, 3]), Player([1]), Player([1, 2, 3, 2, 3, 2, 3])]
+        self.players = [Player([1, 2, 13, 14, 15, 16, 17, 18, 1, 1, 1]), Player([1, 2, 3]), Player([1, 2, 3, 2, 3, 2, 3]), Player([1]), Player([1, 2, 3, 2, 3, 2, 3])]
         self.my_player_index = 0 # TODO: 나의 플레이어 인덱스
 
         self.current_player_index = 0 # TODO: 게임에서 받아와야 함
@@ -89,6 +94,9 @@ class PlayScreen:
         self.draw_my_cards_layout(screen, self.players[self.my_player_index])
 
         self.draw_players_layout(screen, self.players)
+
+        if self.animate_deck_to_player_enabled:
+            self.animate_deck_to_player(screen)
 
         if self.escape_dialog_enabled:
             self.draw_escpe_dialog_layout(screen)
@@ -202,7 +210,7 @@ class PlayScreen:
         card_overlap_percent = 1 
 
         # 카드 시작 좌표
-        start_x, start_y = get_extra_small_margin(), screen.get_height() - get_card_height() * card_percent - get_extra_small_margin()
+        card_start_x, self.next_card_start_y = get_extra_small_margin(), screen.get_height() - get_card_height() * card_percent - get_extra_small_margin()
         temp_idx = 0
 
         for idx, card in enumerate(cards):
@@ -210,8 +218,8 @@ class PlayScreen:
             card_image = pygame.transform.scale(card_image, (get_card_width() * card_percent, get_card_height() * card_percent))
 
             # 카드가 보드 넘어가는 경우 위로 쌓음
-            if start_x + (card_image.get_width() // card_overlap_percent + get_extra_small_margin()) * (idx - temp_idx) + card_image.get_width() >= self.board_layout.width:
-                start_y -= card_image.get_height() + get_extra_small_margin()
+            if card_start_x + (card_image.get_width() // card_overlap_percent + get_extra_small_margin()) * (idx - temp_idx) + card_image.get_width() >= self.board_layout.width:
+                self.next_card_start_y -= card_image.get_height() + get_extra_small_margin()
 
                 if temp_idx == 0:
                     self.cards_line_size = idx
@@ -220,9 +228,9 @@ class PlayScreen:
         
 
             # 카드 시작 위치
-            card_start = start_x + (card_image.get_width() // card_overlap_percent + get_extra_small_margin()) * (idx - temp_idx)
+            self.next_card_start_x = card_start_x + (card_image.get_width() // card_overlap_percent + get_extra_small_margin()) * (idx - temp_idx)
 
-            card_rect = card_image.get_rect().topleft = (card_start, start_y)
+            card_rect = card_image.get_rect().topleft = (self.next_card_start_x, self.next_card_start_y)
             card_layout = screen.blit(card_image, card_rect)
             temp_card_list.append(card_layout)
 
@@ -249,13 +257,13 @@ class PlayScreen:
     # 플레이어
     def draw_player(self, screen, players):
 
-        self.player_list = []
-        temp_player_list = []
+        self.player_layout_list = []
+        temp_player_layout_list = []
 
         for idx, player in enumerate(players):
             # 배경
             player_layout = pygame.draw.rect(screen, COLOR_PLAYER, (self.players_layout.left + get_small_margin(), get_small_margin() + (self.player_layout_height + get_small_margin()) * idx, self.players_layout.width - get_small_margin() * 2, self.player_layout_height))
-            temp_player_list.append(player_layout)
+            temp_player_layout_list.append(player_layout)
 
             # 선택된 플레이어 하이라이트
             if self.players_select_enabled and idx == self.players_selected_index:
@@ -272,7 +280,7 @@ class PlayScreen:
             # 카드
             self.draw_cards(screen, player_layout, player.cards)
 
-        self.player_list = temp_player_list
+        self.player_layout_list = temp_player_layout_list
 
     # 플레이어 상단 타이머 표시
     def draw_player_timer(self, screen, parent):
@@ -390,7 +398,7 @@ class PlayScreen:
 
     # 플레이어 선택 클릭 이벤트
     def run_players_select_click_event(self, pos):
-        for idx, player in enumerate(self.player_list):
+        for idx, player in enumerate(self.player_layout_list):
             if player.collidepoint(pos):
                 self.on_player_selected(idx)
 
@@ -414,4 +422,46 @@ class PlayScreen:
 
     # 덱 선택
     def on_deck_selected(self):
-        print(f"덱 선택")
+        self.animate_deck_to_player_enabled = True
+
+        self.animate_view = pygame.image.load('./resource/card_back.png') # TODO: 카드 수정
+        self.animate_view = pygame.transform.scale(self.animate_view, (get_card_width() * MY_BOARD_CARD_PERCENT, get_card_height() * MY_BOARD_CARD_PERCENT))
+
+        self.animate_view_rect = get_center_rect(self.animate_view, self.board_layout, -self.animate_view.get_width() // MY_BOARD_CARD_PERCENT - get_medium_margin())
+
+        start_x, start_y = self.animate_view_rect.topleft
+
+        self.animate_destination_x, self.animate_destination_y = self.next_card_start_x, self.next_card_start_y
+        if self.next_card_start_x + (get_card_width(MY_BOARD_CARD_PERCENT) // 1 + get_extra_small_margin()) + get_card_width(MY_BOARD_CARD_PERCENT) >= self.board_layout.width:
+            self.animate_destination_y -= get_card_height(MY_BOARD_CARD_PERCENT) + get_extra_small_margin()
+            self.animate_destination_x = get_small_margin()
+        else:
+            self.animate_destination_x = self.next_card_start_x + (get_card_width(MY_BOARD_CARD_PERCENT) // 1 + get_extra_small_margin())
+        
+        distance_x = self.animate_destination_x - start_x
+        distance_y = self.animate_destination_y - start_y
+
+
+        distance = ((distance_x ** 2) + (distance_y ** 2)) ** 0.5
+        self.speed = 15
+        self.direction_x = distance_x / distance
+        self.direction_y = distance_y / distance
+
+    def animate_deck_to_player(self, screen):
+        
+        remaining_distance_x = self.animate_destination_x - self.animate_view_rect.x
+        remaining_distance_y = self.animate_destination_y - self.animate_view_rect.y
+        remaining_distance = ((remaining_distance_x ** 2) + (remaining_distance_y ** 2)) ** 0.5
+        print(remaining_distance)
+        if remaining_distance < self.speed * 3:
+            self.animate_view_rect.x = self.animate_destination_x
+            self.animate_view_rect.y = self.animate_destination_y
+            print("테스트")
+        else:
+            self.animate_view_rect.x += self.speed * self.direction_x
+            self.animate_view_rect.y += self.speed * self.direction_y
+
+        screen.blit(self.animate_view, self.animate_view_rect)
+
+        if self.animate_view_rect.x == self.animate_destination_x and self.animate_view_rect.y == self.animate_destination_y:
+            self.animate_deck_to_player_enabled = False
