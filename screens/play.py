@@ -456,12 +456,13 @@ class PlayScreen:
         if remaining_distance < self.speed * 3:
             self.animate_view_rect.x = self.animate_destination_x
             self.animate_view_rect.y = self.animate_destination_y
-            print("테스트")
+            
+            # 카드 1장 추가 TODO: 덱에서 1장 가져와야 함
+            self.players[self.my_player_index].cards.append(1)
+            # 애니메이션 종료
+            self.animate_deck_to_player_enabled = False
         else:
             self.animate_view_rect.x += self.speed * self.direction_x
             self.animate_view_rect.y += self.speed * self.direction_y
 
         screen.blit(self.animate_view, self.animate_view_rect)
-
-        if self.animate_view_rect.x == self.animate_destination_x and self.animate_view_rect.y == self.animate_destination_y:
-            self.animate_deck_to_player_enabled = False
