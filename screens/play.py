@@ -11,7 +11,7 @@ class PlayScreen:
         self.start_time = time.time() # 게임 시작 시간
 
         # 턴 시간 (초단위)
-        self.turn_time = 3
+        self.turn_time = 5
 
         self.init_game()
 
@@ -163,12 +163,19 @@ class PlayScreen:
         # 배경
         self.my_cards_layout = pygame.draw.rect(screen, COLOR_PLAYER, (0, self.board_layout.bottom, self.board_layout.right, self.my_cards_layout_height))
 
-        # 나의 차례 스트로크
-        if self.my_player_index == self.current_player_index:
-            pygame.draw.rect(screen, COLOR_RED, (0, self.board_layout.bottom, self.board_layout.right, self.my_cards_layout_height), 2)
-
         # 나의 카드
         self.draw_my_cards(screen, player.cards)
+
+        # 나의 차례 스트로크
+        if self.my_player_index == self.current_player_index:
+            self.draw_my_board_timer(screen)
+            pygame.draw.rect(screen, COLOR_RED, (0, self.board_layout.bottom, self.board_layout.right, self.my_cards_layout_height), 2)
+
+    # 나의 보드 위 타이머 표시
+    def draw_my_board_timer(self, screen):
+        timer_text = get_medium_font().render(str(int(self.turn_time + 1 - (time.time() - self.turn_start_time))), True, COLOR_RED)
+        timer_rect = timer_text.get_rect().topleft = (self.my_cards_layout.right - timer_text.get_width() - get_small_margin(), self.my_cards_layout.top)
+        screen.blit(timer_text, timer_rect)
 
     # 나의 카드
     def draw_my_cards(self, screen, cards):
@@ -251,6 +258,10 @@ class PlayScreen:
             self.draw_cards(screen, player_layout, player.cards)
 
         self.player_list = temp_player_list
+
+    # 플레이어 상단 타이머 표시
+    def draw_player_timer(self, screen):
+        pass
             
     # 카드
     def draw_cards(self, screen, player_layout, cards):
