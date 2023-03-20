@@ -83,7 +83,7 @@ class PlayScreen:
     # 모든 View
     def draw(self, screen):
         screen.fill(COLOR_WHITE)
-        self.check_turn()
+        self.check_time()
 
         self.draw_board_layout(screen)
         self.draw_my_cards_layout(screen, self.players[self.my_player_index])
@@ -93,10 +93,16 @@ class PlayScreen:
         if self.escape_dialog_enabled:
             self.draw_escpe_dialog_layout(screen)
 
-    def check_turn(self):
-        if (time.time() - self.turn_start_time) > self.turn_time:
+    def check_time(self):
+        if self.escape_dialog_enabled:
+            current_time = time.time()
+            self.turn_start_time = self.turn_start_time + (current_time - self.pause_temp_time)
+            self.pause_temp_time = current_time
+            
+        elif (time.time() - self.turn_start_time) > self.turn_time:
             self.current_player_index = (self.current_player_index + 1) % len(self.players)
             self.turn_start_time = time.time()
+        
         self.check_my_turn()
 
     def check_my_turn(self):
@@ -304,6 +310,10 @@ class PlayScreen:
     def process_key_event(self, key):
         if key == pygame.K_ESCAPE:
             self.toggle_escape_dialog()
+
+            # 일시정지 시간 처리
+            if self.escape_dialog_enabled:
+                self.pause_temp_time = time.time() 
 
         # 일시정지
         if self.escape_dialog_enabled:
