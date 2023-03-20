@@ -11,7 +11,7 @@ class PlayScreen:
         self.start_time = time.time() # 게임 시작 시간
 
         # 턴 시간 (초단위)
-        self.turn_time = 5
+        self.turn_time = 15
 
         self.init_game()
 
@@ -34,6 +34,7 @@ class PlayScreen:
 
     # 보드 레이아웃 초기화
     def init_board_layout(self, screen):
+        self.deck_select_enabled = False
         self.board_layout_height = screen.get_height() - self.my_cards_layout_height
 
     # 플레이어 레이아웃 초기화
@@ -144,6 +145,13 @@ class PlayScreen:
         deck_layout_rect = get_center_rect(deck_layout, self.board_layout, -deck_layout.get_width() // 2 - get_medium_margin())
         self.deck_layout = screen.blit(deck_layout, deck_layout_rect)
 
+        # 덱 선택 하이라이트
+        if self.my_cards_select_enabled and self.deck_select_enabled:
+            surface = pygame.Surface((get_card_width() * 2, get_card_height() * 2), pygame.SRCALPHA)
+            surface.fill(COLOR_TRANSPARENT_WHITE)
+            screen.blit(surface, deck_layout_rect.topleft)
+
+
     # 현재 카드 레이아웃
     def draw_current_card(self, screen):
         current_card_layout = pygame.image.load('./resource/card_back.png')
@@ -213,7 +221,7 @@ class PlayScreen:
             temp_card_list.append(card_layout)
 
             # 선택된 카드 하이라이트
-            if self.my_cards_select_enabled and idx == self.my_cards_selected_index:
+            if self.my_cards_select_enabled and not self.deck_select_enabled and idx == self.my_cards_selected_index:
                 # 투명 색상 적용
                 surface = pygame.Surface((card_layout.width, card_layout.height), pygame.SRCALPHA)
                 surface.fill(COLOR_TRANSPARENT_WHITE)
@@ -330,17 +338,28 @@ class PlayScreen:
     # 카드 선택 키 이벤트
     def run_my_cards_select_key_event(self, key):
         if key == pygame.K_LEFT:
-            self.my_cards_selected_index = (self.my_cards_selected_index - 1) % len(self.players[self.my_player_index].cards)
+            if not self.deck_select_enabled:
+                self.my_cards_selected_index = (self.my_cards_selected_index - 1) % len(self.players[self.my_player_index].cards)
         elif key == pygame.K_RIGHT:
-            self.my_cards_selected_index = (self.my_cards_selected_index + 1) % len(self.players[self.my_player_index].cards)
+            if not self.deck_select_enabled:
+                self.my_cards_selected_index = (self.my_cards_selected_index + 1) % len(self.players[self.my_player_index].cards)
         elif key == pygame.K_UP:
             if self.cards_line_size != 0 and self.my_cards_selected_index + self.cards_line_size < len(self.players[self.my_player_index].cards):
                 self.my_cards_selected_index = self.my_cards_selected_index + self.cards_line_size
+            else: # 덱 선택
+                self.deck_select_enabled = True
         elif key == pygame.K_DOWN:
-            if self.cards_line_size != 0 and self.my_cards_selected_index - self.cards_line_size >= 0:
+            # 다시 카드 선택으로 돌아옴
+            if self.deck_select_enabled:
+                self.deck_select_enabled = False
+            
+            elif self.cards_line_size != 0 and self.my_cards_selected_index - self.cards_line_size >= 0:
                 self.my_cards_selected_index = self.my_cards_selected_index - self.cards_line_size
         elif key == pygame.K_RETURN:
-            self.on_card_selected(self.my_cards_selected_index)
+            if self.deck_select_enabled:
+                self.on_deck_selected()
+            else:
+                self.on_card_selected(self.my_cards_selected_index)
 
     # 클릭 이벤트
     def process_click_event(self, pos):
@@ -367,6 +386,10 @@ class PlayScreen:
 
     # 카드 선택 클릭 이벤트
     def run_cards_select_click_event(self, pos):
+        
+        if self.deck_layout.collidepoint(pos):
+            self.on_deck_selected()
+
         for idx, card in enumerate(self.card_list):
             if card.collidepoint(pos):
                 self.on_card_selected(idx)
@@ -375,5 +398,10 @@ class PlayScreen:
     def on_player_selected(self, idx):
         print(f"{idx}번 플레이어 선택")
 
+    # 카드 선택 분기
     def on_card_selected(self, idx):
         print(f"{idx}번 카드 선택")
+
+    # 덱 선택
+    def on_deck_selected(self):
+        print(f"덱 선택")
