@@ -272,7 +272,11 @@ class PlayScreen:
             card_layout = pygame.image.load('./resource/card_back.png')
             card_layout = pygame.transform.scale(card_layout, (get_card_width(), get_card_height()))
             card_rect = card_layout.get_rect().topleft = (player_layout.left  + get_extra_small_margin() + (card_layout.get_width() // 2) * idx, player_layout.bottom - card_layout.get_height() - get_extra_small_margin())
-            temp = screen.blit(card_layout, card_rect)
+
+            # 카드가 보드 넘어가는 경우 표시하지 않음
+            if card_rect[0] + get_card_width() <= player_layout.right:
+                screen.blit(card_layout, card_rect)
+
 
         # 카드 개수 표시 (45 변수로 설정해야 함)
         txt_card_cnt = get_small_font().render(str(len(cards)), True, COLOR_BLACK)
