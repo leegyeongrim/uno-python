@@ -253,6 +253,7 @@ class PlayScreen:
             # 현재 플레이어 스트로크
             if idx == self.current_player_index:
                 pygame.draw.rect(screen, COLOR_RED, (self.players_layout.left + get_small_margin(), get_small_margin() + (self.player_layout_height + get_small_margin()) * idx, self.players_layout.width - get_small_margin() * 2, self.player_layout_height), 2)
+                self.draw_player_timer(screen, player_layout)
 
             # 카드
             self.draw_cards(screen, player_layout, player.cards)
@@ -260,8 +261,10 @@ class PlayScreen:
         self.player_list = temp_player_list
 
     # 플레이어 상단 타이머 표시
-    def draw_player_timer(self, screen):
-        pass
+    def draw_player_timer(self, screen, parent):
+        timer_text = get_small_font().render(str(int(self.turn_time + 1 - (time.time() - self.turn_start_time))), True, COLOR_RED)
+        timer_rect = timer_text.get_rect().topleft = (parent.right - timer_text.get_width() - get_small_margin(), parent.top)
+        screen.blit(timer_text, timer_rect)
             
     # 카드
     def draw_cards(self, screen, player_layout, cards):
