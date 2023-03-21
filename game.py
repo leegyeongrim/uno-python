@@ -5,8 +5,7 @@ import time
 import random
 
 class UnoGame:
-    def __init__(self, deck, players):
-        self.timer = 5000
+    def __init__(self, players):
         self.isTurnEnd = False
 
         self.reverseDirection = False
@@ -15,13 +14,12 @@ class UnoGame:
         self.players = players
         self.currentPlayer = players[0]
 
-        self.deck = deck
         self.currentCard = None
 
     # 게임 시작
     def startGame(self):
         self.deck.shuffle()
-        self.currentCard=self.deck.draw() #player들에게 나눠준 후 현재카드 deck에서 1장 놓기
+        self.currentCard=self.deck.draw() #현재카드 deck에서 1장 놓기
         print("current card : ",end='')
         print(self.currentCard.color, self.currentCard.value)
         self.dealCard()
@@ -108,14 +106,6 @@ class UnoGame:
     def skipCurrentPlayer(self):
         self.moveNextPlayer()
 
-    # 타이머 시작 
-    def startTimer(self):
-        self.timer = 5000
-        while (self.timer !=0):
-            self.timer-=1
-            time.sleep(1)
-            print(self.timer)
-
     # 특별 카드 실행
     def runCard(self, card): #기능 확인은 못해봄
         if card.value=="jump":
@@ -147,24 +137,47 @@ class UnoGame:
         else: #기술카드가 아닐때
             self.moveNextPlayer()
 
-    def clickUno(self, idx): #idx는 우노버튼을 누른사람의 idx
+    def clickUno(self, idx): #Uno버튼 눌렀을때 수행되야하는 것
         if self.currentPlayer==players[idx]:
             pass
         else:
             self.penalty(1)
         self.moveNextPlayer()
+    
+    def creatDeck(self):
+        color = ["None",'red','yellow','green','blue']
+        value = [i for i in range(1,10)] + ["jump", "back", "+2", "-1", "omt", "+4"] #omt; 1번더
+        cards=[Card(color[0],value[-1])]
+        for c in color[1:]:
+            for v in value[:14]:
+                cards.append(Card(c,v))
+        self.deck=Deck(cards)
+    
+    def properCard_Color(self, idx): #player가 낸 카드가 currentCard의 색깔과 같은지 비교
+        return self.currentCard.color == self.currentPlayer.hands[idx].color or self.currentCard.color=="None" or self.currentPlayer.hands[idx].color=="None"
 
+    def properCard_Value(self, idx): #player가 낸 카드가 currentCard의 값과 같은지 비교
+        return self.currentCard.value == self.currentPlayer.hands[idx].value
+    
+    def changeCurrentcard(self, idx): #player가 낸 카드가 currentCard로 바뀜
+        self.currentCard=self.currentPlayer.play(idx)
+
+    def checkWinner(self): #현재player 0장 가질때 idx 반환
+        if len(self.currentPlayer.hands)==0:
+            return self.players.idx(self.currentPlayer)
+    
+    def newDeck(self): #deck 0장이 됬는데 게임이 안끝났을때 새로운덱 설정
+        if len(self.deck.cards)==0:
+            self.creatDeck()
+
+    
 p1 = Player()
 p2 = Player()
-color = ["None",'red','yellow','green','blue']
-value = [i for i in range(1,10)] + ["jump", "back", "+2", "-1", "omt", "+4"] #omt; 1번더
-cards=[Card(color[0],value[-1])]
-for c in color[1:]:
-    for v in value[:14]:
-        cards.append(Card(c,v))
 
-deck=Deck(cards)
 players=[p1,p2]
-game=UnoGame(deck,players)
+game=UnoGame(players)
 
 game.startGame()
+game.shuffle()
+game.dealCard()
+game.players[0].play(0)
