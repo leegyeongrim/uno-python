@@ -1,8 +1,8 @@
-from settings import Setting
+from setting.settings import Setting
 from util.globals import *
-from screens.start import StartScreen
-from screens.setting import SettingsScreen
-from screens.play import PlayScreen
+from screen.start import StartScreen
+from screen.setting import SettingsScreen
+from screen.play import PlayScreen
 import pygame
 
 class ScreenController:
@@ -85,7 +85,3 @@ class ScreenController:
 
         # 화면애 따른 이벤트 처리
         self.get_screen().process_events(events)
-
-# 테스트 코드
-if __name__ == '__main__':
-    ScreenController().run()

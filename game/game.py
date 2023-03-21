@@ -1,6 +1,6 @@
-from player import Player
-from deck import Deck
-from card import Card
+from game.model.player import Player
+from game.model.deck import Deck
+from game.model.card import Card
 import time
 import random
 

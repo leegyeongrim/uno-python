@@ -1,5 +1,5 @@
 from util.globals import *
-from player import Player
+from game.model.player import Player
 import time
 
 
@@ -186,7 +186,7 @@ class PlayScreen:
         self.my_cards_layout = pygame.draw.rect(screen, COLOR_PLAYER, (0, self.board_layout.bottom, self.board_layout.right, self.my_cards_layout_height))
 
         # 나의 카드
-        self.draw_my_cards(screen, player.cards)
+        self.draw_my_cards(screen, player.hands)
 
         # 나의 차례 스트로크
         if self.my_player_index == self.current_player_index:
@@ -278,7 +278,7 @@ class PlayScreen:
                 self.draw_player_timer(screen, player_layout)
 
             # 카드
-            self.draw_cards(screen, player_layout, player.cards)
+            self.draw_cards(screen, player_layout, player.hands)
 
         self.player_layout_list = temp_player_layout_list
 
@@ -357,12 +357,12 @@ class PlayScreen:
     def run_my_cards_select_key_event(self, key):
         if key == pygame.K_LEFT:
             if not self.deck_select_enabled:
-                self.my_cards_selected_index = (self.my_cards_selected_index - 1) % len(self.players[self.my_player_index].cards)
+                self.my_cards_selected_index = (self.my_cards_selected_index - 1) % len(self.players[self.my_player_index].hands)
         elif key == pygame.K_RIGHT:
             if not self.deck_select_enabled:
-                self.my_cards_selected_index = (self.my_cards_selected_index + 1) % len(self.players[self.my_player_index].cards)
+                self.my_cards_selected_index = (self.my_cards_selected_index + 1) % len(self.players[self.my_player_index].hands)
         elif key == pygame.K_UP:
-            if self.cards_line_size != 0 and self.my_cards_selected_index + self.cards_line_size < len(self.players[self.my_player_index].cards):
+            if self.cards_line_size != 0 and self.my_cards_selected_index + self.cards_line_size < len(self.players[self.my_player_index].hands):
                 self.my_cards_selected_index = self.my_cards_selected_index + self.cards_line_size
             else: # 덱 선택
                 self.deck_select_enabled = True
@@ -458,7 +458,7 @@ class PlayScreen:
             self.animate_view_rect.y = self.animate_destination_y
             
             # 카드 1장 추가 TODO: 덱에서 1장 가져와야 함
-            self.players[self.my_player_index].cards.append(1)
+            self.players[self.my_player_index].hands.append(1)
             # 애니메이션 종료
             self.animate_deck_to_player_enabled = False
         else:

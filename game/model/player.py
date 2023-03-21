@@ -1,8 +1,8 @@
-from deck import Deck
+from game.model.deck import Deck
 
 class Player:
-    def __init__(self):
-        self.hands = []
+    def __init__(self, hands = []):
+        self.hands = hands
 
     # 덱에서 분배시, 카드를 받음 
     def init_hands(self, hands):
