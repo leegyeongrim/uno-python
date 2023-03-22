@@ -17,7 +17,7 @@ class PlayScreen:
         self.start_time = time.time() # 게임 시작 시간
 
         # 턴 시간 (초단위)
-        self.turn_time = 100
+        self.turn_time = 5
 
         self.animate_deck_to_player_enabled = False
 
@@ -48,8 +48,8 @@ class PlayScreen:
     # 플레이어 레이아웃 초기화
     def init_players_layout(self, screen):
 
-        self.players_selected_index = 0
-        self.players_select_enabled = False # 플레이어 선택 가능 상태
+        self.players_selected_index = 1 # TODO: 유동적으로 수정
+        self.players_select_enabled = True # TODO: 플레이어 선택 가능 상태
 
         self.players_layout_width = 200
         self.player_layout_height = (screen.get_height() - get_small_margin() * 6) // 5
@@ -111,7 +111,7 @@ class PlayScreen:
             self.pause_temp_time = current_time
             
         elif (time.time() - self.turn_start_time) > self.turn_time:
-            self.game.current_player_index = (self.game.current_player_index + 1) % len(self.players)
+            self.game.current_player_index = (self.game.current_player_index + 1) % len(self.game.players)
             self.turn_start_time = time.time()
         
         self.check_my_turn()
@@ -263,25 +263,30 @@ class PlayScreen:
         self.player_layout_list = []
         temp_player_layout_list = []
 
+        cnt = 0
         for idx, player in enumerate(players):
-            # 배경
-            player_layout = pygame.draw.rect(screen, COLOR_PLAYER, (self.players_layout.left + get_small_margin(), get_small_margin() + (self.player_layout_height + get_small_margin()) * idx, self.players_layout.width - get_small_margin() * 2, self.player_layout_height))
-            temp_player_layout_list.append(player_layout)
+            # 보드 플레이어 제외
+            if idx != self.game.board_player_index:
+                # 배경
+                player_layout = pygame.draw.rect(screen, COLOR_PLAYER, (self.players_layout.left + get_small_margin(), get_small_margin() + (self.player_layout_height + get_small_margin()) * cnt, self.players_layout.width - get_small_margin() * 2, self.player_layout_height))
+                temp_player_layout_list.append(player_layout)
 
-            # 선택된 플레이어 하이라이트
-            if self.players_select_enabled and idx == self.players_selected_index:
-                # 투명 색상 적용
-                surface = pygame.Surface((self.players_layout.width - get_small_margin() * 2, self.player_layout_height), pygame.SRCALPHA)
-                surface.fill(COLOR_TRANSPARENT_WHITE)
-                screen.blit(surface, (self.players_layout.left + get_small_margin(), get_small_margin() + (self.player_layout_height + get_small_margin()) * idx))
+                # 선택된 플레이어 하이라이트
+                if self.players_select_enabled and idx == self.players_selected_index:
+                    # 투명 색상 적용
+                    surface = pygame.Surface((self.players_layout.width - get_small_margin() * 2, self.player_layout_height), pygame.SRCALPHA)
+                    surface.fill(COLOR_TRANSPARENT_WHITE)
+                    screen.blit(surface, (self.players_layout.left + get_small_margin(), get_small_margin() + (self.player_layout_height + get_small_margin()) * cnt))
 
-            # 현재 플레이어 스트로크
-            if idx == self.game.current_player_index:
-                pygame.draw.rect(screen, COLOR_RED, (self.players_layout.left + get_small_margin(), get_small_margin() + (self.player_layout_height + get_small_margin()) * idx, self.players_layout.width - get_small_margin() * 2, self.player_layout_height), 2)
-                self.draw_player_timer(screen, player_layout)
+                # 현재 플레이어 스트로크
+                if idx == self.game.current_player_index:
+                    pygame.draw.rect(screen, COLOR_RED, (self.players_layout.left + get_small_margin(), get_small_margin() + (self.player_layout_height + get_small_margin()) * cnt, self.players_layout.width - get_small_margin() * 2, self.player_layout_height), 2)
+                    self.draw_player_timer(screen, player_layout)
 
-            # 카드
-            self.draw_cards(screen, player_layout, player.hands)
+                # 카드
+                self.draw_cards(screen, player_layout, player.hands)
+
+                cnt += 1
 
         self.player_layout_list = temp_player_layout_list
 
@@ -350,9 +355,15 @@ class PlayScreen:
     # 플레이어 선택 키 이벤트
     def run_players_select_key_event(self, key):
         if key == pygame.K_UP:
-            self.players_selected_index = (self.players_selected_index - 1) % len(self.players)
+            self.players_selected_index = (self.players_selected_index - 1) % len(self.game.players)
+            # 보드 플레이어 제와
+            if self.players_selected_index == self.game.board_player_index:
+                self.players_selected_index = (self.players_selected_index - 1) % len(self.game.players)
         elif key == pygame.K_DOWN:
-            self.players_selected_index = (self.players_selected_index + 1) % len(self.players)
+            self.players_selected_index = (self.players_selected_index + 1) % len(self.game.players)
+            # 보드 플레이어 제외
+            if self.players_selected_index == self.game.board_player_index:
+                self.players_selected_index = (self.players_selected_index + 1) % len(self.game.players)
         elif key == pygame.K_RETURN:
             self.on_player_selected(self.players_selected_index)
 
@@ -403,7 +414,11 @@ class PlayScreen:
     def run_players_select_click_event(self, pos):
         for idx, player in enumerate(self.player_layout_list):
             if player.collidepoint(pos):
-                self.on_player_selected(idx)
+                # 보드 플레이어 제외
+                real_idx = idx
+                if idx >= self.game.board_player_index:
+                    real_idx += 1
+                self.on_player_selected(real_idx)
 
     # 카드 선택 클릭 이벤트
     def run_cards_select_click_event(self, pos):

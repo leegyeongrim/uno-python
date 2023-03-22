@@ -20,6 +20,12 @@ class UnoGame:
         p1 = Player("YOU")
         self.players.append(p1)
 
+        p2 = Player("P2")
+        self.players.append(p2)
+
+        p3 = Player("P3")
+        self.players.append(p3)
+
         self.deal()
 
 
