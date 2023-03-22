@@ -101,7 +101,7 @@ class CardBoard:
                 self.game_controller.deck_select_enabled = False
             
             elif self.cards_line_size != 0 and self.game_controller.my_cards_selected_index - self.cards_line_size >= 0:
-                self.game_controller.my_cards_selected_index = self.game_controller.my_cards_selected_index - self.parent.cards_line_size
+                self.game_controller.my_cards_selected_index = self.game_controller.my_cards_selected_index - self.cards_line_size
         elif key == pygame.K_RETURN:
             if self.game_controller.deck_select_enabled:
                 self.game_controller.on_deck_selected()

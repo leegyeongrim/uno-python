@@ -1,6 +1,7 @@
 from game.model.player import Player
 from game.model.deck import Deck
 from game.model.card import *
+from util.globals import *
 import random
 
 class UnoGame:
@@ -12,7 +13,7 @@ class UnoGame:
         self.deck = Deck()
         self.currrent_card: Card = self.deck.draw()
 
-        self.reverse_direction = False
+        self.reverse_direction = True
         self.current_player_index = 0
         self.board_player_index = 0
         self.players: list[Player] = []
@@ -31,7 +32,8 @@ class UnoGame:
 
     # 다음 턴
     def next_turn(self, turn = 1):
-        direction = turn if self.reverse_direction else -turn
+        direction = -turn if self.reverse_direction else turn
+        print(direction)
         self.current_player_index = (self.current_player_index + direction) % len(self.players)
 
     # 현재 플레이어 반환

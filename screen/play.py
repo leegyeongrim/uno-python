@@ -19,7 +19,7 @@ class GameController:
         self.start_time = time.time() # 게임 시작 시간
 
         # 턴 시간 (초단위)
-        self.turn_time = 30
+        self.turn_time = 10
 
         self.deck_select_enabled = False
         self.animate_deck_to_player_enabled = False
@@ -114,7 +114,7 @@ class GameController:
             self.pause_temp_time = current_time
             
         elif (time.time() - self.turn_start_time) > self.turn_time:
-            self.game.current_player_index = (self.game.current_player_index + 1) % len(self.game.players)
+            self.game.next_turn()
             self.turn_start_time = time.time()
         
         self.check_my_turn()
