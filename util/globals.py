@@ -70,11 +70,11 @@ UNO_HEIGHT = 50
 def get_rect(view, x, y):
     return view.get_rect(center = (x, y + view.get_height() // 2))
 
-def get_center_rect(view, parent, x = 0, y = 0):
-    if type(parent) is pygame.Rect:
-        return view.get_rect(center = (parent.left + parent.width // 2 + x, parent.top + parent.height // 2 + y))
+def get_center_rect(view, parent_rect, x = 0, y = 0):
+    if type(parent_rect) is pygame.Rect:
+        return view.get_rect(center = (parent_rect.left + parent_rect.width // 2 + x, parent_rect.top + parent_rect.height // 2 + y))
     else:
-        return None
+        return view.get_rect(center = (parent_rect.left + parent_rect.width // 2 + x, parent_rect.top + parent_rect.height // 2 + y))
 
 def get_large_font(percent = 1):
     return pygame.font.Font('./font/pretendard_regular.otf', DIMEN_LARGE * percent)
@@ -119,4 +119,10 @@ def get_card_back(scale = 1):
 def get_card(card: Card, scale = 1):
     surface = pygame.Surface((get_card_width(scale), get_card_height(scale)))
     surface.fill(CARD_COLOR_SET.get(card.color))
+
+    # 숫자 카드
+    if card.value in range(1, 10):
+        text = get_small_font().render(str(card.value), True, COLOR_BLACK)
+        surface.blit(text, get_center_rect(text, surface.get_rect()))
+
     return surface
