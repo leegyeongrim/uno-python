@@ -1,124 +1,95 @@
 from game.model.player import Player
 from game.model.deck import Deck
-from game.model.card import Card
-import time
+from game.model.card import *
 import random
 
 class UnoGame:
-    def __init__(self, players):
-        self.isTurnEnd = False
-
-        self.reverseDirection = False
-        self.skipTurnCnt = 0
-
-        self.players = players
-        self.currentPlayer = players[0]
-
-        self.currentCard = None
+    def __init__(self):
+        self.init()
 
     # 게임 시작
-    def startGame(self):
-        self.deck.shuffle()
-        self.currentCard=self.deck.draw() #현재카드 deck에서 1장 놓기
-        print("current card : ",end='')
-        print(self.currentCard.color, self.currentCard.value)
-        self.dealCard()
-        #current palyer turn
-        #self.startTimer()
-        while True:
-            print()
-            for idx in range(len(self.currentPlayer.hands)):                        #current card가 색깔이 없을때     #player가 내는 카드가 색깔이 없을때
-                if self.currentCard.color == self.currentPlayer.hands[idx].color or self.currentCard.color=="None" or self.currentPlayer.hands[idx].color=="None": #색깔 같은 카드 먼저 냄 (idx빠른거부터)
-                    self.currentCard=self.currentPlayer.play(idx)
-                    print("current card :",self.currentCard.color, self.currentCard.value, end=" ")
-                    print()
+    def init(self):
+        self.deck = Deck()
+        self.currrent_card: Card = None
 
-                    print("player", self.players.index(self.currentPlayer), "hands :", end=" ")
-                    for idx in range(len(self.currentPlayer.hands)):
-                        print(self.currentPlayer.hands[idx].color, self.currentPlayer.hands[idx].value, end=' / ')
-                    print()
-                    if len(self.currentPlayer.hands)==0:
-                        print("게임 종료!")
-                        return 0
-                    self.runCard(self.currentCard)
-                    break
-                elif self.currentCard.value == self.currentPlayer.hands[idx].value: #값 같은 카드 먼저 냄 (idx빠른거부터)
-                    self.currentCard=self.currentPlayer.play(idx) #현재 플레이어가 카드를 냄
-                    print("current card :",self.currentCard.color, self.currentCard.value, end=" ")
-                    print()
+        self.reverse_direction = False
+        self.current_player_index = 0
+        self.board_player_index = 0
+        self.players: list[Player] = []
 
-                    print("player", self.players.index(self.currentPlayer), "hands :", end=" ")
-                    for idx in range(len(self.currentPlayer.hands)):
-                        print(self.currentPlayer.hands[idx].color, self.currentPlayer.hands[idx].value, end=' / ')
-                    print()
-                    if len(self.currentPlayer.hands)==0:
-                        print("게임 종료!")
-                        return 0
-                    self.runCard(self.currentCard)
-                    break
-            else:                                          #낼 카드가 없을때
-                if len(self.currentPlayer.hands)==0:
-                    print("게임 종료!")
-                    return 0
-                self.penalty(1)
-                print("current card와 일치하는 카드가 없으므로 1장 draw!!")
-                print("player", self.players.index(self.currentPlayer), "hands :", end=" ")
-                for idx in range(len(self.currentPlayer.hands)):
-                    print(self.currentPlayer.hands[idx].color, self.currentPlayer.hands[idx].value, end=' / ')
-                print()
-                self.moveNextPlayer()
-                
-    # 플레이어에게 카드를 분배
-    def dealCard(self):
-            for p in self.players:
-                print("player", self.players.index(p), "hands :", end=" ")
-                hands=[]
-                for _ in range(7):
-                    hands.append(self.deck.cards.pop()) 
-                p.init_hands(hands)
-                for idx in range(len(self.currentPlayer.hands)):
-                    print(p.hands[idx].color, p.hands[idx].value, end=' / ')
-                print()
+        p1 = Player("YOU")
+        self.players.append(p1)
+
+        self.deal()
+
+
+    # 다음 턴
+    def next_turn(self, turn = 1):
+        direction = turn if self.reverse_direction else -turn
+        self.current_player_index = (self.current_player_index + direction) % len(self.players)
+
+    # 현재 플레이어 반환
+    def get_current_player(self):
+        return self.players[self.current_player_index]
+    
+    def get_board_player(self):
+        return self.players[self.board_player_index]
+    
+    def draw(self):
+        self.get_current_player().draw(self.deck.draw())
+
+    # 다음 턴 스킵 : 
+    def skip_turn(self, skip = 1):
+        self.next_turn(skip + 1)
+
+    # 턴 이동 방향 변경
+    def toggle_turn_direction(self):
+        self.reverse_direction = not self.reverse_direction
+
+    # 카드 분배
+    def deal(self, n = 7):
+        for player in self.players:
+            player.deal(self.deck.deal(n))
 
     # 플레이어에게 패널티 카드 n장 부여
-    def penalty(self, n):
+    def penalty(self, player_index, n):
         for _ in range(n):
-            self.currentPlayer.draw(self.deck.draw())
-        #print(self.currentPlayer.hands)
-    
-    # 다음 플레이어로 이동
-    def moveNextPlayer(self):
-        player_idx=players.index(self.currentPlayer)
-        if self.reverseDirection==False:
-            if player_idx<len(self.players)-1:
-                player_idx+=1
-            else:                  #player 수 n명이라 가정하면, player_idx: n-1일때 다음 차례는 처음(player_idx=0)으로 돌아감
-                player_idx=0
-        else:
-            if player_idx>0:
-                player_idx-=1
-            else:                  
-                player_idx=len(self.players)-1
-        self.currentPlayer=players[player_idx]
-        #print(player_idx)
-            
-    # 현재 플레이어 스킵
-    def skipCurrentPlayer(self):
-        self.moveNextPlayer()
+            self.players[player_index].draw(self.deck.draw())
 
-    # 특별 카드 실행
+    # 현재 카드 변경
+    def set_current_card(self, card):
+        self.currrent_card = card
+
+    # 카드 검증
+    def verify_new_card(self, new_card: Card) -> bool:
+        return self.currrent_card.color == CARD_COLOR_NONE or self.currrent_card.color == new_card.color
+        
+
+    # TODO: 우노 버튼 클릭
+    def click_uno(self, idx):
+        pass
+    
+    # TODO: 게임이 끝났는지 확인
+    def is_game_over(self) -> bool:
+        return False
+    
+    # TODO: 승자 확인
+    def get_winner(self) -> Player:
+        return None
+
+    # TODO: 특별 카드 실행
     def runCard(self, card): #기능 확인은 못해봄
         if card.value=="jump":
-            self.moveNextPlayer()
+            self.next_turn()
             self.skipCurrentPlayer() #다음차례 턴이 skip
         elif card.value=="back":
-            if self.reverseDirection==False:
-                self.reverseDirection=True
+            if self.reverse_direction==False:
+                self.reverse_direction=True
             else:
-                self.reverseDirection=False
-            self.moveNextPlayer()
+                self.reverse_direction=False
+            self.next_turn()
         elif card.value=="+2":
-            self.moveNextPlayer()
+            self.next_turn()
             self.penalty(2)
             self.skipCurrentPlayer()
         elif card.value=="-1": # hands 중 1장 무작위로 버림
@@ -127,57 +98,17 @@ class UnoGame:
                 return
             card_idx=random.randint(0,len(self.currentPlayer.hands)-1)
             self.currentPlayer.hands.pop(card_idx)
-            self.moveNextPlayer()
+            self.next_turn()
         elif card.value=="omt": # moveNextPlayer를 실행하지 않음
             pass
         elif card.value=="+4":
-            self.moveNextPlayer()
+            self.next_turn()
             self.penalty(4)
             self.skipCurrentPlayer()
         else: #기술카드가 아닐때
-            self.moveNextPlayer()
-
-    def clickUno(self, idx): #Uno버튼 눌렀을때 수행되야하는 것
-        if self.currentPlayer==players[idx]:
-            pass
-        else:
-            self.penalty(1)
-        self.moveNextPlayer()
+            self.next_turn()
     
-    def creatDeck(self):
-        color = ["None",'red','yellow','green','blue']
-        value = [i for i in range(1,10)] + ["jump", "back", "+2", "-1", "omt", "+4"] #omt; 1번더
-        cards=[Card(color[0],value[-1])]
-        for c in color[1:]:
-            for v in value[:14]:
-                cards.append(Card(c,v))
-        self.deck=Deck(cards)
-    
-    def properCard_Color(self, idx): #player가 낸 카드가 currentCard의 색깔과 같은지 비교
-        return self.currentCard.color == self.currentPlayer.hands[idx].color or self.currentCard.color=="None" or self.currentPlayer.hands[idx].color=="None"
+game = UnoGame()
+game.init()
 
-    def properCard_Value(self, idx): #player가 낸 카드가 currentCard의 값과 같은지 비교
-        return self.currentCard.value == self.currentPlayer.hands[idx].value
-    
-    def changeCurrentcard(self, idx): #player가 낸 카드가 currentCard로 바뀜
-        self.currentCard=self.currentPlayer.play(idx)
 
-    def checkWinner(self): #현재player 0장 가질때 idx 반환
-        if len(self.currentPlayer.hands)==0:
-            return self.players.idx(self.currentPlayer)
-    
-    def newDeck(self): #deck 0장이 됬는데 게임이 안끝났을때 새로운덱 설정
-        if len(self.deck.cards)==0:
-            self.creatDeck()
-
-    
-p1 = Player()
-p2 = Player()
-
-players=[p1,p2]
-game=UnoGame(players)
-
-game.startGame()
-game.shuffle()
-game.dealCard()
-game.players[0].play(0)

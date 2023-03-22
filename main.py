@@ -1,3 +1,5 @@
 from screen.controller import ScreenController
+from game.game import UnoGame
 
-ScreenController().run()
+
+ScreenController(UnoGame()).run()

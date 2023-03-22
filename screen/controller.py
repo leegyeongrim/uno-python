@@ -3,13 +3,16 @@ from util.globals import *
 from screen.start import StartScreen
 from screen.setting import SettingsScreen
 from screen.play import PlayScreen
+from game.game import UnoGame
 import pygame
 
 class ScreenController:
 
     screens = {}
 
-    def __init__(self):
+    def __init__(self, game):
+        self.game: UnoGame = game
+
         pygame.init()
         pygame.display.set_icon(pygame.image.load("./resource/icon.png"))
         pygame.display.set_caption("Uno Game")

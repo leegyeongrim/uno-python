@@ -1,21 +1,24 @@
+from __future__ import annotations
+from typing import TYPE_CHECKING
 from util.globals import *
-from game.model.player import Player
+from screen.animate.animate import AnimateController
 import time
 
+if TYPE_CHECKING:
+    from game.game import UnoGame
 
 class PlayScreen:
 
     def __init__(self, controller):
         self.ctr = controller
+        self.game: UnoGame = controller.game
+        self.animate_controller = AnimateController()
         
         self.start_time = time.time() # 게임 시작 시간
 
         # 턴 시간 (초단위)
-        self.turn_time = 15
+        self.turn_time = 100
 
-        self.animate_speed = (0, 0)
-        self.animate_view = None
-        self.animate_view_rect = None
         self.animate_deck_to_player_enabled = False
 
         self.init_game()
@@ -45,10 +48,6 @@ class PlayScreen:
     # 플레이어 레이아웃 초기화
     def init_players_layout(self, screen):
 
-        self.players = [Player([1, 2, 13, 14, 15, 16, 17, 18, 1, 1, 1]), Player([1, 2, 3]), Player([1, 2, 3, 2, 3, 2, 3]), Player([1]), Player([1, 2, 3, 2, 3, 2, 3])]
-        self.my_player_index = 0 # TODO: 나의 플레이어 인덱스
-
-        self.current_player_index = 0 # TODO: 게임에서 받아와야 함
         self.players_selected_index = 0
         self.players_select_enabled = False # 플레이어 선택 가능 상태
 
@@ -91,12 +90,16 @@ class PlayScreen:
         self.check_time()
 
         self.draw_board_layout(screen)
-        self.draw_my_cards_layout(screen, self.players[self.my_player_index])
+        self.draw_my_cards_layout(screen, self.game.get_current_player()) # TODO: 추가
 
-        self.draw_players_layout(screen, self.players)
+        self.draw_players_layout(screen, self.game.players)
 
         if self.animate_deck_to_player_enabled:
-            self.animate_deck_to_player(screen)
+            if self.animate_controller.enabled:
+                self.animate_controller.draw(screen)
+            else:
+                self.game.draw()
+                self.animate_deck_to_player_enabled = False
 
         if self.escape_dialog_enabled:
             self.draw_escpe_dialog_layout(screen)
@@ -108,13 +111,13 @@ class PlayScreen:
             self.pause_temp_time = current_time
             
         elif (time.time() - self.turn_start_time) > self.turn_time:
-            self.current_player_index = (self.current_player_index + 1) % len(self.players)
+            self.game.current_player_index = (self.game.current_player_index + 1) % len(self.players)
             self.turn_start_time = time.time()
         
         self.check_my_turn()
 
     def check_my_turn(self):
-        self.my_cards_select_enabled = self.my_player_index == self.current_player_index
+        self.my_cards_select_enabled = self.game.board_player_index == self.game.current_player_index
 
     # 일시정지 다이얼로그 레이아웃
     def draw_escpe_dialog_layout(self, screen):
@@ -189,7 +192,7 @@ class PlayScreen:
         self.draw_my_cards(screen, player.hands)
 
         # 나의 차례 스트로크
-        if self.my_player_index == self.current_player_index:
+        if self.game.board_player_index == self.game.current_player_index:
             self.draw_my_board_timer(screen)
             pygame.draw.rect(screen, COLOR_RED, (0, self.board_layout.bottom, self.board_layout.right, self.my_cards_layout_height), 2)
 
@@ -273,7 +276,7 @@ class PlayScreen:
                 screen.blit(surface, (self.players_layout.left + get_small_margin(), get_small_margin() + (self.player_layout_height + get_small_margin()) * idx))
 
             # 현재 플레이어 스트로크
-            if idx == self.current_player_index:
+            if idx == self.game.current_player_index:
                 pygame.draw.rect(screen, COLOR_RED, (self.players_layout.left + get_small_margin(), get_small_margin() + (self.player_layout_height + get_small_margin()) * idx, self.players_layout.width - get_small_margin() * 2, self.player_layout_height), 2)
                 self.draw_player_timer(screen, player_layout)
 
@@ -357,12 +360,12 @@ class PlayScreen:
     def run_my_cards_select_key_event(self, key):
         if key == pygame.K_LEFT:
             if not self.deck_select_enabled:
-                self.my_cards_selected_index = (self.my_cards_selected_index - 1) % len(self.players[self.my_player_index].hands)
+                self.my_cards_selected_index = (self.my_cards_selected_index - 1) % len(self.game.get_board_player().hands)
         elif key == pygame.K_RIGHT:
             if not self.deck_select_enabled:
-                self.my_cards_selected_index = (self.my_cards_selected_index + 1) % len(self.players[self.my_player_index].hands)
+                self.my_cards_selected_index = (self.my_cards_selected_index + 1) % len(self.game.get_board_player().hands)
         elif key == pygame.K_UP:
-            if self.cards_line_size != 0 and self.my_cards_selected_index + self.cards_line_size < len(self.players[self.my_player_index].hands):
+            if self.cards_line_size != 0 and self.my_cards_selected_index + self.cards_line_size < len(self.game.get_board_player().hands):
                 self.my_cards_selected_index = self.my_cards_selected_index + self.cards_line_size
             else: # 덱 선택
                 self.deck_select_enabled = True
@@ -428,7 +431,6 @@ class PlayScreen:
         self.animate_view = pygame.transform.scale(self.animate_view, (get_card_width() * MY_BOARD_CARD_PERCENT, get_card_height() * MY_BOARD_CARD_PERCENT))
 
         self.animate_view_rect = get_center_rect(self.animate_view, self.board_layout, -self.animate_view.get_width() // MY_BOARD_CARD_PERCENT - get_medium_margin())
-
         start_x, start_y = self.animate_view_rect.topleft
 
         self.animate_destination_x, self.animate_destination_y = self.next_card_start_x, self.next_card_start_y
@@ -438,31 +440,4 @@ class PlayScreen:
         else:
             self.animate_destination_x = self.next_card_start_x + (get_card_width(MY_BOARD_CARD_PERCENT) // 1 + get_extra_small_margin())
         
-        distance_x = self.animate_destination_x - start_x
-        distance_y = self.animate_destination_y - start_y
-
-
-        distance = ((distance_x ** 2) + (distance_y ** 2)) ** 0.5
-        self.speed = 15
-        self.direction_x = distance_x / distance
-        self.direction_y = distance_y / distance
-
-    def animate_deck_to_player(self, screen):
-        
-        remaining_distance_x = self.animate_destination_x - self.animate_view_rect.x
-        remaining_distance_y = self.animate_destination_y - self.animate_view_rect.y
-        remaining_distance = ((remaining_distance_x ** 2) + (remaining_distance_y ** 2)) ** 0.5
-        print(remaining_distance)
-        if remaining_distance < self.speed * 3:
-            self.animate_view_rect.x = self.animate_destination_x
-            self.animate_view_rect.y = self.animate_destination_y
-            
-            # 카드 1장 추가 TODO: 덱에서 1장 가져와야 함
-            self.players[self.my_player_index].hands.append(1)
-            # 애니메이션 종료
-            self.animate_deck_to_player_enabled = False
-        else:
-            self.animate_view_rect.x += self.speed * self.direction_x
-            self.animate_view_rect.y += self.speed * self.direction_y
-
-        screen.blit(self.animate_view, self.animate_view_rect)
+        self.animate_controller.init_pos(self.animate_view, self.animate_view_rect, start_x, start_y, self.animate_destination_x, self.animate_destination_y)
