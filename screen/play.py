@@ -3,6 +3,7 @@ from typing import TYPE_CHECKING
 from util.globals import *
 from screen.animate.animate import AnimateController
 from screen.section.board import Board
+from screen.section.cardboard import CardBoard
 import time
 
 if TYPE_CHECKING:
@@ -20,16 +21,18 @@ class PlayScreen:
         # 턴 시간 (초단위)
         self.turn_time = 5
 
+        self.deck_select_enabled = False
         self.animate_deck_to_player_enabled = False
 
         self.init_game()
 
         self.init_my_cards_layout(self.ctr.screen)
-        self.init_board_layout(self.ctr.screen)
+        
         self.init_players_layout(self.ctr.screen)
         self.init_escape_dialog(self.ctr.screen)
 
         self.board = Board(self).init(self.ctr.screen.get_width() - self.players_layout_width, self.ctr.screen.get_height() - self.my_cards_layout_height)
+        self.card_board = CardBoard(self).init(self.board.background_rect.width, self.my_cards_layout_height)
 
 
     # 게임 시작 시 초기화 필요한 변수
@@ -43,10 +46,6 @@ class PlayScreen:
         self.my_cards_select_enabled = False # 카드 선택 가능 상태
         self.my_cards_selected_index = 0
         self.cards_line_size = 0 # 한 줄 당 카드 개수
-
-    # 보드 레이아웃 초기화
-    def init_board_layout(self, screen):
-        self.deck_select_enabled = False
 
     # 플레이어 레이아웃 초기화
     def init_players_layout(self, screen):
@@ -94,7 +93,7 @@ class PlayScreen:
 
         self.board.draw(screen)
         
-        self.draw_my_cards_layout(screen, self.game.get_current_player()) # TODO: 추가
+        self.card_board.draw(screen)
 
         self.draw_players_layout(screen, self.game.players)
 
@@ -143,75 +142,6 @@ class PlayScreen:
             rect = get_rect(text, screen.get_width() // 2, screen.get_height() // 2 + text.get_height() * index)
             menu.update({'view': text, 'rect': rect})
             screen.blit(text, rect)
-
-    # 나의 카드 레이아웃
-    def draw_my_cards_layout(self, screen, player):
-        # 배경
-        self.my_cards_layout = pygame.draw.rect(screen, COLOR_PLAYER, (0, self.board.background_rect.bottom, self.board.background_rect.right, self.my_cards_layout_height))
-
-        # 나의 카드
-        self.draw_my_cards(screen, player.hands)
-
-        # 나의 차례 스트로크
-        if self.game.board_player_index == self.game.current_player_index:
-            self.draw_my_board_timer(screen)
-            pygame.draw.rect(screen, COLOR_RED, (0, self.board.background_rect.bottom, self.board.background_rect.right, self.my_cards_layout_height), 2)
-
-    # 나의 보드 위 타이머 표시
-    def draw_my_board_timer(self, screen):
-        timer_text = get_medium_font().render(str(int(self.turn_time + 1 - (time.time() - self.turn_start_time))), True, COLOR_RED)
-        timer_rect = timer_text.get_rect().topleft = (self.my_cards_layout.right - timer_text.get_width() - get_small_margin(), self.my_cards_layout.top)
-        screen.blit(timer_text, timer_rect)
-
-    # 나의 카드
-    def draw_my_cards(self, screen, cards):
-
-        # 카드 레이아웃 (충돌 감지 목적)
-        self.card_list = []
-        temp_card_list = []
-
-        card_percent = 1.5 # 카드 배율
-        card_overlap_percent = 1 
-
-        # 카드 시작 좌표
-        card_start_x, self.next_card_start_y = get_extra_small_margin(), screen.get_height() - get_card_height() * card_percent - get_extra_small_margin()
-        temp_idx = 0
-
-        for idx, card in enumerate(cards):
-            card_image = pygame.image.load('./resource/card_back.png')
-            card_image = pygame.transform.scale(card_image, (get_card_width() * card_percent, get_card_height() * card_percent))
-
-            # 카드가 보드 넘어가는 경우 위로 쌓음
-            if card_start_x + (card_image.get_width() // card_overlap_percent + get_extra_small_margin()) * (idx - temp_idx) + card_image.get_width() >= self.board.background_rect.width:
-                self.next_card_start_y -= card_image.get_height() + get_extra_small_margin()
-
-                if temp_idx == 0:
-                    self.cards_line_size = idx
-                
-                temp_idx = idx
-        
-
-            # 카드 시작 위치
-            self.next_card_start_x = card_start_x + (card_image.get_width() // card_overlap_percent + get_extra_small_margin()) * (idx - temp_idx)
-
-            card_rect = card_image.get_rect().topleft = (self.next_card_start_x, self.next_card_start_y)
-            card_layout = screen.blit(card_image, card_rect)
-            temp_card_list.append(card_layout)
-
-            # 선택된 카드 하이라이트
-            if self.my_cards_select_enabled and not self.deck_select_enabled and idx == self.my_cards_selected_index:
-                # 투명 색상 적용
-                surface = pygame.Surface((card_layout.width, card_layout.height), pygame.SRCALPHA)
-                surface.fill(COLOR_TRANSPARENT_WHITE)
-                screen.blit(surface, (card_layout.left, card_layout.top))
-
-        self.card_list = temp_card_list
-
-
-        # 카드 개수 표시
-        txt_card_cnt = get_medium_font().render(str(len(cards)), True, COLOR_BLACK)
-        txt_card_cnt_rect = txt_card_cnt.get_rect().topleft = self.my_cards_layout.topleft
-        screen.blit(txt_card_cnt, txt_card_cnt_rect)
 
     # 플레이어 목록 레이아웃
     def draw_players_layout(self, screen, players):
