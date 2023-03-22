@@ -2,7 +2,7 @@ from setting.settings import Setting
 from util.globals import *
 from screen.start import StartScreen
 from screen.setting import SettingsScreen
-from screen.play import PlayScreen
+from screen.play import GameController
 from game.game import UnoGame
 import pygame
 
@@ -30,10 +30,14 @@ class ScreenController:
 
         self.init_instance()
 
+
+    def init(self):
+        pass
+
     def init_instance(self):
         ScreenController.screens = {
             TYPE_START: StartScreen(self),
-            TYPE_PLAY: PlayScreen(self),
+            TYPE_PLAY: GameController(self),
             TYPE_SETTING: SettingsScreen(self),
         }
 

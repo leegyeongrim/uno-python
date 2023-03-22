@@ -2,7 +2,7 @@ class AnimateController:
     def __init__(self):
         self.enabled = False
 
-        self.speed = 10
+        self.speed = 30
 
         self.start_x = None
         self.start_y = None
@@ -35,7 +35,7 @@ class AnimateController:
         print(distance_remain)
 
         # 종료 조건
-        if distance_remain < self.speed ** 2:
+        if distance_remain <= 2 * (self.speed ** 2) ** 0.5:
             self.rect.x = self.end_x
             self.rect.y = self.end_y
             

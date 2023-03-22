@@ -9,7 +9,7 @@ import time
 if TYPE_CHECKING:
     from game.game import UnoGame
 
-class PlayScreen:
+class GameController:
 
     def __init__(self, controller):
         self.ctr = controller
@@ -19,7 +19,7 @@ class PlayScreen:
         self.start_time = time.time() # 게임 시작 시간
 
         # 턴 시간 (초단위)
-        self.turn_time = 5
+        self.turn_time = 30
 
         self.deck_select_enabled = False
         self.animate_deck_to_player_enabled = False
@@ -51,7 +51,7 @@ class PlayScreen:
     def init_players_layout(self, screen):
 
         self.players_selected_index = 1 # TODO: 유동적으로 수정
-        self.players_select_enabled = True # TODO: 플레이어 선택 가능 상태
+        self.players_select_enabled = False # TODO: 플레이어 선택 가능 상태
 
         self.players_layout_width = 200
         self.player_layout_height = (screen.get_height() - get_small_margin() * 6) // 5
@@ -91,7 +91,7 @@ class PlayScreen:
         screen.fill(COLOR_WHITE)
         self.check_time()
 
-        self.board.draw(screen)
+        self.board.draw(screen, self.game.currrent_card)
         
         self.card_board.draw(screen)
 
@@ -228,7 +228,7 @@ class PlayScreen:
         
         # 카드 선택
         elif self.my_cards_select_enabled:
-            self.run_my_cards_select_key_event(key)
+            self.card_board.run_my_cards_select_key_event(key)
 
         # 플레이어 선택
         elif self.players_select_enabled:
@@ -258,39 +258,14 @@ class PlayScreen:
         elif key == pygame.K_RETURN:
             self.on_player_selected(self.players_selected_index)
 
-    # 카드 선택 키 이벤트
-    def run_my_cards_select_key_event(self, key):
-        if key == pygame.K_LEFT:
-            if not self.deck_select_enabled:
-                self.my_cards_selected_index = (self.my_cards_selected_index - 1) % len(self.game.get_board_player().hands)
-        elif key == pygame.K_RIGHT:
-            if not self.deck_select_enabled:
-                self.my_cards_selected_index = (self.my_cards_selected_index + 1) % len(self.game.get_board_player().hands)
-        elif key == pygame.K_UP:
-            if self.cards_line_size != 0 and self.my_cards_selected_index + self.cards_line_size < len(self.game.get_board_player().hands):
-                self.my_cards_selected_index = self.my_cards_selected_index + self.cards_line_size
-            else: # 덱 선택
-                self.deck_select_enabled = True
-        elif key == pygame.K_DOWN:
-            # 다시 카드 선택으로 돌아옴
-            if self.deck_select_enabled:
-                self.deck_select_enabled = False
-            
-            elif self.cards_line_size != 0 and self.my_cards_selected_index - self.cards_line_size >= 0:
-                self.my_cards_selected_index = self.my_cards_selected_index - self.cards_line_size
-        elif key == pygame.K_RETURN:
-            if self.deck_select_enabled:
-                self.on_deck_selected()
-            else:
-                self.on_card_selected(self.my_cards_selected_index)
-
     # 클릭 이벤트
     def process_click_event(self, pos):
         if self.escape_dialog_enabled:
             self.run_esacpe_click_event(pos)
 
         elif self.my_cards_select_enabled:
-            self.run_cards_select_click_event(pos)
+            self.board.run_deck_click_event(pos)
+            self.card_board.run_board_cards_select_click_event(pos)
         
         elif self.players_select_enabled:
             self.run_players_select_click_event(pos)
@@ -310,16 +285,6 @@ class PlayScreen:
                 if idx >= self.game.board_player_index:
                     real_idx += 1
                 self.on_player_selected(real_idx)
-
-    # 카드 선택 클릭 이벤트
-    def run_cards_select_click_event(self, pos):
-        
-        if self.board.deck_rect.collidepoint(pos):
-            self.on_deck_selected()
-
-        for idx, rect in enumerate(self.card_board.card_rects):
-            if rect.collidepoint(pos):
-                self.on_card_selected(idx)
 
     # 플레이어 선택 종류 분기
     def on_player_selected(self, idx):

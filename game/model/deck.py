@@ -1,4 +1,5 @@
 from game.model.card import Card
+from util.globals import *
 import random
 
 class Deck:
@@ -12,8 +13,8 @@ class Deck:
         self.shuffle()
 
     def create_cards(self):
-        color = ["None",'red','yellow','green','blue']
-        value = [i for i in range(1,10)] + ["jump", "back", "+2", "-1", "omt", "+4"] #omt; 1번더
+        color = list(CARD_COLOR_SET.keys())
+        value = [i for i in range(1,10)] + list(SKILL_SET.keys()) #omt; 1번더
         cards=[Card(color[0],value[-1])]
         for c in color[1:]:
             for v in value[:14]:

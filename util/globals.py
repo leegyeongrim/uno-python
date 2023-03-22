@@ -1,14 +1,48 @@
 import pygame
+from game.model.card import Card
 
 COLOR_WHITE = (255, 255, 255)
 COLOR_GRAY = (128, 128, 128)
 COLOR_BLACK = (0, 0, 0)
 COLOR_RED = (255, 0, 0)
+COLOR_GREEN = (0, 255, 0)
+COLOR_YELLOW = (255, 255, 0)
+COLOR_BLUE = (0, 0, 255)
 
 COLOR_TRANSPARENT_WHITE = (255, 255, 255, 128)
 
 COLOR_BOARD = (8, 64, 21)
 COLOR_PLAYER = (40, 120, 58)
+
+SKILL_JUMP = "jump"
+SKILL_REVERSE = "reverse"
+SKILL_PLUS_2 = "+2"
+SKILL_MINUS_1 = "-1"
+SKILL_OMIT = "omit"
+SKILL_PLUS_4 = "+4"
+
+SKILL_SET = {
+    SKILL_JUMP: "jump",
+    SKILL_REVERSE: "reverse",
+    SKILL_PLUS_2: "+2",
+    SKILL_MINUS_1: "-1",
+    SKILL_OMIT: "omit",
+    SKILL_PLUS_4: "+4",
+}
+
+CARD_COLOR_NONE = "none"
+CARD_COLOR_RED = "red"
+CARD_COLOR_YELLOW = "yellow"
+CARD_COLOR_GREEN = "green"
+CARD_COLOR_BLUE = "blue"
+
+CARD_COLOR_SET = {
+    CARD_COLOR_NONE: COLOR_WHITE,
+    CARD_COLOR_RED: COLOR_RED,
+    CARD_COLOR_YELLOW: COLOR_YELLOW,
+    CARD_COLOR_GREEN: COLOR_GREEN,
+    CARD_COLOR_BLUE: COLOR_BLUE,
+}
 
 TYPE_START = "start"
 TYPE_SETTING = "setting"
@@ -81,3 +115,8 @@ def get_card_back(scale = 1):
     card_back = pygame.image.load('./resource/card_back.png') # TODO: 카드 수정
     card_back = pygame.transform.scale(card_back, (get_card_width(scale), get_card_height(scale)))
     return card_back
+
+def get_card(card: Card, scale = 1):
+    surface = pygame.Surface((get_card_width(scale), get_card_height(scale)))
+    surface.fill(CARD_COLOR_SET.get(card.color))
+    return surface

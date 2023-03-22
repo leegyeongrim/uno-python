@@ -10,7 +10,7 @@ class UnoGame:
     # 게임 시작
     def init(self):
         self.deck = Deck()
-        self.currrent_card: Card = None
+        self.currrent_card: Card = self.deck.draw()
 
         self.reverse_direction = False
         self.current_player_index = 0
