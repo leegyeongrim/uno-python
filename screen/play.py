@@ -17,6 +17,7 @@ class GameController:
         self.animate_controller = AnimateController()
 
         self.start_time = time.time() # 게임 시작 시간
+        self.stop_timer_enabled = False
 
         # 턴 시간 (초단위)
         self.turn_time = 10
@@ -34,6 +35,13 @@ class GameController:
         self.board = Board(self).init(self.ctr.screen.get_width() - self.players_layout_width, self.ctr.screen.get_height() - self.my_cards_layout_height)
         self.card_board = CardBoard(self).init(self.board.background_rect.width, self.my_cards_layout_height)
 
+    # 타이머 일시정지
+    def pause_timer(self):
+        self.stop_timer_enabled = True
+        self.pause_temp_time = time.time() 
+
+    def continue_timer(self):
+        self.stop_timer_enabled = False
 
     # 게임 시작 시 초기화 필요한 변수
     def init_game(self):
@@ -82,6 +90,12 @@ class GameController:
     def toggle_escape_dialog(self):
         self.escape_dialog_enabled = not self.escape_dialog_enabled
 
+        # 일시정지 시간 처리
+        if self.escape_dialog_enabled:
+            self.pause_timer()
+        else:
+            self.continue_timer()
+
     # 플레이어 선택 상태 변경
     def toggle_players_select(self):
         self.players_select_enabled = not self.players_select_enabled
@@ -99,16 +113,18 @@ class GameController:
 
         if self.animate_deck_to_player_enabled:
             if self.animate_controller.enabled:
+                self.pause_timer()
                 self.animate_controller.draw(screen)
             else:
                 self.game.draw()
                 self.animate_deck_to_player_enabled = False
+                self.continue_timer()
 
         if self.escape_dialog_enabled:
             self.draw_escpe_dialog_layout(screen)
 
     def check_time(self):
-        if self.escape_dialog_enabled:
+        if self.stop_timer_enabled:
             current_time = time.time()
             self.turn_start_time = self.turn_start_time + (current_time - self.pause_temp_time)
             self.pause_temp_time = current_time
@@ -217,10 +233,6 @@ class GameController:
     def process_key_event(self, key):
         if key == pygame.K_ESCAPE:
             self.toggle_escape_dialog()
-
-            # 일시정지 시간 처리
-            if self.escape_dialog_enabled:
-                self.pause_temp_time = time.time() 
 
         # 일시정지
         if self.escape_dialog_enabled:
