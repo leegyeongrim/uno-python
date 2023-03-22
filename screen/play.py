@@ -317,8 +317,8 @@ class PlayScreen:
         if self.board.deck_rect.collidepoint(pos):
             self.on_deck_selected()
 
-        for idx, card in enumerate(self.card_list):
-            if card.collidepoint(pos):
+        for idx, rect in enumerate(self.card_board.card_rects):
+            if rect.collidepoint(pos):
                 self.on_card_selected(idx)
 
     # 플레이어 선택 종류 분기
@@ -339,11 +339,11 @@ class PlayScreen:
         self.animate_view_rect = get_center_rect(self.animate_view, self.board.background_rect, -self.animate_view.get_width() // MY_BOARD_CARD_PERCENT - get_medium_margin())
         start_x, start_y = self.animate_view_rect.topleft
 
-        self.animate_destination_x, self.animate_destination_y = self.next_card_start_x, self.next_card_start_y
-        if self.next_card_start_x + (get_card_width(MY_BOARD_CARD_PERCENT) // 1 + get_extra_small_margin()) + get_card_width(MY_BOARD_CARD_PERCENT) >= self.board.background_rect.width:
+        self.animate_destination_x, self.animate_destination_y = self.card_board.next_card_start_x, self.card_board.next_card_start_y
+        if self.card_board.next_card_start_x + (get_card_width(MY_BOARD_CARD_PERCENT) // 1 + get_extra_small_margin()) + get_card_width(MY_BOARD_CARD_PERCENT) >= self.board.background_rect.width:
             self.animate_destination_y -= get_card_height(MY_BOARD_CARD_PERCENT) + get_extra_small_margin()
             self.animate_destination_x = get_small_margin()
         else:
-            self.animate_destination_x = self.next_card_start_x + (get_card_width(MY_BOARD_CARD_PERCENT) // 1 + get_extra_small_margin())
+            self.animate_destination_x = self.card_board.next_card_start_x + (get_card_width(MY_BOARD_CARD_PERCENT) // 1 + get_extra_small_margin())
         
         self.animate_controller.init_pos(self.animate_view, self.animate_view_rect, start_x, start_y, self.animate_destination_x, self.animate_destination_y)
