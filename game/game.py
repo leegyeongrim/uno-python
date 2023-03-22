@@ -10,14 +10,13 @@ class UnoGame:
 
     # 게임 시작
     def init(self):
-        self.deck = Deck()
-        self.currrent_card: Card = self.deck.draw()
-
         self.reverse_direction = True
         self.current_player_index = 0
         self.board_player_index = 0
         self.players: list[Player] = []
 
+        self.deck = Deck()
+        
         p1 = Player("YOU")
         self.players.append(p1)
 
@@ -28,6 +27,9 @@ class UnoGame:
         self.players.append(p3)
 
         self.deal()
+
+        self.currrent_card: Card = self.deck.draw()
+
 
 
     # 다음 턴
@@ -45,6 +47,9 @@ class UnoGame:
     
     def draw(self):
         self.get_current_player().draw(self.deck.draw())
+
+    def play(self, idx):
+        self.set_current_card(self.get_current_player().play(idx))
 
     # 다음 턴 스킵 : 
     def skip_turn(self, skip = 1):

@@ -8,10 +8,11 @@ import pygame
 if TYPE_CHECKING:
     from game.game import UnoGame
     from screen.controller import ScreenController
+    from screen.play import GameController
 
 class CardBoard:
     def __init__(self, game_controller):
-        self.game_controller = game_controller
+        self.game_controller: GameController = game_controller
 
         self.game: UnoGame = game_controller.game
         self.board = game_controller.board
@@ -52,7 +53,7 @@ class CardBoard:
 
         # 카드 레이아웃 (충돌 감지 목적)
         self.cards = cards
-        self.card_rects = []
+        self.card_rects: list[pygame.Rect] = []
         temp_card_rects = []
 
 

@@ -20,10 +20,11 @@ class GameController:
         self.stop_timer_enabled = False
 
         # 턴 시간 (초단위)
-        self.turn_time = 10
+        self.turn_time = 30
 
         self.deck_select_enabled = False
         self.animate_deck_to_player_enabled = False
+        self.animate_board_player_to_current_card_enabled = False
 
         self.init_game()
 
@@ -116,8 +117,17 @@ class GameController:
                 self.pause_timer()
                 self.animate_controller.draw(screen)
             else:
-                self.game.draw()
+                self.game.draw() # 애니메이션 종료 후 한장 가져옴
                 self.animate_deck_to_player_enabled = False
+                self.continue_timer()
+        elif self.animate_board_player_to_current_card_enabled:
+            if self.animate_controller.enabled:
+                self.pause_timer()
+                self.animate_controller.draw(screen)
+            else:
+                # 한 장 제출
+                self.game.play(self.board_player_to_current_card_idx)
+                self.animate_board_player_to_current_card_enabled = False
                 self.continue_timer()
 
         if self.escape_dialog_enabled:
@@ -304,7 +314,23 @@ class GameController:
 
     # 카드 선택 분기
     def on_card_selected(self, idx):
-        print(f"{idx}번 카드 선택")
+        card = self.game.get_board_player().hands[idx]
+        # 유효성 확인
+        if self.game.verify_new_card(card):
+            self.animate_board_player_to_current_card_enabled = True
+
+            # 제출할 카드 저장
+            self.board_player_to_current_card_idx = idx
+
+            # 이동 애니메이션
+            start_x, start_y = self.card_board.card_rects[idx].topleft
+            end_x, end_y = self.board.current_card_rect.topleft
+
+            surface = get_card(card, 2)
+            rect = surface.get_rect()
+            rect.topleft = start_x, start_y
+
+            self.animate_controller.init_pos(surface, rect, start_x, start_y, end_x, end_y)
 
     # 덱 선택
     def on_deck_selected(self):
