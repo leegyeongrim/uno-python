@@ -76,3 +76,8 @@ def get_uno_width(percent = 1):
 
 def get_uno_height(percent = 1):
     return UNO_HEIGHT * percent
+
+def get_card_back(scale = 1):
+    card_back = pygame.image.load('./resource/card_back.png') # TODO: 카드 수정
+    card_back = pygame.transform.scale(card_back, (get_card_width(scale), get_card_height(scale)))
+    return card_back

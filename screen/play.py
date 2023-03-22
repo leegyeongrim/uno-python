@@ -2,6 +2,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 from util.globals import *
 from screen.animate.animate import AnimateController
+from screen.section.board import Board
 import time
 
 if TYPE_CHECKING:
@@ -13,7 +14,7 @@ class PlayScreen:
         self.ctr = controller
         self.game: UnoGame = controller.game
         self.animate_controller = AnimateController()
-        
+
         self.start_time = time.time() # 게임 시작 시간
 
         # 턴 시간 (초단위)
@@ -27,6 +28,9 @@ class PlayScreen:
         self.init_board_layout(self.ctr.screen)
         self.init_players_layout(self.ctr.screen)
         self.init_escape_dialog(self.ctr.screen)
+
+        self.board = Board(self).init(self.ctr.screen.get_width() - self.players_layout_width, self.ctr.screen.get_height() - self.my_cards_layout_height)
+
 
     # 게임 시작 시 초기화 필요한 변수
     def init_game(self):
@@ -43,7 +47,6 @@ class PlayScreen:
     # 보드 레이아웃 초기화
     def init_board_layout(self, screen):
         self.deck_select_enabled = False
-        self.board_layout_height = screen.get_height() - self.my_cards_layout_height
 
     # 플레이어 레이아웃 초기화
     def init_players_layout(self, screen):
@@ -89,7 +92,8 @@ class PlayScreen:
         screen.fill(COLOR_WHITE)
         self.check_time()
 
-        self.draw_board_layout(screen)
+        self.board.draw(screen)
+        
         self.draw_my_cards_layout(screen, self.game.get_current_player()) # TODO: 추가
 
         self.draw_players_layout(screen, self.game.players)
@@ -140,53 +144,10 @@ class PlayScreen:
             menu.update({'view': text, 'rect': rect})
             screen.blit(text, rect)
 
-    # 보드 레이아웃
-    def draw_board_layout(self, screen):
-        self.board_layout = pygame.draw.rect(screen, COLOR_BOARD, (0, 0, screen.get_width() - self.players_layout_width, self.board_layout_height))
-        self.draw_current_color(screen)
-        self.draw_deck(screen)
-        self.draw_current_card(screen)
-        self.draw_uno_btn(screen)
-
-    # 현재 색상 표시
-    def draw_current_color(self, screen):
-        # TODO: 색상 동적으로 변경
-        ratio = 4
-        # rect = (self.board_layout.width // ratio, self.board_layout.height // ratio, self.board_layout.width - self.board_layout.width // ratio * 2, self.board_layout.height - self.board_layout.height // ratio * 2)
-        pygame.draw.circle(screen, COLOR_RED, self.board_layout.center, self.board_layout.width // ratio, 20)
-
-    # 덱 레이아웃
-    def draw_deck(self, screen):
-        deck_layout = pygame.image.load('./resource/card_back.png') # TODO: 카드 수정
-        deck_layout = pygame.transform.scale(deck_layout, (get_card_width() * 2, get_card_height() * 2))
-        deck_layout_rect = get_center_rect(deck_layout, self.board_layout, -deck_layout.get_width() // 2 - get_medium_margin())
-        self.deck_layout = screen.blit(deck_layout, deck_layout_rect)
-
-        # 덱 선택 하이라이트
-        if self.my_cards_select_enabled and self.deck_select_enabled:
-            surface = pygame.Surface((get_card_width() * 2, get_card_height() * 2), pygame.SRCALPHA)
-            surface.fill(COLOR_TRANSPARENT_WHITE)
-            screen.blit(surface, deck_layout_rect.topleft)
-
-
-    # 현재 카드 레이아웃
-    def draw_current_card(self, screen):
-        current_card_layout = pygame.image.load('./resource/card_back.png')
-        current_card_layout = pygame.transform.scale(current_card_layout, (get_card_width() * 2, get_card_height() * 2))
-        current_card_layout_rect = get_center_rect(current_card_layout, self.board_layout, current_card_layout.get_width() // 2 + get_medium_margin())
-        self.current_card_layout = screen.blit(current_card_layout, current_card_layout_rect)
-
-    # 우노 버튼
-    def draw_uno_btn(self, screen):
-        uno_btn = pygame.image.load('./resource/uno_btn.png')
-        uno_btn = pygame.transform.scale(uno_btn, (get_uno_width(), get_uno_height()))
-        uno_btn_rect = get_center_rect(uno_btn, self.board_layout, y = self.board_layout.width // 4 - 10)
-        self.uno_btn = screen.blit(uno_btn, uno_btn_rect)
-
     # 나의 카드 레이아웃
     def draw_my_cards_layout(self, screen, player):
         # 배경
-        self.my_cards_layout = pygame.draw.rect(screen, COLOR_PLAYER, (0, self.board_layout.bottom, self.board_layout.right, self.my_cards_layout_height))
+        self.my_cards_layout = pygame.draw.rect(screen, COLOR_PLAYER, (0, self.board.background_rect.bottom, self.board.background_rect.right, self.my_cards_layout_height))
 
         # 나의 카드
         self.draw_my_cards(screen, player.hands)
@@ -194,7 +155,7 @@ class PlayScreen:
         # 나의 차례 스트로크
         if self.game.board_player_index == self.game.current_player_index:
             self.draw_my_board_timer(screen)
-            pygame.draw.rect(screen, COLOR_RED, (0, self.board_layout.bottom, self.board_layout.right, self.my_cards_layout_height), 2)
+            pygame.draw.rect(screen, COLOR_RED, (0, self.board.background_rect.bottom, self.board.background_rect.right, self.my_cards_layout_height), 2)
 
     # 나의 보드 위 타이머 표시
     def draw_my_board_timer(self, screen):
@@ -221,7 +182,7 @@ class PlayScreen:
             card_image = pygame.transform.scale(card_image, (get_card_width() * card_percent, get_card_height() * card_percent))
 
             # 카드가 보드 넘어가는 경우 위로 쌓음
-            if card_start_x + (card_image.get_width() // card_overlap_percent + get_extra_small_margin()) * (idx - temp_idx) + card_image.get_width() >= self.board_layout.width:
+            if card_start_x + (card_image.get_width() // card_overlap_percent + get_extra_small_margin()) * (idx - temp_idx) + card_image.get_width() >= self.board.background_rect.width:
                 self.next_card_start_y -= card_image.get_height() + get_extra_small_margin()
 
                 if temp_idx == 0:
@@ -423,7 +384,7 @@ class PlayScreen:
     # 카드 선택 클릭 이벤트
     def run_cards_select_click_event(self, pos):
         
-        if self.deck_layout.collidepoint(pos):
+        if self.board.deck_rect.collidepoint(pos):
             self.on_deck_selected()
 
         for idx, card in enumerate(self.card_list):
@@ -445,11 +406,11 @@ class PlayScreen:
         self.animate_view = pygame.image.load('./resource/card_back.png') # TODO: 카드 수정
         self.animate_view = pygame.transform.scale(self.animate_view, (get_card_width() * MY_BOARD_CARD_PERCENT, get_card_height() * MY_BOARD_CARD_PERCENT))
 
-        self.animate_view_rect = get_center_rect(self.animate_view, self.board_layout, -self.animate_view.get_width() // MY_BOARD_CARD_PERCENT - get_medium_margin())
+        self.animate_view_rect = get_center_rect(self.animate_view, self.board.background_rect, -self.animate_view.get_width() // MY_BOARD_CARD_PERCENT - get_medium_margin())
         start_x, start_y = self.animate_view_rect.topleft
 
         self.animate_destination_x, self.animate_destination_y = self.next_card_start_x, self.next_card_start_y
-        if self.next_card_start_x + (get_card_width(MY_BOARD_CARD_PERCENT) // 1 + get_extra_small_margin()) + get_card_width(MY_BOARD_CARD_PERCENT) >= self.board_layout.width:
+        if self.next_card_start_x + (get_card_width(MY_BOARD_CARD_PERCENT) // 1 + get_extra_small_margin()) + get_card_width(MY_BOARD_CARD_PERCENT) >= self.board.background_rect.width:
             self.animate_destination_y -= get_card_height(MY_BOARD_CARD_PERCENT) + get_extra_small_margin()
             self.animate_destination_x = get_small_margin()
         else:
