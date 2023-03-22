@@ -20,7 +20,7 @@ class GameController:
         self.stop_timer_enabled = False
 
         # 턴 시간 (초단위)
-        self.turn_time = 30
+        self.turn_time = 1000
 
         self.deck_select_enabled = False
         self.animate_deck_to_player_enabled = False
@@ -105,6 +105,11 @@ class GameController:
     def draw(self, screen):
         screen.fill(COLOR_WHITE)
         self.check_time()
+        if self.game.is_game_over():
+            print("게임 종료")
+            print(self.game.get_winner().name)
+
+        self.resolve_error()
 
         self.board.draw(screen, self.game.currrent_card)
         
@@ -314,7 +319,9 @@ class GameController:
 
     # 카드 선택 분기
     def on_card_selected(self, idx):
-        card = self.game.get_board_player().hands[idx]
+
+        hands = self.game.get_board_player().hands
+        card = hands[idx]
         # 유효성 확인
         if self.game.verify_new_card(card):
             self.animate_board_player_to_current_card_enabled = True
@@ -331,6 +338,12 @@ class GameController:
             rect.topleft = start_x, start_y
 
             self.animate_controller.init_pos(surface, rect, start_x, start_y, end_x, end_y)
+
+    # 에러 방지를 위한 함수
+    def resolve_error(self):
+        # 보드 카드 이전 인덱스 초과 시 처리
+        if self.my_cards_selected_index >= len(self.game.get_board_player().hands):
+            self.my_cards_selected_index -= 1
 
     # 덱 선택
     def on_deck_selected(self):

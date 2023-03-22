@@ -75,7 +75,10 @@ class UnoGame:
 
     # 카드 검증
     def verify_new_card(self, new_card: Card) -> bool:
-        return self.currrent_card.color == CARD_COLOR_NONE or self.currrent_card.color == new_card.color
+        return (self.currrent_card.color == CARD_COLOR_NONE or \
+            self.currrent_card.color == new_card.color) or \
+            self.currrent_card.value == new_card.value
+
         
 
     # TODO: 우노 버튼 클릭
@@ -84,11 +87,18 @@ class UnoGame:
     
     # TODO: 게임이 끝났는지 확인
     def is_game_over(self) -> bool:
+        for idx, player_hands in enumerate([player.hands for player in self.players]):
+            if len(player_hands) == 0:
+                self.set_winner(self.players[idx])
+                return True
         return False
+    
+    def set_winner(self, player):
+        self.winner = player
     
     # TODO: 승자 확인
     def get_winner(self) -> Player:
-        return None
+        return self.winner
 
     # TODO: 특별 카드 실행
     def runCard(self, card): #기능 확인은 못해봄
