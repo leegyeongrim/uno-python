@@ -35,7 +35,7 @@ class Board:
 
     def draw(self, screen, current_card: Card):
         pygame.draw.rect(screen, COLOR_BOARD, self.background_rect)
-        pygame.draw.circle(screen, current_card.color, *self.color_circle)
+        pygame.draw.circle(screen, CARD_COLOR_SET[current_card.color], *self.color_circle)
         screen.blit(self.deck, self.deck_rect)
 
         if self.game_controller.my_cards_select_enabled and self.game_controller.deck_select_enabled:

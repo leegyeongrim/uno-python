@@ -28,7 +28,7 @@ class UnoGame:
 
         self.deal()
 
-        self.currrent_card: Card = self.deck.draw()
+        self.current_card: Card = self.deck.draw()
 
 
 
@@ -71,13 +71,20 @@ class UnoGame:
 
     # 현재 카드 변경
     def set_current_card(self, card):
-        self.currrent_card = card
+        self.current_card = card
 
     # 카드 검증
     def verify_new_card(self, new_card: Card) -> bool:
-        return (self.currrent_card.color == CARD_COLOR_NONE or \
-            self.currrent_card.color == new_card.color) or \
-            self.currrent_card.value == new_card.value
+        # TODO: 색상 카드 선택 시 다음 플레이어는 바뀐 색의 카드나 또 다른 색 변경 카드만 낼 수 있음
+        if self.current_card.value == SKILL_COLOR:
+            if new_card.color == CARD_COLOR_NONE:
+                return new_card.value == SKILL_COLOR
+            
+        # 이전 카드가 미색상 기술 카드이면서 새로운 카드가 미색상 카드가 아닌 경우 
+        return self.current_card.color == CARD_COLOR_NONE or \
+            new_card.color == CARD_COLOR_NONE or \
+            self.current_card.color == new_card.color or \
+            self.current_card.value == new_card.value
 
         
 

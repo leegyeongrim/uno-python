@@ -111,7 +111,7 @@ class GameController:
 
         self.resolve_error()
 
-        self.board.draw(screen, self.game.currrent_card)
+        self.board.draw(screen, self.game.current_card)
         
         self.card_board.draw(screen)
 
