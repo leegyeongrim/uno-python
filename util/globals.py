@@ -14,21 +14,23 @@ COLOR_TRANSPARENT_WHITE = (255, 255, 255, 128)
 COLOR_BOARD = (8, 64, 21)
 COLOR_PLAYER = (40, 120, 58)
 
-SKILL_JUMP = "jump"
-SKILL_REVERSE = "reverse"
-SKILL_PLUS_2 = "+2"
-SKILL_MINUS_1 = "-1"
-SKILL_OMIT = "omit"
-SKILL_PLUS_4 = "+4"
+SKILL_JUMP = "skill_skip"
+SKILL_REVERSE = "skill_reverse"
+SKILL_PLUS_2 = "skill_card_2"
+SKILL_MINUS_1 = "skill_trash"
+SKILL_OMIT = "skill_again"
+SKILL_PLUS_4 = "skill_card_4"
+SKILL_COLOR = "skill_color"
 
-SKILL_SET = {
-    SKILL_JUMP: "jump",
-    SKILL_REVERSE: "reverse",
-    SKILL_PLUS_2: "+2",
-    SKILL_MINUS_1: "-1",
-    SKILL_OMIT: "omit",
-    SKILL_PLUS_4: "+4",
-}
+SKILL_SET = [
+    SKILL_JUMP,
+    SKILL_REVERSE,
+    SKILL_PLUS_2,
+    SKILL_MINUS_1,
+    SKILL_OMIT,
+    SKILL_PLUS_4,
+    SKILL_COLOR,
+]
 
 CARD_COLOR_NONE = "none"
 CARD_COLOR_RED = "red"
@@ -124,5 +126,9 @@ def get_card(card: Card, scale = 1):
     if card.value in range(1, 10):
         text = get_small_font().render(str(card.value), True, COLOR_BLACK)
         surface.blit(text, get_center_rect(text, surface.get_rect()))
-
+    # 기술 카드
+    else:
+        skill = pygame.image.load(f'./resource/{card.value}.png')
+        skill = pygame.transform.scale(skill, (get_card_width(scale) // 1.5, get_card_width(scale) // 1.5))
+        surface.blit(skill, get_center_rect(skill, surface.get_rect()))
     return surface

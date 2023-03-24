@@ -14,8 +14,14 @@ class Deck:
 
     def create_cards(self):
         color = list(CARD_COLOR_SET.keys())
-        value = [i for i in range(1,10)] + list(SKILL_SET.keys()) #omt; 1번더
-        cards=[Card(color[0],value[-1])]
+        value = [i for i in range(1,10)] + SKILL_SET
+        
+        # 무색상 +4 기술 카드
+        cards=[]
+        cards.extend([Card(CARD_COLOR_NONE, SKILL_PLUS_4)] * 4)
+        # 무색상 색상 기술 카드
+        cards.extend([Card(CARD_COLOR_NONE, SKILL_COLOR)] * 4)
+
         for c in color[1:]:
             for v in value[:14]:
                 cards.append(Card(c,v))
