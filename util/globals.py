@@ -77,16 +77,16 @@ def get_center_rect(view, parent_rect, x = 0, y = 0):
         return view.get_rect(center = (parent_rect.left + parent_rect.width // 2 + x, parent_rect.top + parent_rect.height // 2 + y))
 
 def get_large_font(percent = 1):
-    return pygame.font.Font('./font/pretendard_regular.otf', DIMEN_LARGE * percent)
+    return pygame.font.Font('./resource/font/pretendard_regular.otf', DIMEN_LARGE * percent)
 
 def get_medium_font(percent = 1):
-    return pygame.font.Font('./font/pretendard_regular.otf', DIMEN_MEDIUM * percent)
+    return pygame.font.Font('./resource/font/pretendard_regular.otf', DIMEN_MEDIUM * percent)
 
 def get_small_font(percent = 1):
-    return pygame.font.Font('./font/pretendard_regular.otf', DIMEN_SMALL * percent)
+    return pygame.font.Font('./resource/font/pretendard_regular.otf', DIMEN_SMALL * percent)
 
 def get_extra_small_font(percent = 1):
-    return pygame.font.Font('./font/pretendard_regular.otf', DIMEN_EXTRA_SMALL * percent)
+    return pygame.font.Font('./resouorce/font/pretendard_regular.otf', DIMEN_EXTRA_SMALL * percent)
 
 
 def get_medium_margin(percent = 1):
