@@ -41,6 +41,7 @@ class UnoGame:
         direction = -turn if self.reverse_direction else turn
         print(direction)
         self.current_player_index = (self.current_player_index + direction) % len(self.players)
+        self.reset_turn_start_time()
 
     # 현재 플레이어 반환
     def get_current_player(self):

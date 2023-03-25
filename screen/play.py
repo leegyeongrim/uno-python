@@ -120,7 +120,13 @@ class GameController:
             else:
                 self.game.draw() # 애니메이션 종료 후 한장 가져옴
                 self.animate_deck_to_player_enabled = False
+
+                # 일시정해 해제
                 self.continue_timer()
+
+                # 턴 전환
+                self.game.next_turn()
+                
 
         # 카드 제출 애니메이션
         elif self.animate_board_player_to_current_card_enabled:
@@ -145,8 +151,10 @@ class GameController:
             self.pause_temp_time = current_time
             
         elif (time.time() - self.game.turn_start_time) > self.game.turn_time:
-            self.game.next_turn()
-            self.game.turn_start_time = time.time()
+            # 시간 내 미선택 시 카드 드로우
+            self.on_deck_selected()
+
+
         
         self.check_my_turn()
 
