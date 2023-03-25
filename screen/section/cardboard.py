@@ -30,7 +30,7 @@ class CardBoard:
         pygame.draw.rect(screen, COLOR_PLAYER, self.background_rect)
         
         if self.game.board_player_index == self.game.current_player_index:
-            self.timer = get_medium_font().render(str(int(self.game_controller.turn_time + 1 - (time.time() - self.game_controller.turn_start_time))), True, COLOR_RED)
+            self.timer = get_medium_font().render(str(int(self.game.turn_time + 1 - (time.time() - self.game.turn_start_time))), True, COLOR_RED)
             self.timer_rect = (self.background_rect.right - self.timer.get_width() - get_small_margin(), self.background_rect.top)
             screen.blit(self.timer, self.timer_rect)
             pygame.draw.rect(screen, COLOR_RED, self.background_rect, 2)

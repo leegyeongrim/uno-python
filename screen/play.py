@@ -16,11 +16,7 @@ class GameController:
         self.game: UnoGame = controller.game
         self.animate_controller = AnimateController()
 
-        self.start_time = time.time() # 게임 시작 시간
         self.stop_timer_enabled = False
-
-        # 턴 시간 (초단위)
-        self.turn_time = 1000
 
         self.deck_select_enabled = False
         self.animate_deck_to_player_enabled = False
@@ -46,7 +42,7 @@ class GameController:
 
     # 게임 시작 시 초기화 필요한 변수
     def init_game(self):
-        self.turn_start_time = time.time()
+        self.game.turn_start_time = time.time()
 
     # 나의 카드 레이아웃 초기화
     def init_my_cards_layout(self, screen):
@@ -125,10 +121,14 @@ class GameController:
                 self.game.draw() # 애니메이션 종료 후 한장 가져옴
                 self.animate_deck_to_player_enabled = False
                 self.continue_timer()
+
+        # 카드 제출 애니메이션
         elif self.animate_board_player_to_current_card_enabled:
             if self.animate_controller.enabled:
                 self.pause_timer()
                 self.animate_controller.draw(screen)
+
+            # 애니메이션 종료 시 호출
             else:
                 # 한 장 제출
                 self.game.play(self.board_player_to_current_card_idx)
@@ -141,12 +141,12 @@ class GameController:
     def check_time(self):
         if self.stop_timer_enabled:
             current_time = time.time()
-            self.turn_start_time = self.turn_start_time + (current_time - self.pause_temp_time)
+            self.game.turn_start_time = self.game.turn_start_time + (current_time - self.pause_temp_time)
             self.pause_temp_time = current_time
             
-        elif (time.time() - self.turn_start_time) > self.turn_time:
+        elif (time.time() - self.game.turn_start_time) > self.game.turn_time:
             self.game.next_turn()
-            self.turn_start_time = time.time()
+            self.game.turn_start_time = time.time()
         
         self.check_my_turn()
 
@@ -214,7 +214,7 @@ class GameController:
 
     # 플레이어 상단 타이머 표시
     def draw_player_timer(self, screen, parent):
-        timer_text = get_small_font().render(str(int(self.turn_time + 1 - (time.time() - self.turn_start_time))), True, COLOR_RED)
+        timer_text = get_small_font().render(str(int(self.game.turn_time + 1 - (time.time() - self.game.turn_start_time))), True, COLOR_RED)
         timer_rect = timer_text.get_rect().topleft = (parent.right - timer_text.get_width() - get_small_margin(), parent.top)
         screen.blit(timer_text, timer_rect)
             

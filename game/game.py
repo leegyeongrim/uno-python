@@ -3,10 +3,14 @@ from game.model.deck import Deck
 from game.model.card import *
 from util.globals import *
 import random
+import time
 
 class UnoGame:
     def __init__(self):
         self.init()
+
+        self.turn_time = 10 # 턴 시간 (초단위)
+        self.turn_start_time = time.time()
 
     # 게임 시작
     def init(self):
@@ -50,6 +54,11 @@ class UnoGame:
 
     def play(self, idx):
         self.set_current_card(self.get_current_player().play(idx))
+        self.next_turn()
+        self.reset_turn_start_time()
+    
+    def reset_turn_start_time(self):
+        self.turn_start_time = time.time()
 
     # 다음 턴 스킵 : 
     def skip_turn(self, skip = 1):
