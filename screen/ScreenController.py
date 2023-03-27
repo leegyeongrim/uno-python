@@ -16,12 +16,9 @@ class ScreenController:
     screens = {}
 
     def __init__(self, game):
-        self.game: UnoGame = game
+        self.init_pygame()
 
-        pygame.init()
-        pygame.display.set_icon(pygame.image.load("./resource/icon.png"))
-        pygame.display.set_caption("Uno Game")
-        pygame.mouse.set_visible(False)
+        self.game: UnoGame = game
 
         self.clock = pygame.time.Clock()
         self.fps = 30
@@ -36,8 +33,14 @@ class ScreenController:
         self.init_instance()
 
 
-    def init(self):
-        pass
+    def init_pygame(self):
+        pygame.init()
+        # 아이콘
+        pygame.display.set_icon(pygame.image.load("./resource/icon.png"))
+        #제목
+        pygame.display.set_caption("Uno Game")
+        # 기본 마우스
+        pygame.mouse.set_visible(False)
 
     def init_instance(self):
         ScreenController.screens = {
@@ -75,6 +78,7 @@ class ScreenController:
     def get_screen(self):
         return ScreenController.screens.get(self.screen_type)
     
+    # 현재 화면 설정
     def set_screen(self, screen_type):
         self.screen_type = screen_type
     
@@ -100,5 +104,5 @@ class ScreenController:
             if event.type == pygame.QUIT: # 종료 이벤트
                 self.running = False
 
-        # 화면애 따른 이벤트 처리
+        # 화면에 이벤트 전달
         self.get_screen().run_events(events)

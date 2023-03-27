@@ -80,6 +80,10 @@ def get_center_rect(view, parent_rect, x = 0, y = 0):
     else:
         return view.get_rect(center = (parent_rect.left + parent_rect.width // 2 + x, parent_rect.top + parent_rect.height // 2 + y))
 
+def get_leftcenter_rect(view, parent_rect: pygame.Rect, x = 0, y = 0):
+    return view.get_rect(topleft = (parent_rect.left + x, parent_rect.height // 2 + y))
+
+
 def get_large_font(percent = 1):
     return pygame.font.Font('./resource/font/pretendard_regular.otf', DIMEN_LARGE * percent)
 
