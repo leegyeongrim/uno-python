@@ -2,7 +2,12 @@ from setting.settings import Setting
 from util.globals import *
 from screen.home.HomeScreen import HomeScreen
 from screen.setting.SettingScreen import SettingScreen
-from screen.game.GameController import GameController
+
+from screen.game.lobby.LobbyScreen import LobbyScreen
+from screen.game.play.PlayScreen import PlayScreen
+from screen.game.story.StoryScreen import StoryScreen
+
+
 from game.game import UnoGame
 import pygame
 
@@ -37,9 +42,15 @@ class ScreenController:
     def init_instance(self):
         ScreenController.screens = {
             TYPE_START: HomeScreen(self),
-            TYPE_PLAY: GameController(self),
             TYPE_SETTING: SettingScreen(self),
+            TYPE_PLAY: PlayScreen(self),
+            TYPE_LOBBY: LobbyScreen(self),
+            TYPE_STORY: StoryScreen(self),
         }
+
+    # 화면 설정
+    def set_screen_type(self, type):
+        self.screen_type = type
 
 
     # 설정 불러오기
@@ -52,7 +63,7 @@ class ScreenController:
             self.dt = self.clock.tick(self.fps)
 
             self.display_screen()
-            self.process_events()
+            self.run_events()
             pygame.display.update()
         pygame.quit()
 
@@ -62,7 +73,6 @@ class ScreenController:
 
     # 현재 화면 불러옴
     def get_screen(self):
-
         return ScreenController.screens.get(self.screen_type)
     
     def set_screen(self, screen_type):
@@ -81,7 +91,7 @@ class ScreenController:
         self.screen.blit(cursor, cursor_rect)
     
     # 이벤트 선택
-    def process_events(self):
+    def run_events(self):
         # 이벤트 목록 
         events = pygame.event.get()
 
@@ -91,4 +101,4 @@ class ScreenController:
                 self.running = False
 
         # 화면애 따른 이벤트 처리
-        self.get_screen().process_events(events)
+        self.get_screen().run_events(events)

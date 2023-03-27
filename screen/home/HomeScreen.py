@@ -8,7 +8,7 @@ class HomeScreen:
         # 초기 설정
         self.selected_menu_index = 0
         self.menu_dict = [
-            {'text': '싱글플레이', 'action': lambda: controller.set_screen(TYPE_PLAY), 'view': None, 'rect': None }, 
+            {'text': '싱글플레이', 'action': lambda: controller.set_screen(TYPE_LOBBY), 'view': None, 'rect': None }, 
             {'text': '설정', 'action': lambda: controller.set_screen(TYPE_SETTING), 'view': None, 'rect': None }, 
             {'text': '종료', 'action': lambda: controller.stop(), 'view': None, 'rect': None }, 
         ]
@@ -34,7 +34,7 @@ class HomeScreen:
         
 
     # 시작 화면 이벤트 처리
-    def process_events(self, events):
+    def run_events(self, events):
         for event in events:
             # 마우스 좌표 (x, y)
             pos = pygame.mouse.get_pos() 

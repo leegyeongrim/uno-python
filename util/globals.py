@@ -49,6 +49,8 @@ CARD_COLOR_SET = {
 TYPE_START = "start"
 TYPE_SETTING = "setting"
 TYPE_PLAY = "play"
+TYPE_LOBBY = "lobby"
+TYPE_STORY = "story"
 
 DIMEN_EXTRA_LARGE = 50
 DIMEN_LARGE = 40

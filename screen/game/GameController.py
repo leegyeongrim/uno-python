@@ -2,18 +2,24 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 from util.globals import *
 from screen.animate.animate import AnimateController
-from screen.game.section.board import Board
-from screen.game.section.cardboard import CardBoard
+from screen.game.play.section.board import Board
+from screen.game.play.section.cardboard import CardBoard
+from screen.game.lobby.LobbyScreen import LobbyScreen
+from screen.game.story.StoryScreen import StoryScreen
+from screen.game.play.PlayScreen import PlayScreen
 import time
 
 if TYPE_CHECKING:
     from game.game import UnoGame
+    from ScreenController import ScreenController
 
 class GameController:
 
-    def __init__(self, controller):
-        self.ctr = controller
-        self.game: UnoGame = controller.game
+    screens = {}
+
+    def __init__(self, screen_controller: ScreenController):
+        self.screen_controller = screen_controller
+        self.game: UnoGame = screen_controller.game
         self.animate_controller = AnimateController()
 
         self.stop_timer_enabled = False
@@ -24,12 +30,12 @@ class GameController:
 
         self.init_game()
 
-        self.init_my_cards_layout(self.ctr.screen)
+        self.init_my_cards_layout(self.screen_controller.screen)
         
-        self.init_players_layout(self.ctr.screen)
-        self.init_escape_dialog(self.ctr.screen)
+        self.init_players_layout(self.screen_controller.screen)
+        self.init_escape_dialog(self.screen_controller.screen)
 
-        self.board = Board(self).init(self.ctr.screen.get_width() - self.players_layout_width, self.ctr.screen.get_height() - self.my_cards_layout_height)
+        self.board = Board(self).init(self.screen_controller.screen.get_width() - self.players_layout_width, self.screen_controller.screen.get_height() - self.my_cards_layout_height)
         self.card_board = CardBoard(self).init(self.board.background_rect.width, self.my_cards_layout_height)
 
     # 타이머 일시정지
@@ -70,10 +76,10 @@ class GameController:
 
         self.escape_menu_index = 0 
         self.esacpe_menus = [
-            {'text': '설정', 'view': None, 'rect': None, 'action': lambda: self.ctr.set_screen(TYPE_SETTING) }, 
+            {'text': '설정', 'view': None, 'rect': None, 'action': lambda: self.screen_controller.set_screen(TYPE_SETTING) }, 
             {'text': '종료', 'view': None, 'rect': None, 'action': lambda: (
                     self.init(),
-                    self.ctr.set_screen(TYPE_START) 
+                    self.screen_controller.set_screen(TYPE_START) 
                 )
             }
         ]
@@ -99,6 +105,14 @@ class GameController:
 
     # 모든 View
     def draw(self, screen):
+
+        # 로비 화면
+        if self.lobby.enabled:
+            self.lobby.draw(screen)
+            return
+        
+        
+
         screen.fill(COLOR_WHITE)
         self.check_time()
         if self.game.is_game_over():
@@ -244,7 +258,7 @@ class GameController:
         screen.blit(txt_card_cnt, txt_card_cnt_rect)
 
     # 이벤트 처리 함수
-    def process_events(self, events):
+    def run_events(self, events):
         for event in events:
             if event.type == pygame.KEYDOWN:
                 self.process_key_event(event.key)
@@ -254,6 +268,11 @@ class GameController:
 
     # 키보드 입력 이벤트 처리
     def process_key_event(self, key):
+        # 로비 화면 이벤트
+        if self.lobby.enabled:
+            self.lobby.run_key_event(key)
+            return
+
         if key == pygame.K_ESCAPE:
             self.toggle_escape_dialog()
 
@@ -295,6 +314,12 @@ class GameController:
 
     # 클릭 이벤트
     def process_click_event(self, pos):
+        
+        # 로비 화면 이벤트
+        if self.lobby.enabled:
+            self.lobby.run_click_event(pos)
+            return
+
         if self.escape_dialog_enabled:
             self.run_esacpe_click_event(pos)
 
