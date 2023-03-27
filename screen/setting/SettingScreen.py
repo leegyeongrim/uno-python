@@ -1,7 +1,7 @@
 from util.globals import *
 import pygame
 
-class SettingsScreen:
+class SettingScreen:
     def __init__(self, controller):
         self.controller = controller # ScreenController 객체
 

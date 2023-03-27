@@ -1,4 +1,4 @@
-from screen.controller import ScreenController
+from screen.ScreenController import ScreenController
 from game.game import UnoGame
 
 

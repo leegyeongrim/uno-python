@@ -1,7 +1,7 @@
 from util.globals import *
 import pygame
 
-class StartScreen:
+class HomeScreen:
     def __init__(self, controller):
         self.controller = controller
 

@@ -7,8 +7,8 @@ import pygame
 
 if TYPE_CHECKING:
     from game.game import UnoGame
-    from screen.controller import ScreenController
-    from screen.play import GameController
+    from screen.ScreenController import ScreenController
+    from screen.game.GameController import GameController
 
 class CardBoard:
     def __init__(self, game_controller):

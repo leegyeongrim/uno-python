@@ -1,8 +1,8 @@
 from setting.settings import Setting
 from util.globals import *
-from screen.start import StartScreen
-from screen.setting import SettingsScreen
-from screen.play import GameController
+from screen.home.HomeScreen import HomeScreen
+from screen.setting.SettingScreen import SettingScreen
+from screen.game.GameController import GameController
 from game.game import UnoGame
 import pygame
 
@@ -36,9 +36,9 @@ class ScreenController:
 
     def init_instance(self):
         ScreenController.screens = {
-            TYPE_START: StartScreen(self),
+            TYPE_START: HomeScreen(self),
             TYPE_PLAY: GameController(self),
-            TYPE_SETTING: SettingsScreen(self),
+            TYPE_SETTING: SettingScreen(self),
         }
 
 

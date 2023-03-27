@@ -2,8 +2,8 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 from util.globals import *
 from screen.animate.animate import AnimateController
-from screen.section.board import Board
-from screen.section.cardboard import CardBoard
+from screen.game.section.board import Board
+from screen.game.section.cardboard import CardBoard
 import time
 
 if TYPE_CHECKING:
