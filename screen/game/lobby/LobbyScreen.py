@@ -128,7 +128,7 @@ class LobbyScreen:
                              self.computer_layout_width - get_small_margin() * 2, self.computer_height
                             )
 
-            self.computer_layout_list.append({'view': computer_rect, 'enabled': False})
+            self.computer_layout_list.append({'view': computer_rect, 'enabled': False if idx >= 1 else True})
 
     def draw_computer(self, screen):
         for idx, computer in enumerate(self.computer_layout_list):
