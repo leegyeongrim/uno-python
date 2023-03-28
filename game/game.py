@@ -18,23 +18,15 @@ class UnoGame:
         self.current_player_index = 0
         self.board_player_index = 0
         self.players: list[Player] = []
-
+        self.add_player("YOU")
         self.deck = Deck()
-        
-        p1 = Player("YOU")
-        self.players.append(p1)
-
-        p2 = Player("P2")
-        self.players.append(p2)
-
-        p3 = Player("P3")
-        self.players.append(p3)
 
         self.deal()
 
         self.current_card: Card = self.deck.draw()
 
-
+    def add_player(self, name, computer = False):
+        self.players.append(Player(name))
 
     # 다음 턴
     def next_turn(self, turn = 1):

@@ -15,10 +15,10 @@ class ScreenController:
 
     screens = {}
 
-    def __init__(self, game):
+    def __init__(self):
         self.init_pygame()
 
-        self.game: UnoGame = game
+        self.game: UnoGame = UnoGame()
 
         self.clock = pygame.time.Clock()
         self.fps = 30

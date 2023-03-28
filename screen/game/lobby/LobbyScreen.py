@@ -89,7 +89,7 @@ class LobbyScreen:
 
         # 확인
         submit = get_medium_font().render("확인", True, COLOR_BLACK)
-        submit_rect = get_bottom_center_rect(submit, background_rect, -submit.get_width() // 2, -(submit.get_height() + get_small_margin()))
+        self.submit_rect = get_bottom_center_rect(submit, background_rect, -submit.get_width() // 2, -(submit.get_height() + get_small_margin()))
 
         # 입력 박스
         input_name = get_small_font().render('이름', True, COLOR_BLACK)
@@ -100,7 +100,7 @@ class LobbyScreen:
         pygame.draw.rect(screen, COLOR_BLACK, background_rect, 2)
 
         screen.blit(title, get_top_center_rect(title, background_rect, x = -title.get_width() // 2, y = get_medium_margin()))
-        screen.blit(submit, submit_rect)
+        screen.blit(submit, self.submit_rect)
         screen.blit(input_background, get_center_rect(input_background, background_rect))
 
     # 이벤트 처리
@@ -136,7 +136,17 @@ class LobbyScreen:
 
     def run_input_name_dialog_key_event(self, key):
         if key == pygame.K_ESCAPE:
-            self.toggle_input_name_dialog()
+            return self.toggle_input_name_dialog()
+
+        if key == pygame.K_RETURN:
+            # 이름 설정
+
+            # 플레이어 설정 적용
+
+            # 화면 이동
+            self.screen_controller.set_screen_type(TYPE_PLAY)
+
+
     # 클릭 이벤트 처리
     def run_click_event(self, event, pos):
         pass
