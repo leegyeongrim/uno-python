@@ -1,7 +1,8 @@
 from screen.ScreenController import ScreenController
 from game.game import UnoGame
 
-game = UnoGame()
-screenController = ScreenController(game)
+if __name__ == '__main__':
+    game = UnoGame()
+    screenController = ScreenController(game)
 
-screenController.run()  
+    screenController.run()

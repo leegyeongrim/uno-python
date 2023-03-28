@@ -3,6 +3,7 @@ from game.model.card import Card
 
 COLOR_WHITE = (255, 255, 255)
 COLOR_GRAY = (128, 128, 128)
+COLOR_LIGHT_GRAY = (192, 192, 192)
 COLOR_BLACK = (0, 0, 0)
 COLOR_RED = (255, 0, 0)
 COLOR_GREEN = (0, 255, 0)
@@ -74,15 +75,19 @@ UNO_HEIGHT = 50
 def get_rect(view, x, y):
     return view.get_rect(center = (x, y + view.get_height() // 2))
 
-def get_center_rect(view, parent_rect, x = 0, y = 0):
+def get_center_rect(view, parent_rect, x = 0, y = 0) -> pygame.Rect:
     if type(parent_rect) is pygame.Rect:
         return view.get_rect(center = (parent_rect.left + parent_rect.width // 2 + x, parent_rect.top + parent_rect.height // 2 + y))
     else:
         return view.get_rect(center = (parent_rect.left + parent_rect.width // 2 + x, parent_rect.top + parent_rect.height // 2 + y))
 
-def get_leftcenter_rect(view, parent_rect: pygame.Rect, x = 0, y = 0):
+def get_left_center_rect(view, parent_rect: pygame.Rect, x = 0, y = 0):
     return view.get_rect(topleft = (parent_rect.left + x, parent_rect.height // 2 + y))
+def get_top_center_rect(view, parent_rect: pygame.Rect, x = 0, y = 0):
+    return view.get_rect(topleft = (parent_rect.centerx + x, parent_rect.top + y))
 
+def get_bottom_center_rect(view, parent_rect: pygame.Rect, x = 0, y = 0):
+    return view.get_rect(bottomleft = (parent_rect.centerx + x, parent_rect.bottom + y))
 
 def get_large_font(percent = 1):
     return pygame.font.Font('./resource/font/pretendard_regular.otf', DIMEN_LARGE * percent)
