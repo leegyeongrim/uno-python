@@ -3,7 +3,7 @@ from game.model.deck import Deck
 class Player:
     def __init__(self, name):
         self.name = name
-        self.hands = None
+        self.hands = []
     
     def deal(self, cards):
         self.hands = cards

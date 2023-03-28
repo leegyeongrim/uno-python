@@ -372,6 +372,7 @@ class PlayScreen:
     # 에러 방지를 위한 함수
     def resolve_error(self):
         # 보드 카드 이전 인덱스 초과 시 처리
+
         if self.my_cards_selected_index >= len(self.game.get_board_player().hands):
             self.my_cards_selected_index -= 1
 

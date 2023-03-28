@@ -21,7 +21,7 @@ class UnoGame:
         self.current_player_index = 0
         self.board_player_index = 0
         self.players: list[Player] = []
-        self.add_player("YOU")
+
         self.deck = Deck()
 
         self.deal()
