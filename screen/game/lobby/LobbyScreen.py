@@ -5,9 +5,6 @@ import pygame.draw
 
 from util.globals import *
 
-if TYPE_CHECKING:
-    from screen.game.GameController import GameController
-
 
 class LobbyScreen:
     def __init__(self, screen_controller):
@@ -23,7 +20,7 @@ class LobbyScreen:
         self.input_name_dialog_enabled = False
 
         self.input_name_enabled = False
-        self.input_name_text = ''
+        self.input_name_text = 'Player'
 
         # 상위 의존성 초기화
         self.screen_controller = screen_controller
@@ -92,7 +89,8 @@ class LobbyScreen:
         self.submit_rect = get_bottom_center_rect(submit, background_rect, -submit.get_width() // 2, -(submit.get_height() + get_small_margin()))
 
         # 입력 박스
-        input_name = get_small_font().render('이름', True, COLOR_BLACK)
+        input_name = get_small_font().render(self.input_name_text, True, COLOR_BLACK)
+
         input_background = pygame.Surface(size = (background_rect.width - 4 * get_medium_margin(), input_name.get_height() + get_small_margin()))
         input_background.fill(COLOR_LIGHT_GRAY)
 
@@ -102,6 +100,7 @@ class LobbyScreen:
         screen.blit(title, get_top_center_rect(title, background_rect, x = -title.get_width() // 2, y = get_medium_margin()))
         screen.blit(submit, self.submit_rect)
         screen.blit(input_background, get_center_rect(input_background, background_rect))
+        screen.blit(input_name, get_center_rect(input_name, background_rect))
 
     # 이벤트 처리
     def run_events(self, events):
@@ -129,12 +128,12 @@ class LobbyScreen:
                 self.input_name_enabled = True
 
         if self.input_name_dialog_enabled:
-            return self.run_input_name_dialog_key_event(key)
+            return self.run_input_name_dialog_key_event(event, key)
 
         # 함수 호출
         run_menu_key_event(key)
 
-    def run_input_name_dialog_key_event(self, key):
+    def run_input_name_dialog_key_event(self, event, key):
         if key == pygame.K_ESCAPE:
             return self.toggle_input_name_dialog()
 
@@ -145,6 +144,15 @@ class LobbyScreen:
 
             # 화면 이동
             self.screen_controller.set_screen_type(TYPE_PLAY)
+            self.screen_controller.game.start_game()
+
+        # 키보드 입력
+        elif key == pygame.K_BACKSPACE:
+            self.input_name_text = self.input_name_text[:-1]
+
+        else:
+            self.input_name_text += event.unicode
+
 
 
     # 클릭 이벤트 처리

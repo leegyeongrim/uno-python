@@ -10,6 +10,7 @@ class PlayScreen:
     def __init__(self, screen_controller):
 
         self.game = screen_controller.game
+        self.game_started = False
 
         self.screen_controller = screen_controller
         self.animate_controller = AnimateController()
@@ -18,8 +19,6 @@ class PlayScreen:
         self.deck_select_enabled = False
         self.animate_deck_to_player_enabled = False
         self.animate_board_player_to_current_card_enabled = False
-
-        self.init_game()
 
         self.init_my_cards_layout(self.screen_controller.screen)
 
@@ -38,8 +37,8 @@ class PlayScreen:
     def continue_timer(self):
         self.stop_timer_enabled = False
 
-    # 게임 시작 시 초기화 필요한 변수
-    def init_game(self):
+    def start_game(self):
+        self.game.is_started = True
         self.game.turn_start_time = time.time()
 
     # 나의 카드 레이아웃 초기화
@@ -99,18 +98,20 @@ class PlayScreen:
     # 모든 View
     def draw(self, screen):
         screen.fill(COLOR_WHITE)
-        self.check_time()
-        if self.game.is_game_over():
-            print("게임 종료")
-            print(self.game.get_winner().name)
+        if self.game.is_started:
+            self.check_time()
 
-        self.resolve_error()
+            if self.game.is_game_over():
+                print("게임 종료")
+                print(self.game.get_winner().name)
 
-        self.board.draw(screen, self.game.current_card)
+            self.resolve_error()
 
-        self.card_board.draw(screen)
+            self.board.draw(screen, self.game.current_card)
 
-        self.draw_players_layout(screen, self.game.players)
+            self.card_board.draw(screen)
+
+            self.draw_players_layout(screen, self.game.players)
 
         if self.animate_deck_to_player_enabled:
             if self.animate_controller.enabled:
@@ -263,30 +264,31 @@ class PlayScreen:
 
     # 이벤트 처리 함수
     def run_events(self, events):
-        for event in events:
-            if event.type == pygame.KEYDOWN:
-                self.process_key_event(event.key)
+        if self.game.is_started:
+            for event in events:
+                if event.type == pygame.KEYDOWN:
+                    self.process_key_event(event.key)
 
-            elif event.type == pygame.MOUSEBUTTONUP:
-                self.process_click_event(pygame.mouse.get_pos())
+                elif event.type == pygame.MOUSEBUTTONUP:
+                    self.process_click_event(pygame.mouse.get_pos())
 
     # 키보드 입력 이벤트 처리
     def process_key_event(self, key):
+        if self.game.is_started:
+            if key == pygame.K_ESCAPE:
+                self.toggle_escape_dialog()
 
-        if key == pygame.K_ESCAPE:
-            self.toggle_escape_dialog()
+            # 일시정지
+            if self.escape_dialog_enabled:
+                self.run_esacpe_key_event(key)
 
-        # 일시정지
-        if self.escape_dialog_enabled:
-            self.run_esacpe_key_event(key)
+            # 카드 선택
+            elif self.my_cards_select_enabled:
+                self.card_board.run_my_cards_select_key_event(key)
 
-        # 카드 선택
-        elif self.my_cards_select_enabled:
-            self.card_board.run_my_cards_select_key_event(key)
-
-        # 플레이어 선택
-        elif self.players_select_enabled:
-            self.run_players_select_key_event(key)
+            # 플레이어 선택
+            elif self.players_select_enabled:
+                self.run_players_select_key_event(key)
 
     # 일시정지 메뉴 키 이벤트
     def run_esacpe_key_event(self, key):
@@ -314,11 +316,6 @@ class PlayScreen:
 
     # 클릭 이벤트
     def process_click_event(self, pos):
-
-        # 로비 화면 이벤트
-        if self.lobby.enabled:
-            self.lobby.run_click_event(pos)
-            return
 
         if self.escape_dialog_enabled:
             self.run_esacpe_click_event(pos)
