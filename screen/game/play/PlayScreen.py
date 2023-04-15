@@ -351,7 +351,7 @@ class PlayScreen:
 
     # 카드 선택 분기
     def on_card_selected(self, idx):
-
+        self.screen_controller.play_effect()
         hands = self.game.get_board_player().hands
         card = hands[idx]
         # 유효성 확인
@@ -380,6 +380,8 @@ class PlayScreen:
 
     # 덱 선택
     def on_deck_selected(self):
+        self.screen_controller.play_effect()
+        
         self.animate_deck_to_player_enabled = True
 
         self.animate_view = pygame.image.load('./resource/card_back.png')  # TODO: 카드 수정

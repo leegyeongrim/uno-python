@@ -34,7 +34,7 @@ class ScreenController:
 
         self.is_bgm_playing = False
         self.bgm = pygame.mixer.Sound('./resource/sound/bgm.mp3')
-
+        self.effect = pygame.mixer.Sound('./resource/sound/effect.mp3')
 
     def init_pygame(self):
         pygame.init()
@@ -119,3 +119,6 @@ class ScreenController:
 
         # 화면에 이벤트 전달
         self.get_screen().run_events(events)
+
+    def play_effect(self):
+        self.effect.play()
