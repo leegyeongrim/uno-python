@@ -11,14 +11,23 @@ class Setting:
     def get_resolution(self):
         return (self.screen_width, self.screen_height)
     
-    def setResolution(self, width, height):
-        self.screen_width, self.screen_height = width, height
     
     def toggleBlindMode(self):
         self.blind_mode = not self.blind_mode
 
     def isBlindModeEnabled(self):
         return self.blind_mode
+    
+    def setResolution(self):
+        width = [360,720,1080]
+        height = [300,600,900]
+        if(self.screen_mode==0):
+            self.screen_width, self.screen_height=width[0], height[0]
+        elif(self.screen_mode==1):
+            self.screen_width, self.screen_height=width[1], height[1]
+        elif(self.screen_mode==2):
+            self.screen_width, self.screen_height=width[2], height[2]
+    
 
     # 설정 저장
     def save(self):
