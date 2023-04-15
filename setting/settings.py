@@ -11,6 +11,8 @@ class Setting:
     def get_resolution(self):
         return (self.screen_width, self.screen_height)
     
+    def get_screen_mode(self):
+        return self.screen_mode
     
     def isBlindModeEnabled(self):
         return self.blind_mode
