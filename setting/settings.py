@@ -3,8 +3,9 @@ file_path='/Users/leegyeongrim/setting_data.json'
 
 class Setting:
     def __init__(self):
-        self.screen_width = 720
-        self.screen_height = 600
+        self.screen_width=720
+        self.screen_height=600
+        self.screen_mode = 1
         self.blind_mode = False
 
     def get_resolution(self):
