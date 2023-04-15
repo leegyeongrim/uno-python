@@ -1,3 +1,6 @@
+import json
+file_path='/Users/leegyeongrim/setting_data.json'
+
 class Setting:
     def __init__(self):
         self.screen_width = 720
