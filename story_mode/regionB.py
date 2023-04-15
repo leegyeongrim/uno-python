@@ -5,6 +5,7 @@ import random
 class regionB:
    def __init__(self):
       self.game=UnoGame()
+      self.game.init()
       self.game.add_computer("computer1")
       self.game.add_computer("computer2")
       self.game.add_computer("computer3")
@@ -12,4 +13,4 @@ class regionB:
 
    def num_decision(self): #player들에게 분배할 카드수 지정
       n=len(self.game.players)
-      self.num=(len(self.game.deck.cards)-1)/n
+      self.num=len(self.game.deck.cards)//n

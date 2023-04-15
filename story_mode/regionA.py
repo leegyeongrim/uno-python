@@ -6,7 +6,9 @@ import random
 class regionA:
    def __init__(self):
       self.game=UnoGame()
-      self.example=[]
+      self.game.init()
+      self.game.add_computer("computer1")
+      self.example=[] #TODO: computer1의 hands로 바꿔야함 -> game.py에서 deal함수 구분후에 수정필요.
       self.func_list=[] #기술카드만 모은 list
       self.num_list=[] #숫자카드만 모은 list
       
@@ -20,6 +22,9 @@ class regionA:
             self.func_list.append(cards[i])
 
    def computer_deal(self,n): #computer가 처음 기술카드 더 많이 갖게 deal (n장 받음)
+      
+      self.split_cards()
+
       sample=[0,0,1,1,1]
       random.shuffle(self.func_list)
       random.shuffle(self.num_list)
@@ -30,6 +35,10 @@ class regionA:
             self.example.append(self.func_list.pop())
          else:
             self.example.append(self.num_list.pop())
+      
+      for i in range(len(self.game.players)):
+         if self.game.players[i].name=="computer1":
+            self.game.players[i].init_hands(self.example)
 
    # func,num pop한 결과를 cards에 반영
    def set_deck(self):

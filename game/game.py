@@ -14,15 +14,16 @@ class UnoGame:
 
     # 게임 시작
     def init(self):
-        self.reverse_direction = True
+        self.reverse_direction = False
         self.current_player_index = 0
         self.board_player_index = 0
-        self.turn_counter=0         #지금까지 지난 게임 턴수를 셈
+        self.turn_counter=1         #지금까지 지난 게임 턴수를 셈
         self.players: list[Player] = []
         self.add_player("YOU")
         self.deck = Deck()
 
-        self.deal()
+        self.deck.shuffle()
+        #self.deal(0) storymodeB 때문에 나중에 deal
 
         self.current_card: Card = self.deck.draw()
 
@@ -35,10 +36,10 @@ class UnoGame:
     # 다음 턴
     def next_turn(self, turn = 1):
         direction = -turn if self.reverse_direction else turn
-        print(direction)
+        #print(direction)
         self.current_player_index = (self.current_player_index + direction) % len(self.players)
-        self.reset_turn_start_time()
         self.turn_counter+=1 #턴수를 세기 위함
+        self.reset_turn_start_time()
 
     # 현재 플레이어 반환
     def get_current_player(self):
@@ -66,10 +67,9 @@ class UnoGame:
     def toggle_turn_direction(self):
         self.reverse_direction = not self.reverse_direction
 
-    # 카드 분배
-    def deal(self, n = 7):
-        for player in self.players:
-            player.deal(self.deck.deal(n))
+    # 카드 분배 #수정부분: idx 받아서 특정 player에게만 deal 해주기
+    def deal(self, idx, n=7):
+        self.players[idx].deal(self.deck.deal(n))
 
     # 플레이어에게 패널티 카드 n장 부여
     def penalty(self, player_index, n):
@@ -133,10 +133,10 @@ class UnoGame:
         self.players[self.current_player_index].hands.pop(card_idx)
     # SKILL_OMIT 수행
     def runOMIT(self):
-        if self.reverse_direction: #정방향이면
-            self.current_player_index-=1 #미리 index 감소시켜놓고, next_turn 수행시 다시 자기 차례로 돌아오게함 
-        else: #역방향이면
-            self.current_player_index+=1 #미리 index 증가시켜놓고, next_turn 수행시 다시 자기 차례로 돌아오게함
+        if self.reverse_direction: #역방향
+            self.current_player_index=(self.current_player_index+1)%len(self.players) #미리 index 증가시켜놓고, next_turn 수행시 다시 자기 차례로 돌아오게함 
+        else: #정방향이면
+            self.current_player_index=(self.current_player_index-1)%len(self.players) #미리 index 감소시켜놓고, next_turn 수행시 다시 자기 차례로 돌아오게함
     # SKILL_runPLUS_4 수행
     def runPLUS_4(self):
         if self.reverse_direction:
@@ -147,6 +147,8 @@ class UnoGame:
     def runCOLOR(self, idx):
         self.current_card.color=CARD_COLOR_SET[idx]
         
+if __name__ == '__main__':
+    game=UnoGame()
+    game.init()
+    game.add_computer("computer1")
     
-
-
