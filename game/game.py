@@ -17,7 +17,7 @@ class UnoGame:
         self.is_started = True
     # 게임 시작
     def init(self):
-        self.reverse_direction = True
+        self.reverse_direction = False
         self.current_player_index = 0
         self.board_player_index = 0
         self.players: list[Player] = []

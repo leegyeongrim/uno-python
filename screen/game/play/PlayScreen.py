@@ -20,6 +20,9 @@ class PlayScreen:
         self.animate_deck_to_player_enabled = False
         self.animate_board_player_to_current_card_enabled = False
 
+        self.player_layout_list = []
+
+
         self.init_my_cards_layout(self.screen_controller.screen)
 
         self.init_players_layout(self.screen_controller.screen)
@@ -99,8 +102,6 @@ class PlayScreen:
     def draw(self, screen):
         screen.fill(COLOR_WHITE)
         if self.game.is_started:
-            self.check_time()
-
             if self.game.is_game_over():
                 print("게임 종료")
                 print(self.game.get_winner().name)
@@ -112,6 +113,7 @@ class PlayScreen:
             self.card_board.draw(screen)
 
             self.draw_players_layout(screen, self.game.players)
+            self.check_time()
 
         if self.animate_deck_to_player_enabled:
             if self.animate_controller.enabled:
@@ -388,15 +390,25 @@ class PlayScreen:
                                                  -self.animate_view.get_width() // MY_BOARD_CARD_PERCENT - get_medium_margin())
         start_x, start_y = self.animate_view_rect.topleft
 
-        self.animate_destination_x, self.animate_destination_y = self.card_board.next_card_start_x, self.card_board.next_card_start_y
-        if self.card_board.next_card_start_x + (
-                get_card_width(MY_BOARD_CARD_PERCENT) // 1 + get_extra_small_margin()) + get_card_width(
-                MY_BOARD_CARD_PERCENT) >= self.board.background_rect.width:
-            self.animate_destination_y -= get_card_height(MY_BOARD_CARD_PERCENT) + get_extra_small_margin()
-            self.animate_destination_x = get_small_margin()
-        else:
-            self.animate_destination_x = self.card_board.next_card_start_x + (
-                        get_card_width(MY_BOARD_CARD_PERCENT) // 1 + get_extra_small_margin())
+        # 애니메이션 목적지
+        if self.game.current_player_index == self.game.board_player_index:
+            self.animate_destination_x, self.animate_destination_y = self.card_board.next_card_start_x, self.card_board.next_card_start_y
+            if self.card_board.next_card_start_x + (
+                    get_card_width(MY_BOARD_CARD_PERCENT) // 1 + get_extra_small_margin()) + get_card_width(
+                    MY_BOARD_CARD_PERCENT) >= self.board.background_rect.width:
+                self.animate_destination_y -= get_card_height(MY_BOARD_CARD_PERCENT) + get_extra_small_margin()
+                self.animate_destination_x = get_small_margin()
+            else:
+                self.animate_destination_x = self.card_board.next_card_start_x + (
+                            get_card_width(MY_BOARD_CARD_PERCENT) // 1 + get_extra_small_margin())
 
+        # 내가 아닌 플레이어
+        else:
+            player_rect = self.player_layout_list[self.game.current_player_index - 1]
+            self.animate_destination_x, self.animate_destination_y = player_rect.topleft
+
+        # 애니메이션 정보 초기화
         self.animate_controller.init_pos(self.animate_view, self.animate_view_rect, start_x, start_y,
                                          self.animate_destination_x, self.animate_destination_y)
+
+
