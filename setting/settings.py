@@ -22,7 +22,16 @@ class Setting:
 
     # 설정 불러오기
     def load(self):
+        with open(file_path,'r') as file:
+            data=json.load(file)
+        self.screen_mode=data['screen_mode']
+        self.blind_mode=data['blind_mode']
         pass
+    
+    def load2(self):
+        with open(file_path,'r') as file:
+            data=json.load(file)
+        print(data)
 
     # 설정 초기화
     def clear(self):
