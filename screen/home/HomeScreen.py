@@ -16,7 +16,8 @@ class HomeScreen:
         self.menu_dict = [
             {'text': '싱글플레이', 'action': lambda: self.screen_controller.set_screen(TYPE_LOBBY), 'view': None, 'rect': None },
             {'text': '스토리모드', 'view': None, 'rect': None, 'action': lambda: (
-                self.screen_controller.set_screen_type(TYPE_STORY)
+                self.screen_controller.set_screen_type(TYPE_STORY),
+                self.screen_controller.screens[TYPE_STORY].init()
             )},
             {'text': '설정', 'action': lambda: self.screen_controller.set_screen(TYPE_SETTING), 'view': None, 'rect': None },
             {'text': '종료', 'action': lambda: self.screen_controller.stop(), 'view': None, 'rect': None },
@@ -26,9 +27,6 @@ class HomeScreen:
 
         self.draw_title(self.screen_controller.screen)
         self.draw_menu(self.screen_controller.screen, self.menu_dict)
-
-
-
 
 
     # 시작 화면

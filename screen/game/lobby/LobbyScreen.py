@@ -197,8 +197,12 @@ class LobbyScreen:
         elif key == pygame.K_BACKSPACE:
             self.input_name_text = self.input_name_text[:-1]
 
-        else:
+        elif event.unicode.isalnum():
             self.input_name_text += event.unicode
+
+        else:
+            pass
+            #TODO: 알파벳 숫자만 입력가능합니다.
 
     def run_computer_select_key_event(self, key):
         if key == pygame.K_UP:
