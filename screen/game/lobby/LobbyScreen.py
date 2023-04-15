@@ -3,14 +3,19 @@ from typing import TYPE_CHECKING
 
 import pygame.draw
 
+from game.model.player import Player
 from util.globals import *
-
-if TYPE_CHECKING:
-    from screen.game.GameController import GameController
 
 
 class LobbyScreen:
     def __init__(self, screen_controller):
+
+        # 상위 의존성 초기화
+        self.screen_controller = screen_controller
+        self.screen = screen_controller.screen
+        self.game = screen_controller.game
+
+
         # 메뉴 초기화
         self.menu_index = 0
         self.menus = [
@@ -20,14 +25,29 @@ class LobbyScreen:
             )},
         ]
 
+        self.menu_enabled = True
         self.input_name_dialog_enabled = False
+        self.input_name_text = 'Player'
 
-        self.input_name_enabled = False
-        self.input_name_text = ''
+        self.computer_layout_list = []
+        self.computer_select_enabled = False
+        self.computer_index = 0
+        self.computer_layout_width = 200
+        self.computer_height = (self.screen.get_height() - get_small_margin() * 6) // 5
+        self.init_computer(self.screen)
 
-        # 상위 의존성 초기화
-        self.screen_controller = screen_controller
-        self.game = screen_controller.game
+
+    def init(self):
+        self.menu_enabled = True
+        self.input_name_dialog_enabled = False
+        self.computer_select_enabled = False
+        self.input_name_text = 'Player'
+
+        self.computer_layout_list = []
+        self.computer_select_enabled = False
+        self.computer_index = 0
+        self.init_computer(self.screen)
+
 
     def toggle_input_name_dialog(self):
         self.input_name_dialog_enabled = not self.input_name_dialog_enabled
@@ -39,7 +59,7 @@ class LobbyScreen:
             for idx, item in enumerate(self.menus):
                 # 플레이 텍스트
                 text_play = get_medium_font().render(item['text'], True,
-                                                     COLOR_BLACK if idx == self.menu_index else COLOR_GRAY)
+                                                     COLOR_BLACK if self.menu_enabled and idx == self.menu_index else COLOR_GRAY)
                 text_play_rect = get_left_center_rect(text_play, screen.get_rect(), y=text_play.get_height() * idx,
                                                       x=get_medium_margin())
 
@@ -66,12 +86,10 @@ class LobbyScreen:
             # 글자
             screen.blit(self.input_name, input_name_rect)
 
-            if self.input_name_enabled:
-                pygame.draw.rect(screen, COLOR_BLACK, input_name_rect, 2)
-
         # 함수 호출
         screen.fill(COLOR_WHITE)
         draw_menu()
+        self.draw_computer_layout(screen)
 
         if self.input_name_dialog_enabled:
             self.draw_input_name_dialog(screen)
@@ -92,7 +110,8 @@ class LobbyScreen:
         self.submit_rect = get_bottom_center_rect(submit, background_rect, -submit.get_width() // 2, -(submit.get_height() + get_small_margin()))
 
         # 입력 박스
-        input_name = get_small_font().render('이름', True, COLOR_BLACK)
+        input_name = get_small_font().render(self.input_name_text, True, COLOR_BLACK)
+
         input_background = pygame.Surface(size = (background_rect.width - 4 * get_medium_margin(), input_name.get_height() + get_small_margin()))
         input_background.fill(COLOR_LIGHT_GRAY)
 
@@ -102,6 +121,35 @@ class LobbyScreen:
         screen.blit(title, get_top_center_rect(title, background_rect, x = -title.get_width() // 2, y = get_medium_margin()))
         screen.blit(submit, self.submit_rect)
         screen.blit(input_background, get_center_rect(input_background, background_rect))
+        screen.blit(input_name, get_center_rect(input_name, background_rect))
+
+    def draw_computer_layout(self, screen):
+        pygame.draw.rect(screen, COLOR_GRAY, (screen.get_width() - self.computer_layout_width, 0, self.computer_layout_width, screen.get_height()))
+        self.draw_computer(screen)
+
+    def init_computer(self, screen):
+        for idx in range(5):
+            computer_rect = pygame.Rect(screen.get_width() - self.computer_layout_width + get_small_margin(),
+                             get_small_margin() + (self.computer_height + get_small_margin()) * idx,
+                             self.computer_layout_width - get_small_margin() * 2, self.computer_height
+                            )
+
+            self.computer_layout_list.append({'view': computer_rect, 'enabled': False if idx >= 1 else True})
+
+    def draw_computer(self, screen):
+        for idx, computer in enumerate(self.computer_layout_list):
+            if computer['enabled']:
+                pygame.draw.rect(screen, COLOR_PLAYER, computer['view'])
+
+            # 선택된 플레이어 하이라이트
+            if self.computer_select_enabled and idx == self.computer_index:
+                # 투명 색상 적용
+                surface = pygame.Surface(
+                    (self.computer_layout_width - get_small_margin() * 2, self.computer_height),
+                    pygame.SRCALPHA)
+                surface.fill(COLOR_TRANSPARENT_WHITE)
+                screen.blit(surface, (screen.get_width() - self.computer_layout_width + get_small_margin(),
+                                      get_small_margin() + (self.computer_height + get_small_margin()) * idx))
 
     # 이벤트 처리
     def run_events(self, events):
@@ -114,39 +162,66 @@ class LobbyScreen:
 
     # 키입력 이벤트 처리
     def run_key_event(self, event, key):
-
-        # 메뉴 키입력 이벤트 처리
-        def run_menu_key_event(key):
-            if key == pygame.K_UP:
-                self.menu_index = (self.menu_index - 1) % len(self.menus)
-            elif key == pygame.K_DOWN:
-                self.menu_index = (self.menu_index + 1) % len(self.menus)
-            elif key == pygame.K_RETURN:
-                self.menus[self.menu_index]['action']()
-
-            elif key == pygame.K_RIGHT:
-                self.menu_enabled = False
-                self.input_name_enabled = True
-
         if self.input_name_dialog_enabled:
-            return self.run_input_name_dialog_key_event(key)
+            self.run_input_name_dialog_key_event(event, key)
+        elif self.menu_enabled:
+            self.run_menu_key_event(key)
+        elif self.computer_select_enabled:
+            self.run_computer_select_key_event(key)
 
-        # 함수 호출
-        run_menu_key_event(key)
+    def run_menu_key_event(self, key):
+        if key == pygame.K_UP:
+            self.menu_index = (self.menu_index - 1) % len(self.menus)
+        elif key == pygame.K_DOWN:
+            self.menu_index = (self.menu_index + 1) % len(self.menus)
+        elif key == pygame.K_RETURN:
+            self.menus[self.menu_index]['action']()
 
-    def run_input_name_dialog_key_event(self, key):
+        elif key == pygame.K_RIGHT:
+            self.menu_enabled = False
+            self.computer_select_enabled = True
+
+    def run_input_name_dialog_key_event(self, event, key):
         if key == pygame.K_ESCAPE:
             return self.toggle_input_name_dialog()
 
         if key == pygame.K_RETURN:
             # 이름 설정
+            self.game.players = []
+            self.game.players.append(Player(self.input_name_text))
+            # 컴퓨터 플레이어 설정 적용
+            for idx, computer in enumerate(self.computer_layout_list):
+                if computer['enabled']:
+                    self.game.players.append(Player(f'Computer{idx + 1}'))
 
-            # 플레이어 설정 적용
 
             # 화면 이동
             self.screen_controller.set_screen_type(TYPE_PLAY)
+            self.screen_controller.game.start_game()
 
+        # 키보드 입력
+        elif key == pygame.K_BACKSPACE:
+            self.input_name_text = self.input_name_text[:-1]
 
-    # 클릭 이벤트 처리
+        elif event.unicode.isalnum():
+            self.input_name_text += event.unicode
+
+        else:
+            pass
+            #TODO: 알파벳 숫자만 입력가능합니다.
+
+    def run_computer_select_key_event(self, key):
+        if key == pygame.K_UP:
+            self.computer_index = (self.computer_index - 1) % 5
+        elif key == pygame.K_DOWN:
+            self.computer_index = (self.computer_index + 1) % 5
+        elif key == pygame.K_LEFT:
+            self.menu_enabled = True
+            self.computer_select_enabled = False
+        elif key == pygame.K_RETURN:
+            self.toggle_computer_enabled()
+    def toggle_computer_enabled(self):
+        self.computer_layout_list[self.computer_index]['enabled'] = not self.computer_layout_list[self.computer_index]['enabled']
+
     def run_click_event(self, event, pos):
         pass

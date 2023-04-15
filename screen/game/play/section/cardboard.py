@@ -17,6 +17,8 @@ class CardBoard:
         self.game: UnoGame = game_controller.game
         self.board = game_controller.board
 
+        self.next_card_start_x = get_extra_small_margin()
+
 
     def init(self, width, height):
         self.card_width = get_card_width(1.5)

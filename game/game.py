@@ -10,15 +10,18 @@ class UnoGame:
         self.init()
 
         self.turn_time = 10 # 턴 시간 (초단위)
+        self.is_started = False
         self.turn_start_time = time.time()
 
+    def start_game(self):
+        self.is_started = True
     # 게임 시작
     def init(self):
-        self.reverse_direction = True
+        self.reverse_direction = False
         self.current_player_index = 0
         self.board_player_index = 0
         self.players: list[Player] = []
-        self.add_player("YOU")
+
         self.deck = Deck()
 
         self.deal()

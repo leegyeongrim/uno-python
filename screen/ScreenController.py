@@ -32,6 +32,9 @@ class ScreenController:
 
         self.init_instance()
 
+        self.is_bgm_playing = False
+        self.bgm = pygame.mixer.Sound('./resource/sound/bgm.mp3')
+        self.effect = pygame.mixer.Sound('./resource/sound/effect.mp3')
 
     def init_pygame(self):
         pygame.init()
@@ -55,7 +58,6 @@ class ScreenController:
     def set_screen_type(self, type):
         self.screen_type = type
 
-
     # 설정 불러오기
     def loadSetting(self):
         self.screen = pygame.display.set_mode(self.setting.get_resolution())
@@ -68,7 +70,18 @@ class ScreenController:
             self.display_screen()
             self.run_events()
             pygame.display.update()
+            self.update_bgm()
         pygame.quit()
+
+    def update_bgm(self):
+        if self.screen_type == TYPE_PLAY:
+            if not self.is_bgm_playing:
+                self.is_bgm_playing = True
+                self.bgm.play(-1)
+        else:
+            self.bgm.stop()
+            self.is_bgm_playing = False
+
 
     # 화면 종료
     def stop(self):
@@ -77,11 +90,11 @@ class ScreenController:
     # 현재 화면 불러옴
     def get_screen(self):
         return ScreenController.screens.get(self.screen_type)
-    
+
     # 현재 화면 설정
     def set_screen(self, screen_type):
         self.screen_type = screen_type
-    
+
     # 화면 선택
     def display_screen(self):
         self.get_screen().draw(self.screen)
@@ -93,7 +106,7 @@ class ScreenController:
         # cursor = pygame.transform.scale(cursor, (35, 40))
         cursor_rect = cursor.get_rect().topleft = pygame.mouse.get_pos()
         self.screen.blit(cursor, cursor_rect)
-    
+
     # 이벤트 선택
     def run_events(self):
         # 이벤트 목록 
@@ -106,3 +119,6 @@ class ScreenController:
 
         # 화면에 이벤트 전달
         self.get_screen().run_events(events)
+
+    def play_effect(self):
+        self.effect.play()
