@@ -26,10 +26,7 @@ class LobbyScreen:
         ]
 
         self.menu_enabled = True
-
         self.input_name_dialog_enabled = False
-
-        self.input_name_enabled = False
         self.input_name_text = 'Player'
 
         self.computer_layout_list = []
@@ -37,6 +34,18 @@ class LobbyScreen:
         self.computer_index = 0
         self.computer_layout_width = 200
         self.computer_height = (self.screen.get_height() - get_small_margin() * 6) // 5
+        self.init_computer(self.screen)
+
+
+    def init(self):
+        self.menu_enabled = True
+        self.input_name_dialog_enabled = False
+        self.computer_select_enabled = False
+        self.input_name_text = 'Player'
+
+        self.computer_layout_list = []
+        self.computer_select_enabled = False
+        self.computer_index = 0
         self.init_computer(self.screen)
 
 
@@ -76,9 +85,6 @@ class LobbyScreen:
 
             # 글자
             screen.blit(self.input_name, input_name_rect)
-
-            if self.input_name_enabled:
-                pygame.draw.rect(screen, COLOR_BLACK, input_name_rect, 2)
 
         # 함수 호출
         screen.fill(COLOR_WHITE)

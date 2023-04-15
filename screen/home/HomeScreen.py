@@ -14,7 +14,10 @@ class HomeScreen:
         # 초기 설정
         self.selected_menu_index = 0
         self.menu_dict = [
-            {'text': '싱글플레이', 'action': lambda: self.screen_controller.set_screen(TYPE_LOBBY), 'view': None, 'rect': None },
+            {'text': '싱글플레이', 'view': None, 'rect': None, 'action': lambda: (
+                self.screen_controller.set_screen(TYPE_LOBBY),
+                self.screen_controller.screens[TYPE_LOBBY].init()
+            )},
             {'text': '스토리모드', 'view': None, 'rect': None, 'action': lambda: (
                 self.screen_controller.set_screen_type(TYPE_STORY),
                 self.screen_controller.screens[TYPE_STORY].init()
