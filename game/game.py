@@ -136,7 +136,7 @@ class UnoGame:
         if self.reverse_direction: #정방향이면
             self.current_player_index-=1 #미리 index 감소시켜놓고, next_turn 수행시 다시 자기 차례로 돌아오게함 
         else: #역방향이면
-            self.current_player_index-=1 #미리 index 증가시켜놓고, next_turn 수행시 다시 자기 차례로 돌아오게함
+            self.current_player_index+=1 #미리 index 증가시켜놓고, next_turn 수행시 다시 자기 차례로 돌아오게함
     # SKILL_runPLUS_4 수행
     def runPLUS_4(self):
         if self.reverse_direction:
@@ -148,7 +148,5 @@ class UnoGame:
         self.current_card.color=CARD_COLOR_SET[idx]
         
     
-game = UnoGame()
-game.init()
 
 

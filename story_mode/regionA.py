@@ -6,9 +6,10 @@ import random
 class regionA:
    def __init__(self):
       self.game=UnoGame()
-      self.game.add_computer("computer1")
+      self.example=[]
       self.func_list=[] #기술카드만 모은 list
       self.num_list=[] #숫자카드만 모은 list
+      
 
    def split_cards(self): #카드 기술,숫자로 분리
       cards=self.game.deck.cards
@@ -18,18 +19,18 @@ class regionA:
          else: #기술카드 분리
             self.func_list.append(cards[i])
 
-   def computer_deal(self): #computer가 처음 기술카드 더 많이 갖게 deal
+   def computer_deal(self,n): #computer가 처음 기술카드 더 많이 갖게 deal (n장 받음)
       sample=[0,0,1,1,1]
       random.shuffle(self.func_list)
       random.shuffle(self.num_list)
-      for _ in range(7):
+
+      for _ in range(n):
          idx=random.randint(0,len(sample)-1) #무작위 뽑기
          if sample[idx]: #기술카드 뽑는 경우
-            self.game.players[1].hands.append(self.func_list.pop())
+            self.example.append(self.func_list.pop())
          else:
-            self.game.players[1].hands.append(self.num_list.pop())
-      #위에서 뽑은 7장의 카드를 deck에 반영해야함 (추가 구현 필요)
+            self.example.append(self.num_list.pop())
 
-practice=regionA()
-practice.split_cards()
-practice.computer_deal()
+   # func,num pop한 결과를 cards에 반영
+   def set_deck(self):
+      self.game.deck.cards=self.func_list+self.num_list
