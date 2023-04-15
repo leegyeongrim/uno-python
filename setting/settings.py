@@ -12,9 +12,6 @@ class Setting:
         return (self.screen_width, self.screen_height)
     
     
-    def toggleBlindMode(self):
-        self.blind_mode = not self.blind_mode
-
     def isBlindModeEnabled(self):
         return self.blind_mode
     
@@ -28,6 +25,9 @@ class Setting:
         elif(self.screen_mode==2):
             self.screen_width, self.screen_height=width[2], height[2]
     
+    def toggleBlindMode(self):
+        self.blind_mode = not self.blind_mode
+        
 
     # 설정 저장
     def save(self):
