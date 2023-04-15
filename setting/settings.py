@@ -26,4 +26,8 @@ class Setting:
 
     # 설정 초기화
     def clear(self):
+        self.screen_width=720
+        self.screen_height=600
+        self.screen_mode = 1
+        self.blind_mode = False
         pass
