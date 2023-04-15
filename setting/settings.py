@@ -18,6 +18,8 @@ class Setting:
 
     # 설정 저장
     def save(self):
+        with open(file_path,'w') as file:
+            json.dump(self.setting_data(), file)
         pass
 
     # 설정 불러오기
