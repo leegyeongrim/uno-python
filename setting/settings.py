@@ -30,6 +30,12 @@ class Setting:
     def toggleBlindMode(self):
         self.blind_mode = not self.blind_mode
         
+    def setting_data(self):
+        setting_data={
+        'screen_mode':self.screen_mode,
+        'blind_mode':self.blind_mode
+        }
+        return setting_data
 
     # 설정 저장
     def save(self):
