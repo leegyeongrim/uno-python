@@ -3,7 +3,8 @@ from game.model.deck import Deck
 class Player:
     def __init__(self, name):
         self.name = name
-        self.hands = []
+        self.hands = None
+        self.isComputer=False #컴퓨터인지 사람인지 구별
     
     def deal(self, cards):
         self.hands = cards
@@ -21,6 +22,11 @@ class Player:
         pass
     
 class Computer(Player):
+    def __init__(self, name):
+        self.name = name
+        self.hands = None
+        self.isComputer=True
+
     def init_hands(self, hands):
         self.hands= hands
 
