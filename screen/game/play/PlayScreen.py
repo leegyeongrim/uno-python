@@ -1,4 +1,6 @@
 from __future__ import annotations
+
+from screen.game.play.section.escapeDialog import EscapeDialog
 from util.globals import *
 from screen.animate.animate import AnimateController
 from screen.game.play.section.board import Board
@@ -9,12 +11,29 @@ class PlayScreen:
 
     def __init__(self, screen_controller):
 
-        self.players_layout_width = 200
-
+        # 의존성 객체
         self.screen_controller = screen_controller
         self.animate_controller = AnimateController()
         self.game = screen_controller.game
 
+        # 고정된 값
+        self.players_layout_width = 200
+
+        # 다이얼로그
+        self.escape_dialog = EscapeDialog(self)
+
+        # 나의 카드 레이아웃
+        self.my_cards_selected_index = 0
+        self.cards_line_size = 0  # 한 줄 당 카드 개수
+
+        self.my_cards_select_enabled = False  # 카드 선택 가능 상태
+
+        # 플레이어 레이아웃
+        self.player_layout_list = []
+        self.players_selected_index = 1
+        self.players_select_enabled = False # 플레이어 선택 가능 상태
+
+        # 게임 관련
         self.game_started = False
 
         self.stop_timer_enabled = False
@@ -22,18 +41,11 @@ class PlayScreen:
         self.animate_deck_to_player_enabled = False
         self.animate_board_player_to_current_card_enabled = False
 
-        self.player_layout_list = []
-
-
-        self.init_my_cards_layout(self.screen_controller.screen)
-
-        self.init_players_layout(self.screen_controller.screen)
-        self.init_escape_dialog(self.screen_controller.screen)
-
         # 보드 값
         self.board_width = self.screen_controller.screen.get_width() - self.players_layout_width
-
         self.board = Board(self)
+        
+        # 카드 레이아웃
         self.card_board = CardBoard(self)
 
     # 타이머 일시정지
@@ -48,55 +60,17 @@ class PlayScreen:
         self.game.is_started = True
         self.game.turn_start_time = time.time()
 
-    # 나의 카드 레이아웃 초기화
-    def init_my_cards_layout(self, screen):
-        self.my_cards_layout_height = screen.get_height() // 3
-
-        self.my_cards_select_enabled = False  # 카드 선택 가능 상태
-        self.my_cards_selected_index = 0
-        self.cards_line_size = 0  # 한 줄 당 카드 개수
-
-    # 플레이어 레이아웃 초기화
-    def init_players_layout(self, screen):
-
-        self.players_selected_index = 1  # TODO: 유동적으로 수정
-        self.players_select_enabled = False  # TODO: 플레이어 선택 가능 상태
-
-
-
-
-    # 일시정지 다이얼로그 초기화
-    def init_escape_dialog(self, screen):
-        self.escape_dialog_enabled = False
-
-        self.escape_dialog_width = 500
-        self.escape_dialog_height = 300
-
-        self.escape_menu_index = 0
-        self.esacpe_menus = [
-            {'text': '설정', 'view': None, 'rect': None,
-             'action': lambda: (
-                 self.screen_controller.set_screen(TYPE_SETTING),
-                 self.screen_controller.set_paused(),
-             )},
-            {'text': '종료', 'view': None, 'rect': None, 'action': lambda: (
-                self.init(),
-                self.screen_controller.set_screen(TYPE_START)
-            )
-             }
-        ]
-
-    # 초기화 함수 (게임 종료 후 다시 들어왔을 때 호출)
+    # 초기화 함수
     def init(self):
-        self.escape_dialog_enabled = False
-        self.escape_menu_index = 0
+        self.escape_dialog.enabled = False
+        self.escape_dialog.menu_idx = 0
 
     # 다이얼로그 표시 상태 변경
     def toggle_escape_dialog(self):
-        self.escape_dialog_enabled = not self.escape_dialog_enabled
+        self.escape_dialog.enabled = not self.escape_dialog.enabled
 
         # 일시정지 시간 처리
-        if self.escape_dialog_enabled:
+        if self.escape_dialog.enabled:
             self.pause_timer()
         else:
             self.continue_timer()
@@ -153,8 +127,8 @@ class PlayScreen:
                 self.animate_board_player_to_current_card_enabled = False
                 self.continue_timer()
 
-        if self.escape_dialog_enabled:
-            self.draw_escpe_dialog_layout(screen)
+        if self.escape_dialog.enabled:
+            self.escape_dialog.draw(screen)
 
     def check_time(self):
         if self.stop_timer_enabled:
@@ -171,31 +145,6 @@ class PlayScreen:
     def check_my_turn(self):
         self.my_cards_select_enabled = self.game.board_player_index == self.game.current_player_index
 
-    # 일시정지 다이얼로그 레이아웃
-    def draw_escpe_dialog_layout(self, screen):
-        # background solid
-        self.escape_box = pygame.draw.rect(screen, COLOR_WHITE, (
-        (screen.get_width() - self.escape_dialog_width) // 2, (screen.get_height() - self.escape_dialog_height) // 2,
-        self.escape_dialog_width, self.escape_dialog_height))
-        # background outline
-        pygame.draw.rect(screen, COLOR_BLACK, (
-        (screen.get_width() - self.escape_dialog_width) // 2, (screen.get_height() - self.escape_dialog_height) // 2,
-        self.escape_dialog_width, self.escape_dialog_height), 1)
-
-        title = get_large_font().render("일시정지", True, COLOR_BLACK)
-        title_rect = get_rect(title, screen.get_width() // 2, self.escape_box.y + get_medium_margin())
-        screen.blit(title, title_rect)
-
-        self.draw_esacpe_menu(screen)
-
-    # 일시정지 메뉴
-    def draw_esacpe_menu(self, screen):
-        for index, menu in enumerate(self.esacpe_menus):
-            text = get_medium_font().render(menu['text'], True,
-                                            COLOR_GRAY if index != self.escape_menu_index else COLOR_BLACK)
-            rect = get_rect(text, screen.get_width() // 2, screen.get_height() // 2 + text.get_height() * index)
-            menu.update({'view': text, 'rect': rect})
-            screen.blit(text, rect)
 
     # 플레이어 목록 레이아웃
     def draw_players_layout(self, screen, players):
@@ -291,8 +240,8 @@ class PlayScreen:
                 self.toggle_escape_dialog()
 
             # 일시정지
-            if self.escape_dialog_enabled:
-                self.run_esacpe_key_event(key)
+            if self.escape_dialog.enabled:
+                self.escape_dialog.run_key_event(key)
 
             # 카드 선택
             elif self.my_cards_select_enabled:
@@ -301,15 +250,6 @@ class PlayScreen:
             # 플레이어 선택
             elif self.players_select_enabled:
                 self.run_players_select_key_event(key)
-
-    # 일시정지 메뉴 키 이벤트
-    def run_esacpe_key_event(self, key):
-        if key == pygame.K_UP:
-            self.escape_menu_index = (self.escape_menu_index - 1) % len(self.esacpe_menus)
-        elif key == pygame.K_DOWN:
-            self.escape_menu_index = (self.escape_menu_index + 1) % len(self.esacpe_menus)
-        elif key == pygame.K_RETURN:
-            self.esacpe_menus[self.escape_menu_index]['action']()
 
     # 플레이어 선택 키 이벤트
     def run_players_select_key_event(self, key):
@@ -329,8 +269,8 @@ class PlayScreen:
     # 클릭 이벤트
     def process_click_event(self, pos):
 
-        if self.escape_dialog_enabled:
-            self.run_esacpe_click_event(pos)
+        if self.escape_dialog.enabled:
+            self.escape_dialog.run_click_event(pos)
 
         elif self.my_cards_select_enabled:
             self.board.run_deck_click_event(pos)
@@ -339,11 +279,6 @@ class PlayScreen:
         elif self.players_select_enabled:
             self.run_players_select_click_event(pos)
 
-    # 일시정지 메뉴 클릭 이벤트
-    def run_esacpe_click_event(self, pos):
-        for menu in self.esacpe_menus:
-            if menu['rect'] and menu['rect'].collidepoint(pos):
-                menu['action']()
 
     # 플레이어 선택 클릭 이벤트
     def run_players_select_click_event(self, pos):
