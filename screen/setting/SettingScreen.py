@@ -25,7 +25,7 @@ class SettingScreen:
             {'text': '배경볼륨', 'rect': None, 'result': None, 'selected_mode': 0, 'mode_rects': [], 'max': 10, 'type': MODE_BACKGROUND_VOLUME},
             {'text': '효과음볼륨', 'rect': None, 'result': None, 'selected_mode': 0, 'mode_rects': [], 'max': 10, 'type': MODE_EFFECT_VOLUME},
             {'text': '키 설정', 'rect': None, 'result': None, 'selected_mode': 0, 'mode_rects': [], 'max': 0, 'type': None},
-            {'text': '초기화', 'rect': None, 'result': None, 'selected_mode': 0, 'mode_rects': [], 'max': 0, 'type': None},
+            {'text': '초기화', 'rect': None, 'result': None, 'selected_mode': 0, 'mode_rects': [], 'max': 0, 'type': MODE_CLEAR},
             {'text': '돌아가기', 'rect': None, 'result': None, 'selected_mode': 0, 'mode_rects': [], 'max': 0, 'type': MODE_RETURN},
         ]
         self.max_text_right = get_medium_font().render('효과음볼륨', True, COLOR_BLACK).get_rect().right + get_medium_margin()
@@ -94,8 +94,9 @@ class SettingScreen:
         elif key == pygame.K_DOWN:
             self.updateSettingSelectIndex(1)
         elif key == pygame.K_RIGHT:
-            self.mode_select_enabled = True
-            self.setting_select_enabled = False
+            if self.get_selected_setting()['max'] != 0:
+                self.mode_select_enabled = True
+                self.setting_select_enabled = False
         elif key == pygame.K_RETURN:
             if self.get_selected_type() == MODE_RETURN:
                 if self.controller.is_paused:
@@ -103,6 +104,8 @@ class SettingScreen:
                     self.controller.is_paused = False
                 else:
                     self.controller.set_screen(TYPE_START)
+            elif self.get_selected_type() == MODE_CLEAR:
+                self.setting.clear()
 
 
     def run_select_mode_event(self, key):
@@ -127,6 +130,7 @@ class SettingScreen:
         setting['selected_mode'] = (setting['selected_mode'] + direction) % setting['max']
         print(setting['selected_mode'])
 
-
+    def get_selected_setting(self):
+        return self.settings[self.selected_setting_idx]
     def get_selected_type(self):
-        return self.settings[self.selected_setting_idx]['type']
+        return self.get_selected_setting()['type']

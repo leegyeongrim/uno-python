@@ -58,6 +58,7 @@ MODE_BLIND = "mode_blind"
 MODE_MASTER_VOLUME = "mode_master_volume"
 MODE_BACKGROUND_VOLUME = "mode_background_volume"
 MODE_EFFECT_VOLUME = "mode_effect_volume"
+MODE_CLEAR = "mode_clear"
 MODE_RETURN = "mode_return"
 
 TYPE_SINGLE = "type_single"
