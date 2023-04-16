@@ -2,7 +2,7 @@ class AnimateController:
     def __init__(self):
         self.enabled = False
 
-        self.speed = 40
+        self.speed = 20
 
         self.start_x = None
         self.start_y = None
