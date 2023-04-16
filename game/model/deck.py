@@ -8,8 +8,9 @@ class Deck:
 
         self.init_deck()
 
-    def init_deck(self): #deck 생성시, shuffle 되는거 뺌 -> regionA 구현 위해
+    def init_deck(self):
         self.create_cards()
+        self.shuffle()
 
     def create_cards(self):
         color = list(CARD_COLOR_SET.keys())
@@ -24,7 +25,7 @@ class Deck:
         for c in color[1:]:
             for v in value[:14]:
                 cards.append(Card(c,v))
-        self.cards=cards
+        self.cards = cards
         
     def shuffle(self):
         random.shuffle(self.cards)

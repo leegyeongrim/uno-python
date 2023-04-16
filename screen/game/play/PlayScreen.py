@@ -3,6 +3,7 @@ from typing import TYPE_CHECKING
 
 from game.model.player import Computer
 from screen.game.play.section.escapeDialog import EscapeDialog
+from screen.game.play.section.gameOverDialog import GameOverDialog
 from screen.game.play.section.playersLayout import PlayersLayout
 from util.globals import *
 from screen.animate.animate import AnimateController
@@ -23,10 +24,8 @@ class PlayScreen:
         self.animate_controller = AnimateController()
         self.game = screen_controller.game
 
-        # 다이얼로그
         self.escape_dialog = EscapeDialog(self)
-
-        # 플레이어 레이아웃
+        self.game_over_dialog = GameOverDialog(self)
         self.players_layout = PlayersLayout(self)
 
         # 나의 카드 레이아웃
@@ -89,11 +88,6 @@ class PlayScreen:
         self.my_cards_layout_height = screen.get_height() // 3
 
         if self.game.is_started:
-            if self.game.is_game_over():
-                pass
-                # print("게임 종료") TODO 게임 종료
-                # print(self.game.get_winner().name)
-
             self.resolve_error()
 
             self.board.draw(screen, self.game.current_card)
@@ -103,7 +97,11 @@ class PlayScreen:
             self.players_layout.draw(screen)
             self.check_time()
 
-        if self.animate_deck_to_player_enabled:
+        if self.game.is_game_over():
+            self.game_over_dialog.draw(screen, self.game.get_winner())
+        elif self.escape_dialog.enabled:
+            pass
+        elif self.animate_deck_to_player_enabled:
             if self.animate_controller.enabled:
                 self.pause_timer()
                 self.animate_controller.draw(screen)
@@ -174,11 +172,12 @@ class PlayScreen:
                 elif event.type == pygame.MOUSEBUTTONUP:
                     self.process_click_event(pygame.mouse.get_pos())
 
-
-
     # 키보드 입력 이벤트 처리
     def process_key_event(self, key):
         if self.game.is_started:
+            if self.game.is_game_over():
+                self.game_over_dialog.run_key_event(key)
+
             if key == pygame.K_ESCAPE:
                 self.toggle_escape_dialog()
 
@@ -196,6 +195,9 @@ class PlayScreen:
 
     # 클릭 이벤트
     def process_click_event(self, pos):
+
+        if self.game.is_game_over():
+            self.game_over_dialog.run_click_event(None)
 
         if self.escape_dialog.enabled:
             self.escape_dialog.run_click_event(pos)
@@ -278,7 +280,7 @@ class PlayScreen:
 
             self.to_computer_play_idx = computer.to_play(self.game)
 
-            if self.to_computer_play_idx:
+            if self.to_computer_play_idx is not None:
                 self.screen_controller.play_effect()
                 self.animate_current_player_to_current_card_enabled = True
 
