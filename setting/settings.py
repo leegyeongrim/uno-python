@@ -1,15 +1,11 @@
 import json
 import os
 
+from util.globals import *
+
 
 class Setting:
     file_path = 'uno_setting.json'
-
-    MODE_SCREEN = "mode_screen"
-    MODE_BLIND = "mode_blind"
-    MODE_MASTER_VOLUME = "mode_master_volume"
-    MODE_BACKGROUND_VOLUME = "mode_background_volume"
-    MODE_EFFECT_VOLUME = "mode_effect_volume"
 
     MAX_VOLUME = 10
 
@@ -24,11 +20,11 @@ class Setting:
 
     def init(self):
         self.data = {
-            Setting.MODE_SCREEN: 1,
-            Setting.MODE_BLIND: False,
-            Setting.MODE_MASTER_VOLUME: 5,
-            Setting.MODE_BACKGROUND_VOLUME: 5,
-            Setting.MODE_EFFECT_VOLUME: 5,
+            MODE_SCREEN: 1,
+            MODE_BLIND: 0,
+            MODE_MASTER_VOLUME: 4,
+            MODE_BACKGROUND_VOLUME: 4,
+            MODE_EFFECT_VOLUME: 4,
         }
 
     def clear(self):
@@ -36,13 +32,13 @@ class Setting:
         self.save()
 
     def get_resolution(self):
-        return self.screen_resolution[self.get(Setting.MODE_SCREEN)]
+        return self.screen_resolution[self.get(MODE_SCREEN)]
 
     def get_background_volume(self):
-        return self.get(Setting.MODE_BACKGROUND_VOLUME) * self.get(Setting.MODE_MASTER_VOLUME) / 100
+        return self.get(MODE_BACKGROUND_VOLUME) * self.get(MODE_MASTER_VOLUME) / 100
 
     def get_effect_volume(self):
-        return self.get(Setting.MODE_EFFECT_VOLUME) * self.get(Setting.MODE_MASTER_VOLUME) / 100
+        return self.get(MODE_EFFECT_VOLUME) * self.get(MODE_MASTER_VOLUME) / 100
 
     # 파일 저장 관련 코드
     def get(self, key):
@@ -61,7 +57,7 @@ class Setting:
         try:
             with open(self.file_path, 'r') as f:
                 self.data = json.load(f)
-        except FileNotFoundError:
+        except:
             self.clear()
 
 
@@ -69,4 +65,4 @@ if __name__ == '__main__':
     setting = Setting()
     print(setting.get_resolution())
     print(setting.get_effect_volume())
-    print(setting.get(Setting.MODE_MASTER_VOLUME))
+    print(setting.get(MODE_MASTER_VOLUME))

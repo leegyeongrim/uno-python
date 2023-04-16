@@ -53,6 +53,13 @@ TYPE_PLAY = "play"
 TYPE_LOBBY = "lobby"
 TYPE_STORY = "story"
 
+MODE_SCREEN = "mode_screen"
+MODE_BLIND = "mode_blind"
+MODE_MASTER_VOLUME = "mode_master_volume"
+MODE_BACKGROUND_VOLUME = "mode_background_volume"
+MODE_EFFECT_VOLUME = "mode_effect_volume"
+MODE_RETURN = "mode_return"
+
 DIMEN_EXTRA_LARGE = 50
 DIMEN_LARGE = 40
 DIMEN_MEDIUM = 30

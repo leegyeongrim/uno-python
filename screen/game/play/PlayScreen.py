@@ -9,11 +9,13 @@ class PlayScreen:
 
     def __init__(self, screen_controller):
 
-        self.game = screen_controller.game
-        self.game_started = False
+        self.players_layout_width = 200
 
         self.screen_controller = screen_controller
         self.animate_controller = AnimateController()
+        self.game = screen_controller.game
+
+        self.game_started = False
 
         self.stop_timer_enabled = False
         self.deck_select_enabled = False
@@ -28,9 +30,11 @@ class PlayScreen:
         self.init_players_layout(self.screen_controller.screen)
         self.init_escape_dialog(self.screen_controller.screen)
 
-        self.board = Board(self).init(self.screen_controller.screen.get_width() - self.players_layout_width,
-                                      self.screen_controller.screen.get_height() - self.my_cards_layout_height)
-        self.card_board = CardBoard(self).init(self.board.background_rect.width, self.my_cards_layout_height)
+        # 보드 값
+        self.board_width = self.screen_controller.screen.get_width() - self.players_layout_width
+
+        self.board = Board(self)
+        self.card_board = CardBoard(self)
 
     # 타이머 일시정지
     def pause_timer(self):
@@ -58,8 +62,8 @@ class PlayScreen:
         self.players_selected_index = 1  # TODO: 유동적으로 수정
         self.players_select_enabled = False  # TODO: 플레이어 선택 가능 상태
 
-        self.players_layout_width = 200
-        self.player_layout_height = (screen.get_height() - get_small_margin() * 6) // 5
+
+
 
     # 일시정지 다이얼로그 초기화
     def init_escape_dialog(self, screen):
@@ -71,7 +75,10 @@ class PlayScreen:
         self.escape_menu_index = 0
         self.esacpe_menus = [
             {'text': '설정', 'view': None, 'rect': None,
-             'action': lambda: self.screen_controller.set_screen(TYPE_SETTING)},
+             'action': lambda: (
+                 self.screen_controller.set_screen(TYPE_SETTING),
+                 self.screen_controller.set_paused(),
+             )},
             {'text': '종료', 'view': None, 'rect': None, 'action': lambda: (
                 self.init(),
                 self.screen_controller.set_screen(TYPE_START)
@@ -101,6 +108,9 @@ class PlayScreen:
     # 모든 View
     def draw(self, screen):
         screen.fill(COLOR_WHITE)
+        self.player_layout_height = (screen.get_height() - get_small_margin() * 6) // 5
+        self.my_cards_layout_height = screen.get_height() // 3
+
         if self.game.is_started:
             if self.game.is_game_over():
                 print("게임 종료")

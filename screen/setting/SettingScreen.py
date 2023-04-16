@@ -16,19 +16,22 @@ class SettingScreen:
 
         self.title_rect = None
 
-        self.is_setting_select_enabled = True
+        self.setting_select_enabled = True
         self.selected_setting_idx = 0
         self.settings = [
-            {'text': '해상도', 'rect': None, 'result': None, 'modes': [], 'max': 3},
-            {'text': '색약모드', 'rect': None, 'result': None, 'modes': [], 'max': 2},
-            {'text': '전체볼륨', 'rect': None, 'result': None, 'modes': [], 'max': 10},
-            {'text': '배경볼륨', 'rect': None, 'result': None, 'modes': [], 'max': 10},
-            {'text': '효과음볼륨', 'rect': None, 'result': None, 'modes': [], 'max': 10},
-            {'text': '키 설정', 'rect': None, 'result': None, 'modes': [], 'max': 10},
-            {'text': '돌아가기', 'rect': None, 'result': None, 'modes': [], 'max': 10},
+            {'text': '해상도', 'rect': None, 'result': None, 'selected_mode': 0, 'mode_rects': [], 'max': 3, 'type': MODE_SCREEN},
+            {'text': '색약모드', 'rect': None, 'result': None, 'selected_mode': 0, 'mode_rects': [], 'max': 2, 'type': MODE_BLIND},
+            {'text': '전체볼륨', 'rect': None, 'result': None, 'selected_mode': 0, 'mode_rects': [], 'max': 10, 'type': MODE_MASTER_VOLUME},
+            {'text': '배경볼륨', 'rect': None, 'result': None, 'selected_mode': 0, 'mode_rects': [], 'max': 10, 'type': MODE_BACKGROUND_VOLUME},
+            {'text': '효과음볼륨', 'rect': None, 'result': None, 'selected_mode': 0, 'mode_rects': [], 'max': 10, 'type': MODE_EFFECT_VOLUME},
+            {'text': '키 설정', 'rect': None, 'result': None, 'selected_mode': 0, 'mode_rects': [], 'max': 0, 'type': None},
+            {'text': '초기화', 'rect': None, 'result': None, 'selected_mode': 0, 'mode_rects': [], 'max': 0, 'type': None},
+            {'text': '돌아가기', 'rect': None, 'result': None, 'selected_mode': 0, 'mode_rects': [], 'max': 0, 'type': MODE_RETURN},
         ]
         self.max_text_right = get_medium_font().render('효과음볼륨', True, COLOR_BLACK).get_rect().right + get_medium_margin()
 
+        # 모든 선택 상태
+        self.mode_select_enabled = False
 
     def draw(self, screen: pygame.Surface):
         screen.fill(COLOR_WHITE)
@@ -44,17 +47,32 @@ class SettingScreen:
         temp_right = 0
         for idx, setting in enumerate(self.settings):
             # 텍스트
-            color = COLOR_BLACK if idx == self.selected_setting_idx else COLOR_GRAY
+            color = COLOR_BLACK if idx == self.selected_setting_idx and self.setting_select_enabled else COLOR_GRAY
             text = get_medium_font().render(setting['text'], True, color)
             text_rect = get_rect(text, text.get_width() // 2 + get_small_margin(), screen.get_height() // 2 + text.get_height() * (idx - len(self.settings) // 2))
             setting['rect'] = text_rect
             screen.blit(text, text_rect)
 
-            # 모드 박스
-            for mode in range(setting['max']):
-                box_size = 20
-                pygame.draw.rect(screen, COLOR_GRAY, (self.max_text_right + box_size * mode * 1.1, text_rect.y + (text_rect.height - box_size) // 2, 20, 20))
+            # 값
+            temp_value = str(self.setting.get(setting['type']))
+            if setting['type'] == MODE_SCREEN:
+                temp_value = str(self.setting.get_resolution())
+            elif setting['type'] == MODE_BLIND:
+                temp_value = 'OFF' if temp_value == '0' else 'ON'
 
+            value = get_medium_font().render(temp_value, True, COLOR_BLACK)
+            value_rect = get_rect(value, screen.get_width() - value.get_width() - get_small_margin(), screen.get_height() // 2 + text.get_height() * (idx - len(self.settings) // 2))
+            screen.blit(value, value_rect)
+
+            # 모드 박스
+            box_size = 20
+            for mode in range(setting['max']):
+
+                color = COLOR_BLACK if mode == self.setting.get(setting['type']) else COLOR_GRAY
+                pygame.draw.rect(screen, color, (self.max_text_right + box_size * mode * 1.1, text_rect.y + (text_rect.height - box_size) // 2, 20, 20))
+
+                if idx == self.selected_setting_idx and self.mode_select_enabled and mode == setting['selected_mode']:
+                    pygame.draw.rect(screen, COLOR_RED, (self.max_text_right + box_size * mode * 1.1, text_rect.y + (text_rect.height - box_size) // 2, 20, 20), 2)
 
     def run_events(self, events):
         for event in events:
@@ -64,16 +82,51 @@ class SettingScreen:
                 pos = pygame.mouse.get_pos()
 
     def run_key_events(self, key):
-        if self.is_setting_select_enabled:
+        if self.setting_select_enabled:
             self.run_select_settings_event(key)
+
+        elif self.mode_select_enabled:
+            self.run_select_mode_event(key)
 
     def run_select_settings_event(self, key):
         if key == pygame.K_UP:
             self.updateSettingSelectIndex(-1)
         elif key == pygame.K_DOWN:
             self.updateSettingSelectIndex(1)
+        elif key == pygame.K_RIGHT:
+            self.mode_select_enabled = True
+            self.setting_select_enabled = False
         elif key == pygame.K_RETURN:
-            pass
+            if self.get_selected_type() == MODE_RETURN:
+                if self.controller.is_paused:
+                    self.controller.set_screen(TYPE_PLAY)
+                    self.controller.is_paused = False
+                else:
+                    self.controller.set_screen(TYPE_START)
+
+
+    def run_select_mode_event(self, key):
+        if key == pygame.K_LEFT:
+            if self.settings[self.selected_setting_idx]['selected_mode'] == 0:
+                self.mode_select_enabled = False
+                self.setting_select_enabled = True
+            else:
+                self.updateModeSelectIndex(self.settings[self.selected_setting_idx], -1)
+        elif key == pygame.K_RIGHT:
+            self.updateModeSelectIndex(self.settings[self.selected_setting_idx], 1)
+        elif key == pygame.K_RETURN:
+            self.setting.set(self.get_selected_type(), self.settings[self.selected_setting_idx]['selected_mode'])
+            self.mode_select_enabled = False
+            self.setting_select_enabled = True
 
     def updateSettingSelectIndex(self, direction):
         self.selected_setting_idx = (self.selected_setting_idx + direction) % len(self.settings)
+
+    def updateModeSelectIndex(self, setting, direction):
+
+        setting['selected_mode'] = (setting['selected_mode'] + direction) % setting['max']
+        print(setting['selected_mode'])
+
+
+    def get_selected_type(self):
+        return self.settings[self.selected_setting_idx]['type']

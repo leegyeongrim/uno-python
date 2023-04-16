@@ -36,6 +36,11 @@ class ScreenController:
         self.bgm = pygame.mixer.Sound('./resource/sound/bgm.mp3')
         self.effect = pygame.mixer.Sound('./resource/sound/effect.mp3')
 
+        self.is_paused = False
+
+    def set_paused(self):
+        self.is_paused = True
+
     def init_pygame(self):
         pygame.init()
         # 아이콘
@@ -67,8 +72,13 @@ class ScreenController:
             self.run_events()
             pygame.display.update()
             self.update_bgm()
+            self.update_setting()
+
         pygame.quit()
 
+    def update_setting(self):
+        if self.screen.get_size() != self.setting.get_resolution():
+            self.screen = pygame.display.set_mode(self.setting.get_resolution())
     def update_bgm(self):
         if self.screen_type == TYPE_PLAY:
             if not self.is_bgm_playing:

@@ -7,28 +7,24 @@ import pygame
 
 if TYPE_CHECKING:
     from game.game import UnoGame
-    from screen.ScreenController import ScreenController
-    from screen.game.GameController import GameController
 
 class CardBoard:
-    def __init__(self, game_controller):
-        self.game_controller: GameController = game_controller
+    def __init__(self, play_screen):
+        self.play_screen = play_screen
 
-        self.game: UnoGame = game_controller.game
-        self.board = game_controller.board
+        self.game: UnoGame = play_screen.game
+        self.board = play_screen.board
 
         self.next_card_start_x = get_extra_small_margin()
-
-
-    def init(self, width, height):
-        self.card_width = get_card_width(1.5)
-        self.card_height = get_card_height(1.5)
-
-        self.background_rect = pygame.Rect(0, self.board.background_rect.bottom, self.board.background_rect.right, height)
-
-        return self
     
     def draw(self, screen):
+        background_height = screen.get_height() // 3
+
+        self.card_width = get_card_width(1.5)
+        self.card_height = get_card_height(1.5)
+        self.background_rect = pygame.Rect(0, self.board.background_rect.bottom, self.board.background_rect.right, background_height)
+
+
         pygame.draw.rect(screen, COLOR_PLAYER, self.background_rect)
         
         if self.game.board_player_index == self.game.current_player_index:
@@ -42,7 +38,7 @@ class CardBoard:
             screen.blit(get_card(self.cards[idx], 1.5), rect)
 
             # 하이라이트
-            if self.game_controller.my_cards_select_enabled and not self.game_controller.deck_select_enabled and idx == self.game_controller.my_cards_selected_index:
+            if self.play_screen.my_cards_select_enabled and not self.play_screen.deck_select_enabled and idx == self.play_screen.my_cards_selected_index:
                 pygame.draw.rect(screen, COLOR_BLACK, rect, 5)
 
         txt_card_cnt = get_medium_font().render(str(len(self.card_rects)), True, COLOR_BLACK)
@@ -88,30 +84,30 @@ class CardBoard:
     # 카드 선택 키 이벤트
     def run_my_cards_select_key_event(self, key):
         if key == pygame.K_LEFT:
-            if not self.game_controller.deck_select_enabled:
-                self.game_controller.my_cards_selected_index = (self.game_controller.my_cards_selected_index - 1) % len(self.game.get_board_player().hands)
+            if not self.play_screen.deck_select_enabled:
+                self.play_screen.my_cards_selected_index = (self.play_screen.my_cards_selected_index - 1) % len(self.game.get_board_player().hands)
         elif key == pygame.K_RIGHT:
-            if not self.game_controller.deck_select_enabled:
-                self.game_controller.my_cards_selected_index = (self.game_controller.my_cards_selected_index + 1) % len(self.game.get_board_player().hands)
+            if not self.play_screen.deck_select_enabled:
+                self.play_screen.my_cards_selected_index = (self.play_screen.my_cards_selected_index + 1) % len(self.game.get_board_player().hands)
         elif key == pygame.K_UP:
-            if self.cards_line_size != 0 and self.game_controller.my_cards_selected_index + self.cards_line_size < len(self.game.get_board_player().hands):
-                self.game_controller.my_cards_selected_index = self.game_controller.my_cards_selected_index + self.cards_line_size
+            if self.cards_line_size != 0 and self.play_screen.my_cards_selected_index + self.cards_line_size < len(self.game.get_board_player().hands):
+                self.play_screen.my_cards_selected_index = self.play_screen.my_cards_selected_index + self.cards_line_size
             else: # 덱 선택
-                self.game_controller.deck_select_enabled = True
+                self.play_screen.deck_select_enabled = True
         elif key == pygame.K_DOWN:
             # 다시 카드 선택으로 돌아옴
-            if self.game_controller.deck_select_enabled:
-                self.game_controller.deck_select_enabled = False
+            if self.play_screen.deck_select_enabled:
+                self.play_screen.deck_select_enabled = False
             
-            elif self.cards_line_size != 0 and self.game_controller.my_cards_selected_index - self.cards_line_size >= 0:
-                self.game_controller.my_cards_selected_index = self.game_controller.my_cards_selected_index - self.cards_line_size
+            elif self.cards_line_size != 0 and self.play_screen.my_cards_selected_index - self.cards_line_size >= 0:
+                self.play_screen.my_cards_selected_index = self.play_screen.my_cards_selected_index - self.cards_line_size
         elif key == pygame.K_RETURN:
-            if self.game_controller.deck_select_enabled:
-                self.game_controller.on_deck_selected()
+            if self.play_screen.deck_select_enabled:
+                self.play_screen.on_deck_selected()
             else:
-                self.game_controller.on_card_selected(self.game_controller.my_cards_selected_index)
+                self.play_screen.on_card_selected(self.play_screen.my_cards_selected_index)
 
     def run_board_cards_select_click_event(self, pos):
         for idx, rect in enumerate(self.card_rects):
             if rect.collidepoint(pos):
-                self.game_controller.on_card_selected(idx)
+                self.play_screen.on_card_selected(idx)
