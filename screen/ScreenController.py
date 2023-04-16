@@ -28,7 +28,7 @@ class ScreenController:
 
         # 설정 불러오기
         self.setting = Setting()
-        self.loadSetting()
+        self.screen = pygame.display.set_mode(self.setting.get_resolution())
 
         self.init_instance()
 
@@ -57,10 +57,6 @@ class ScreenController:
     # 화면 설정
     def set_screen_type(self, type):
         self.screen_type = type
-
-    # 설정 불러오기
-    def loadSetting(self):
-        self.screen = pygame.display.set_mode(self.setting.get_resolution())
 
     # 화면 시작
     def run(self):
