@@ -113,8 +113,11 @@ class StoryScreen:
         elif key == pygame.K_LEFT:
             self.update_current_position(-1)
         elif key == pygame.K_RETURN:
-            self.is_story_enabled = False
-            self.is_confirm_enabled = True
+            self.toggle_confirm_dialog()
+
+    def toggle_confirm_dialog(self):
+        self.is_story_enabled = not self.is_story_enabled
+        self.is_confirm_enabled = not self.is_confirm_enabled
 
     def run_confirm_event(self, key):
         if key == pygame.K_RIGHT:
@@ -150,6 +153,7 @@ class StoryScreen:
             if story['rect'].collidepoint(pos):
                 if idx <= self.cleared_idx:
                     self.current_position = idx
+                    self.toggle_confirm_dialog()
 
     def run_confirm_click_event(self, pos):
         if self.confirm_yes_rect.collidepoint(pos):
