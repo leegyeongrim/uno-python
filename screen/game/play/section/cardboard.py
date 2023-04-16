@@ -22,10 +22,14 @@ class CardBoard:
 
         self.card_width = get_card_width(1.5)
         self.card_height = get_card_height(1.5)
-        self.background_rect = pygame.Rect(0, self.board.background_rect.bottom, self.board.background_rect.right, background_height)
+        self.background_rect = pygame.Rect(0, screen.get_height() - background_height, self.board.background_rect.right, background_height)
 
 
         pygame.draw.rect(screen, COLOR_PLAYER, self.background_rect)
+
+        name = get_small_font().render(self.game.get_board_player().name, True, COLOR_BLACK)
+        name_rect = get_top_center_rect(name, self.background_rect, x=-name.get_width() // 2)
+        screen.blit(name, name_rect)
         
         if self.game.board_player_index == self.game.current_player_index:
             self.timer = get_medium_font().render(str(int(self.game.turn_time + 1 - (time.time() - self.game.turn_start_time))), True, COLOR_RED)

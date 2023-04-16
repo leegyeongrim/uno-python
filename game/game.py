@@ -7,26 +7,35 @@ import time
 
 class UnoGame:
     def __init__(self):
-        self.init()
-
-        self.turn_time = 10 # 턴 시간 (초단위)
         self.is_started = False
-        self.turn_start_time = time.time()
 
-    def start_game(self):
-        self.is_started = True
-    # 게임 시작
-    def init(self):
         self.reverse_direction = False
         self.current_player_index = 0
         self.board_player_index = 0
         self.players: list[Player] = []
 
         self.deck = Deck()
-
         self.deal()
-
         self.current_card: Card = self.deck.draw()
+
+        self.turn_time = 10 # 턴 시간 (초단위)
+
+        self.turn_start_time = time.time()
+
+    def start_game(self):
+        self.is_started = True
+        self.reverse_direction = False
+        self.current_player_index = 0
+        self.board_player_index = 0
+
+        self.deck = Deck()
+        self.deal()
+        self.current_card: Card = self.deck.draw()
+
+        self.turn_start_time = time.time()
+
+    def finish_game(self):
+        self.players: list[Player] = []
 
     def add_player(self, name, computer = False):
         self.players.append(Player(name))
@@ -144,6 +153,5 @@ class UnoGame:
             self.next_turn()
     
 game = UnoGame()
-game.init()
 
 

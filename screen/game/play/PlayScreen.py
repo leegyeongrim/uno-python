@@ -61,6 +61,11 @@ class PlayScreen:
         self.escape_dialog.enabled = False
         self.escape_dialog.menu_idx = 0
 
+        if self.escape_dialog.enabled:
+            self.pause_timer()
+        else:
+            self.continue_timer()
+
     # 다이얼로그 표시 상태 변경
     def toggle_escape_dialog(self):
         self.escape_dialog.enabled = not self.escape_dialog.enabled
@@ -181,11 +186,12 @@ class PlayScreen:
 
     # 카드 선택 분기
     def on_card_selected(self, idx):
-        self.screen_controller.play_effect()
+
         hands = self.game.get_board_player().hands
         card = hands[idx]
         # 유효성 확인
         if self.game.verify_new_card(card):
+            self.screen_controller.play_effect()
             self.animate_board_player_to_current_card_enabled = True
 
             # 제출할 카드 저장

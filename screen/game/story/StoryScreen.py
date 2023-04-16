@@ -20,7 +20,7 @@ class StoryScreen:
         self.is_story_enabled = True
 
         # 선택할 수 있는 스토리 최대 인덱스
-        self.cleared_idx = 3
+        self.cleared_idx = 2
         self.current_position = 0
         self.confirm_idx = 0
 

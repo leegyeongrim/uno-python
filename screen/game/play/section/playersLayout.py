@@ -51,6 +51,11 @@ class PlayersLayout:
                                                                         self.player_height))
                 temp_player_layouts.append(player_layout)
 
+                # 플레이어 이름
+                name = get_small_font().render(player.name, True, COLOR_BLACK)
+                name_rect = get_top_center_rect(name, player_layout, x=-name.get_width() // 2)
+                screen.blit(name, name_rect)
+
                 # 선택된 플레이어 하이라이트
                 if self.select_enabled and idx == self.selected_idx:
                     # 투명 색상 적용

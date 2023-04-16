@@ -69,23 +69,6 @@ class LobbyScreen:
 
                 screen.blit(text_play, text_play_rect)
 
-        # 본인 이름 입력
-        def draw_input_name():
-            text_name = get_small_font().render('이름', True, COLOR_BLACK)
-            text_name_rect = get_center_rect(text_name, screen.get_rect())
-
-            self.input_name = get_small_font().render(self.input_name_text, True, COLOR_BLACK)
-            input_name_rect = pygame.Rect(text_name_rect.bottomleft, self.input_name.get_size())
-
-            # 제목
-            screen.blit(text_name, text_name_rect)
-
-            # 배경
-            pygame.draw.rect(screen, COLOR_LIGHT_GRAY, input_name_rect)
-
-            # 글자
-            screen.blit(self.input_name, input_name_rect)
-
         # 함수 호출
         screen.fill(COLOR_WHITE)
         draw_menu()
@@ -134,12 +117,18 @@ class LobbyScreen:
                              self.computer_layout_width - get_small_margin() * 2, self.computer_height
                             )
 
-            self.computer_layout_list.append({'view': computer_rect, 'enabled': False if idx >= 1 else True})
+            self.computer_layout_list.append({'name': f'Computer{idx}', 'view': computer_rect, 'enabled': False if idx >= 1 else True})
 
     def draw_computer(self, screen):
         for idx, computer in enumerate(self.computer_layout_list):
             if computer['enabled']:
-                pygame.draw.rect(screen, COLOR_PLAYER, computer['view'])
+                layout = pygame.draw.rect(screen, COLOR_PLAYER, computer['view'])
+
+                # 컴퓨터 이름
+                name = get_small_font().render(computer['name'], True, COLOR_BLACK)
+                name_rect = get_center_rect(name, layout)
+
+                screen.blit(name, name_rect)
 
             # 선택된 플레이어 하이라이트
             if self.computer_select_enabled and idx == self.computer_index:
@@ -192,7 +181,7 @@ class LobbyScreen:
             # 컴퓨터 플레이어 설정 적용
             for idx, computer in enumerate(self.computer_layout_list):
                 if computer['enabled']:
-                    self.game.players.append(Player(f'Computer{idx + 1}'))
+                    self.game.players.append(Player(computer['name']))
 
 
             # 화면 이동
