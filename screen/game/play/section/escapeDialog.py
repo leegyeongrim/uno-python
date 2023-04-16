@@ -27,6 +27,10 @@ class EscapeDialog:
                  self.screen_controller.set_screen(TYPE_SETTING),
                  self.screen_controller.set_paused(),
              )},
+            {'text': '돌아가기', 'view': None, 'rect': None,
+             'action': lambda: (
+                self.play_screen.toggle_escape_dialog()
+             )},
             {'text': '종료', 'view': None, 'rect': None, 'action': lambda: (
                 self.play_screen.init(),
                 self.screen_controller.set_screen(TYPE_START),
@@ -35,12 +39,13 @@ class EscapeDialog:
         ]
 
     def draw(self, screen: pygame.Surface):
-        layout = pygame.draw.rect(screen, COLOR_WHITE, (
-        (screen.get_width() - self.width) // 2, (screen.get_height() - self.height) // 2, self.width, self.height))
-        # background outline
-        pygame.draw.rect(screen, COLOR_BLACK,
-                         ((screen.get_width() - self.width) // 2, (screen.get_height() - self.height) // 2, self.width, self.height), 1)
+        # background
+        layout = pygame.draw.rect(screen, COLOR_WHITE, ((screen.get_width() - self.width) // 2, (screen.get_height() - self.height) // 2, self.width, self.height))
 
+        # background outline
+        pygame.draw.rect(screen, COLOR_BLACK, ((screen.get_width() - self.width) // 2, (screen.get_height() - self.height) // 2, self.width, self.height), 1)
+
+        # title
         title = get_large_font().render("일시정지", True, COLOR_BLACK)
         title_rect = get_rect(title, screen.get_width() // 2, layout.y + get_medium_margin())
         screen.blit(title, title_rect)
