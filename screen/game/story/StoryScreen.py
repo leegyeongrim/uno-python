@@ -26,10 +26,10 @@ class StoryScreen:
 
         # 스토리 목록
         self.stories = [
-            {'type': 1, 'rect': None, 'action': None, 'hover': None, 'color': COLOR_RED, 'features': ['컴퓨터 플레이어 기술 카드 확률 50% 상승', '컴퓨터 플레이어 기술 카드 콤보 사용(2-3장)']},
-            {'type': 2, 'rect': None, 'action': None, 'hover': None, 'color': COLOR_BLUE, 'features': ['컴퓨터 플레이어 3명', '모든 카드를 같은 수만큼 분배']},
-            {'type': 3, 'rect': None, 'action': None, 'hover': None, 'color': COLOR_GREEN, 'features': ['컴퓨터 플레이어 2명', '매 5턴마다 낼 수 있는 카드 색상 무작위 변경']},
-            {'type': 4, 'rect': None, 'action': None, 'hover': None, 'color': COLOR_YELLOW, 'features': ['각 턴을 2번 씩 진행']},
+            {'type': TYPE_STORY_A, 'rect': None, 'action': None, 'hover': None, 'color': COLOR_RED, 'features': ['컴퓨터 플레이어 기술 카드 확률 50% 상승', '컴퓨터 플레이어 기술 카드 콤보 사용(2-3장)']},
+            {'type': TYPE_STORY_B, 'rect': None, 'action': None, 'hover': None, 'color': COLOR_BLUE, 'features': ['컴퓨터 플레이어 3명', '모든 카드를 같은 수만큼 분배']},
+            {'type': TYPE_STORY_C, 'rect': None, 'action': None, 'hover': None, 'color': COLOR_GREEN, 'features': ['컴퓨터 플레이어 2명', '매 5턴마다 낼 수 있는 카드 색상 무작위 변경']},
+            {'type': TYPE_STORY_D, 'rect': None, 'action': None, 'hover': None, 'color': COLOR_YELLOW, 'features': ['각 턴을 2번 씩 진행']},
         ]
 
         # 확인 다이얼로그
@@ -129,7 +129,7 @@ class StoryScreen:
 
     def run_confirm_action(self):
         if self.confirm_idx == 0:
-            self.movePlayerScreen()
+            self.move_play_screen()
         else:
             self.is_confirm_enabled = False
             self.is_story_enabled = True
@@ -157,17 +157,16 @@ class StoryScreen:
 
     def run_confirm_click_event(self, pos):
         if self.confirm_yes_rect.collidepoint(pos):
-            self.movePlayerScreen()
+            self.move_play_screen()
 
         elif self.confirm_no_rect.collidepoint(pos):
             self.is_confirm_enabled = False
             self.is_story_enabled = True
 
-    def movePlayerScreen(self):
-        print('이동')
-        self.game.players = []
-        self.game.players.append(Player("You"))
-
+    def move_play_screen(self):
         self.screen_controller.set_screen_type(TYPE_PLAY)
-        self.screen_controller.game.start_game()
+        self.screen_controller.game.start_game(self.get_selected_story()['type'], [Player("You")])
+
+    def get_selected_story(self):
+        return self.stories[self.current_position]
 

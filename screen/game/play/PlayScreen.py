@@ -1,5 +1,7 @@
 from __future__ import annotations
+from typing import TYPE_CHECKING
 
+from game.model.player import Computer
 from screen.game.play.section.escapeDialog import EscapeDialog
 from screen.game.play.section.playersLayout import PlayersLayout
 from util.globals import *
@@ -8,9 +10,13 @@ from screen.game.play.section.board import Board
 from screen.game.play.section.cardboard import CardBoard
 import time
 
+if TYPE_CHECKING:
+    from screen.ScreenController import ScreenController
+
+
 class PlayScreen:
 
-    def __init__(self, screen_controller):
+    def __init__(self, screen_controller: ScreenController):
 
         # 의존성 객체
         self.screen_controller = screen_controller
@@ -36,11 +42,12 @@ class PlayScreen:
         self.deck_select_enabled = False
         self.animate_deck_to_player_enabled = False
         self.animate_board_player_to_current_card_enabled = False
+        self.animate_current_player_to_current_card_enabled = False
 
         # 보드 값
         self.board_width = self.screen_controller.screen.get_width() - self.players_layout.width
         self.board = Board(self)
-        
+
         # 카드 레이아웃
         self.card_board = CardBoard(self)
 
@@ -83,8 +90,9 @@ class PlayScreen:
 
         if self.game.is_started:
             if self.game.is_game_over():
-                print("게임 종료")
-                print(self.game.get_winner().name)
+                pass
+                # print("게임 종료") TODO 게임 종료
+                # print(self.game.get_winner().name)
 
             self.resolve_error()
 
@@ -109,7 +117,6 @@ class PlayScreen:
                 # 턴 전환
                 self.game.next_turn()
 
-
         # 카드 제출 애니메이션
         elif self.animate_board_player_to_current_card_enabled:
             if self.animate_controller.enabled:
@@ -122,6 +129,22 @@ class PlayScreen:
                 self.game.play(self.board_player_to_current_card_idx)
                 self.animate_board_player_to_current_card_enabled = False
                 self.continue_timer()
+
+        elif self.animate_current_player_to_current_card_enabled:
+            if self.animate_controller.enabled:
+                self.pause_timer()
+                self.animate_controller.draw(screen)
+
+            # 애니메이션 종료 시 호출
+            else:
+                # 한 장 제출
+                print('컴퓨터 제출')
+                self.game.play(self.to_computer_play_idx)
+                self.animate_current_player_to_current_card_enabled = False
+                self.continue_timer()
+
+        else:
+            self.run_computer()
 
         if self.escape_dialog.enabled:
             self.escape_dialog.draw(screen)
@@ -151,6 +174,8 @@ class PlayScreen:
                 elif event.type == pygame.MOUSEBUTTONUP:
                     self.process_click_event(pygame.mouse.get_pos())
 
+
+
     # 키보드 입력 이벤트 처리
     def process_key_event(self, key):
         if self.game.is_started:
@@ -169,7 +194,6 @@ class PlayScreen:
             elif self.players_layout.select_enabled:
                 self.players_layout.run_select_key_event(key)
 
-
     # 클릭 이벤트
     def process_click_event(self, pos):
 
@@ -182,7 +206,6 @@ class PlayScreen:
 
         elif self.players_layout.select_enabled:
             self.players_layout.run_select_click_event(pos)
-
 
     # 카드 선택 분기
     def on_card_selected(self, idx):
@@ -217,12 +240,12 @@ class PlayScreen:
     # 덱 선택
     def on_deck_selected(self):
         self.screen_controller.play_effect()
-        
+
         self.animate_deck_to_player_enabled = True
 
         self.animate_view = pygame.image.load('./resource/card_back.png')  # TODO: 카드 수정
         self.animate_view = pygame.transform.scale(self.animate_view, (
-        get_card_width() * MY_BOARD_CARD_PERCENT, get_card_height() * MY_BOARD_CARD_PERCENT))
+            get_card_width() * MY_BOARD_CARD_PERCENT, get_card_height() * MY_BOARD_CARD_PERCENT))
 
         self.animate_view_rect = get_center_rect(self.animate_view, self.board.background_rect,
                                                  -self.animate_view.get_width() // MY_BOARD_CARD_PERCENT - get_medium_margin())
@@ -233,12 +256,12 @@ class PlayScreen:
             self.animate_destination_x, self.animate_destination_y = self.card_board.next_card_start_x, self.card_board.next_card_start_y
             if self.card_board.next_card_start_x + (
                     get_card_width(MY_BOARD_CARD_PERCENT) // 1 + get_extra_small_margin()) + get_card_width(
-                    MY_BOARD_CARD_PERCENT) >= self.board.background_rect.width:
+                MY_BOARD_CARD_PERCENT) >= self.board.background_rect.width:
                 self.animate_destination_y -= get_card_height(MY_BOARD_CARD_PERCENT) + get_extra_small_margin()
                 self.animate_destination_x = get_small_margin()
             else:
                 self.animate_destination_x = self.card_board.next_card_start_x + (
-                            get_card_width(MY_BOARD_CARD_PERCENT) // 1 + get_extra_small_margin())
+                        get_card_width(MY_BOARD_CARD_PERCENT) // 1 + get_extra_small_margin())
 
         # 내가 아닌 플레이어
         else:
@@ -249,4 +272,28 @@ class PlayScreen:
         self.animate_controller.init_pos(self.animate_view, self.animate_view_rect, start_x, start_y,
                                          self.animate_destination_x, self.animate_destination_y)
 
+    def run_computer(self):
+        if type(self.game.get_current_player()) is Computer:
+            computer = self.game.get_current_player()
 
+            self.to_computer_play_idx = computer.to_play(self.game)
+
+            if self.to_computer_play_idx:
+                self.screen_controller.play_effect()
+                self.animate_current_player_to_current_card_enabled = True
+
+                # 이동 애니메이션
+
+                player_rect = self.players_layout.players[self.game.current_player_index - 1]
+
+                start_x, start_y = player_rect.topleft
+                end_x, end_y = self.board.current_card_rect.topleft
+
+                surface = get_card_back(2)
+                rect = surface.get_rect()
+                rect.topleft = start_x, start_y
+
+                self.animate_controller.init_pos(surface, rect, start_x, start_y, end_x, end_y)
+            else:
+                print('컴퓨터 낼 카드 없음')
+                self.on_deck_selected()

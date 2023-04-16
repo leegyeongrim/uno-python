@@ -5,7 +5,7 @@ import random
 class regionD:
    def __init__(self):
       self.game=UnoGame()
-      self.game.init()
+      self.game.start_game()
       self.game.add_computer("computer1")
       self.tmp = 1 #컴퓨터 턴일때 한 번만 omit을 위한 변수
 

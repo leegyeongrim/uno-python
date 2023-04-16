@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING
 
 import pygame.draw
 
-from game.model.player import Player
+from game.model.player import *
 from util.globals import *
 
 
@@ -176,17 +176,16 @@ class LobbyScreen:
 
         if key == pygame.K_RETURN:
             # 이름 설정
-            self.game.players = []
-            self.game.players.append(Player(self.input_name_text))
+            players = [Player(self.input_name_text)]
             # 컴퓨터 플레이어 설정 적용
             for idx, computer in enumerate(self.computer_layout_list):
                 if computer['enabled']:
-                    self.game.players.append(Player(computer['name']))
+                    players.append(Computer(computer['name']))
 
 
             # 화면 이동
             self.screen_controller.set_screen_type(TYPE_PLAY)
-            self.screen_controller.game.start_game()
+            self.screen_controller.game.start_game(TYPE_SINGLE, players)
 
         # 키보드 입력
         elif key == pygame.K_BACKSPACE:

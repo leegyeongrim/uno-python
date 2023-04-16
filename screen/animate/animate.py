@@ -32,8 +32,6 @@ class AnimateController:
         distance_remain_y = self.end_y - self.rect.y
         distance_remain = ((distance_remain_x ** 2) + (distance_remain_y ** 2)) ** 0.5
 
-        print(distance_remain)
-
         # 종료 조건
         if distance_remain <= 2 * (self.speed ** 2) ** 0.5:
             self.rect.x = self.end_x

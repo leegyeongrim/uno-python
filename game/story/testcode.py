@@ -1,6 +1,4 @@
-from screen.ScreenController import ScreenController
-from story_mode.regionA import regionA
-from game.game import UnoGame
+from game.story.regionA import regionA
 
 #TODO main에서는 돌아가는데 testcode.py에서는 안돌아감
 

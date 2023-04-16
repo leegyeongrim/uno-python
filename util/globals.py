@@ -60,6 +60,13 @@ MODE_BACKGROUND_VOLUME = "mode_background_volume"
 MODE_EFFECT_VOLUME = "mode_effect_volume"
 MODE_RETURN = "mode_return"
 
+TYPE_SINGLE = "type_single"
+TYPE_MULTI = "type_multi"
+TYPE_STORY_A = 1
+TYPE_STORY_B = 2
+TYPE_STORY_C = 3
+TYPE_STORY_D = 4
+
 DIMEN_EXTRA_LARGE = 50
 DIMEN_LARGE = 40
 DIMEN_MEDIUM = 30

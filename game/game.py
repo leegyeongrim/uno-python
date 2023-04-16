@@ -5,56 +5,54 @@ from util.globals import *
 import random
 import time
 
+
 class UnoGame:
+
     def __init__(self):
         self.is_started = False
 
+
+        self.play_type = None
+        self.players = []
+
         self.reverse_direction = False
         self.current_player_index = 0
         self.board_player_index = 0
-        self.players: list[Player] = []
+        self.turn_counter = None
 
-        self.deck = Deck()
-        self.deal()
-        self.current_card: Card = self.deck.draw()
-
-        self.turn_time = 10 # 턴 시간 (초단위)
+        self.deck = None
+        self.current_card = None
+        self.turn_time = 10
 
         self.turn_start_time = time.time()
 
-    def start_game(self):
+    def start_game(self, play_type, players):
+
         self.is_started = True
+        self.play_type = play_type
+        self.players = players
+
         self.reverse_direction = False
         self.current_player_index = 0
         self.board_player_index = 0
-        self.turn_counter=1         #지금까지 지난 게임 턴수를 셈
-        self.players: list[Player] = []
-        self.add_player("YOU")
+        self.turn_counter = 1
+
         self.deck = Deck()
-
         self.deck.shuffle()
-        #self.deal(0) storymodeB 때문에 나중에 deal
+        if self.play_type == TYPE_SINGLE:
+            self.deal()
+        self.current_card = self.deck.draw()
 
-        self.current_card: Card = self.deck.draw()
-
-    def add_player(self, name):
         self.turn_start_time = time.time()
 
     def finish_game(self):
         self.players: list[Player] = []
 
-    def add_player(self, name, computer = False):
-        self.players.append(Player(name))
-
-    def add_computer(self, name): #computer 추가
-      self.players.append(Computer(name))
-
     # 다음 턴
-    def next_turn(self, turn = 1):
+    def next_turn(self, turn=1):
         direction = -turn if self.reverse_direction else turn
-        #print(direction)
         self.current_player_index = (self.current_player_index + direction) % len(self.players)
-        self.turn_counter+=1 #턴수를 세기 위함
+        self.turn_counter += 1
         self.reset_turn_start_time()
 
     # 현재 플레이어 반환
@@ -67,8 +65,8 @@ class UnoGame:
     def draw(self):
         self.get_current_player().draw(self.deck.draw())
 
-    def play(self, idx):
-        self.set_current_card(self.get_current_player().play(idx))
+    def play(self, idx=None):
+        self.set_current_card(self.get_current_player().play(self, idx))
         self.next_turn()
         self.reset_turn_start_time()
     
@@ -76,7 +74,7 @@ class UnoGame:
         self.turn_start_time = time.time()
 
     # 다음 턴 스킵 : 
-    def skip_turn(self, skip = 1):
+    def skip_turn(self, skip=1):
         self.next_turn(skip + 1)
 
     # 턴 이동 방향 변경
@@ -84,8 +82,9 @@ class UnoGame:
         self.reverse_direction = not self.reverse_direction
 
     # 카드 분배 #수정부분: idx 받아서 특정 player에게만 deal 해주기
-    def deal(self, idx, n=7):
-        self.players[idx].deal(self.deck.deal(n))
+    def deal(self, idx=None, n=7):
+        for player in self.players:
+            player.deal(self.deck.deal(7))
 
     # 플레이어에게 패널티 카드 n장 부여
     def penalty(self, player_index, n):
@@ -125,9 +124,8 @@ class UnoGame:
     
     def set_winner(self, player):
         self.winner = player
-    
-    # TODO: 승자 확인
-    def get_winner(self) -> Player:
+
+    def get_winner(self):
         return self.winner
 
     # TODO: 특별 카드 실행
@@ -162,9 +160,3 @@ class UnoGame:
     # SKILL_COLOR 수행
     def runCOLOR(self, idx):
         self.current_card.color=CARD_COLOR_SET[idx]
-        
-if __name__ == '__main__':
-    game=UnoGame()
-    game.init()
-    game.add_computer("computer1")
-    
