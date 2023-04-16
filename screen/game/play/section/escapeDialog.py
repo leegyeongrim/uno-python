@@ -35,14 +35,11 @@ class EscapeDialog:
         ]
 
     def draw(self, screen: pygame.Surface):
-        width = 500
-        height = 300
-
         layout = pygame.draw.rect(screen, COLOR_WHITE, (
-        (screen.get_width() - width) // 2, (screen.get_height() - height) // 2, width, height))
+        (screen.get_width() - self.width) // 2, (screen.get_height() - self.height) // 2, self.width, self.height))
         # background outline
         pygame.draw.rect(screen, COLOR_BLACK,
-                         ((screen.get_width() - width) // 2, (screen.get_height() - height) // 2, width, height), 1)
+                         ((screen.get_width() - self.width) // 2, (screen.get_height() - self.height) // 2, self.width, self.height), 1)
 
         title = get_large_font().render("일시정지", True, COLOR_BLACK)
         title_rect = get_rect(title, screen.get_width() // 2, layout.y + get_medium_margin())

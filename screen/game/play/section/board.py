@@ -8,7 +8,6 @@ import pygame
 if TYPE_CHECKING:
     from game.game import UnoGame
     from screen.ScreenController import ScreenController
-    from screen.game.GameController import GameController
 
 class Board:
     def __init__(self, play_screen):
@@ -16,7 +15,7 @@ class Board:
 
     def draw(self, screen: pygame.Surface, current_card: Card):
 
-        self.background_rect = pygame.Rect((0, 0, screen.get_width() - self.play_screen.players_layout_width, screen.get_height() // 3 * 2))
+        self.background_rect = pygame.Rect((0, 0, screen.get_width() - self.play_screen.players_layout.width, screen.get_height() // 3 * 2))
         self.color_circle = (self.background_rect.center, self.background_rect.width // 4, 20)
 
         self.deck = get_card_back(2)
