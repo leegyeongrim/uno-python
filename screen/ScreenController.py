@@ -36,7 +36,7 @@ class ScreenController:
         self.bgm = pygame.mixer.Sound('./resource/sound/bgm.mp3')
         self.effect = pygame.mixer.Sound('./resource/sound/effect.mp3')
 
-        self.is_paused = False
+        self.is_paused = False  # 설정에서 돌아오기 위한 용도
 
     def set_paused(self):
         self.is_paused = True
@@ -85,7 +85,7 @@ class ScreenController:
 
         if self.effect.get_volume() != self.setting.get_effect_volume():
             self.effect.set_volume(self.setting.get_effect_volume())
-            
+
     def update_bgm(self):
         if self.screen_type == TYPE_PLAY:
             if not self.is_bgm_playing:

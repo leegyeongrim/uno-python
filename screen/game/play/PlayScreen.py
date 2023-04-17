@@ -104,6 +104,11 @@ class PlayScreen:
         self.check_time() # 타이머 관련 동작
         self.game.update_uno_enabled()  # 우노 상태 확인
 
+        # 일시정지 다이얼로그
+        if self.escape_dialog.enabled:
+            self.escape_dialog.draw(screen)
+            return
+        
         # 애니메이션
         self.draw_animation(screen)
 
@@ -111,9 +116,7 @@ class PlayScreen:
         if self.game.is_game_over():
             self.game_over_dialog.draw(screen, self.game.get_winner())
 
-        # 일시정지 다이얼로그
-        if self.escape_dialog.enabled:
-            self.escape_dialog.draw(screen)
+
 
     def draw_animation(self, screen):
         if self.animate_deck_to_player_enabled:
