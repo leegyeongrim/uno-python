@@ -21,9 +21,9 @@ class SettingScreen:
         self.settings = [
             {'text': '해상도', 'rect': None, 'result': None, 'selected_mode': 0, 'mode_rects': [], 'max': 3, 'type': MODE_SCREEN},
             {'text': '색약모드', 'rect': None, 'result': None, 'selected_mode': 0, 'mode_rects': [], 'max': 2, 'type': MODE_BLIND},
-            {'text': '전체볼륨', 'rect': None, 'result': None, 'selected_mode': 0, 'mode_rects': [], 'max': 10, 'type': MODE_MASTER_VOLUME},
-            {'text': '배경볼륨', 'rect': None, 'result': None, 'selected_mode': 0, 'mode_rects': [], 'max': 10, 'type': MODE_BACKGROUND_VOLUME},
-            {'text': '효과음볼륨', 'rect': None, 'result': None, 'selected_mode': 0, 'mode_rects': [], 'max': 10, 'type': MODE_EFFECT_VOLUME},
+            {'text': '전체볼륨', 'rect': None, 'result': None, 'selected_mode': 0, 'mode_rects': [], 'max': 11, 'type': MODE_MASTER_VOLUME},
+            {'text': '배경볼륨', 'rect': None, 'result': None, 'selected_mode': 0, 'mode_rects': [], 'max': 11, 'type': MODE_BACKGROUND_VOLUME},
+            {'text': '효과음볼륨', 'rect': None, 'result': None, 'selected_mode': 0, 'mode_rects': [], 'max': 11, 'type': MODE_EFFECT_VOLUME},
             {'text': '키 설정', 'rect': None, 'result': None, 'selected_mode': 0, 'mode_rects': [], 'max': 0, 'type': None},
             {'text': '초기화', 'rect': None, 'result': None, 'selected_mode': 0, 'mode_rects': [], 'max': 0, 'type': MODE_CLEAR},
             {'text': '돌아가기', 'rect': None, 'result': None, 'selected_mode': 0, 'mode_rects': [], 'max': 0, 'type': MODE_RETURN},
@@ -60,9 +60,10 @@ class SettingScreen:
             elif setting['type'] == MODE_BLIND:
                 temp_value = 'OFF' if temp_value == '0' else 'ON'
 
-            value = get_medium_font().render(temp_value, True, COLOR_BLACK)
-            value_rect = get_rect(value, screen.get_width() - value.get_width() - get_small_margin(), screen.get_height() // 2 + text.get_height() * (idx - len(self.settings) // 2))
-            screen.blit(value, value_rect)
+            if temp_value != 'None':
+                value = get_medium_font().render(temp_value, True, COLOR_BLACK)
+                value_rect = get_rect(value, screen.get_width() - value.get_width() - get_small_margin(), screen.get_height() // 2 + text.get_height() * (idx - len(self.settings) // 2))
+                screen.blit(value, value_rect)
 
             # 모드 박스
             box_size = 20

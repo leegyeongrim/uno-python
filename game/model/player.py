@@ -26,6 +26,8 @@ class Player:
 
 class Computer(Player):
 
+    DELAY = 1.5
+
     def __init__(self, name):
         super().__init__(name)
 

@@ -36,7 +36,6 @@ class PlayScreen:
 
         # 게임 관련
         self.game_started = False
-
         self.stop_timer_enabled = False
         self.deck_select_enabled = False
         self.animate_deck_to_player_enabled = False
@@ -276,6 +275,10 @@ class PlayScreen:
 
     def run_computer(self):
         if type(self.game.get_current_player()) is Computer:
+            # 컴퓨터 딜레이
+            if time.time() - self.game.turn_start_time < Computer.DELAY:
+                return
+
             computer = self.game.get_current_player()
 
             self.to_computer_play_idx = computer.to_play(self.game)
