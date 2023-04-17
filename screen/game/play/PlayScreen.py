@@ -207,6 +207,10 @@ class PlayScreen:
         elif card.value == SKILL_PLUS_2:
             self.game.skill_plus_cnt = 2
             self.on_deck_selected()
+
+        elif card.value == SKILL_PLUS_4:
+            self.game.skill_plus_cnt = 4
+            self.on_deck_selected()
         else:
             self.game.next_turn()
 
