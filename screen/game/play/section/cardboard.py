@@ -48,6 +48,14 @@ class CardBoard:
         txt_card_cnt = get_medium_font().render(str(len(self.card_rects)), True, COLOR_BLACK)
         screen.blit(txt_card_cnt, self.background_rect)
 
+        skipped = self.game.get_skipped_player_indexs()
+        for skipped_index in skipped:
+            print(skipped_index)
+            if self.game.board_player_index == skipped_index:
+                surface = pygame.Surface(self.background_rect.size, pygame.SRCALPHA)
+                surface.fill(COLOR_TRANSPARENT_RED)
+                screen.blit(surface, self.background_rect.topleft)
+
 
 
     # 나의 카드

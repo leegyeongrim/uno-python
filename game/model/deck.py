@@ -15,7 +15,8 @@ class Deck:
     def create_cards(self):
         color = list(CARD_COLOR_SET.keys())
         value = [i for i in range(1,10)] + SKILL_SET
-        
+        value = [SKILL_JUMP] * 7 + [SKILL_REVERSE] * 3 # TODO: 테스트
+
         # 무색상 +4 기술 카드
         cards=[]
         cards.extend([Card(CARD_COLOR_NONE, SKILL_PLUS_4)])

@@ -1,3 +1,6 @@
+from __future__ import annotations
+from typing import TYPE_CHECKING
+
 import time
 
 import pygame
@@ -5,14 +8,17 @@ import pygame
 from game.model.player import Player
 from util.globals import *
 
+if TYPE_CHECKING:
+    from game.game import UnoGame
+
 
 class PlayersLayout:
     def __init__(self, play_screen):
 
         # 의존성 객체
-        self.play_screen = play_screen
+        self.play_screen =  play_screen
         self.screen_controller = play_screen.screen_controller
-        self.game = self.screen_controller.game
+        self.game: UnoGame = self.screen_controller.game
 
         self.width = 200
         self.left = 0
@@ -66,6 +72,9 @@ class PlayersLayout:
                     screen.blit(surface, (self.left + get_small_margin(),
                                           get_small_margin() + (self.player_height + get_small_margin()) * cnt))
 
+
+
+
                 # 현재 플레이어 스트로크
                 if idx == self.game.current_player_index:
                     pygame.draw.rect(screen, COLOR_RED, (self.left + get_small_margin(),
@@ -77,6 +86,18 @@ class PlayersLayout:
 
                 # 카드
                 self.draw_cards(screen, player_layout, player.hands)
+
+                # 스킵된 플레이어 표시
+                skipped = self.game.get_skipped_player_indexs()
+                for skipped_index in skipped:
+                    print(skipped_index)
+                    if idx == skipped_index:
+                        surface = pygame.Surface(
+                            (self.width - get_small_margin() * 2, self.player_height),
+                            pygame.SRCALPHA)
+                        surface.fill(COLOR_TRANSPARENT_RED)
+                        screen.blit(surface, (self.left + get_small_margin(),
+                                              get_small_margin() + (self.player_height + get_small_margin()) * cnt))
 
                 cnt += 1
 

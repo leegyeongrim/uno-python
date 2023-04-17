@@ -180,8 +180,11 @@ class PlayScreen:
     def run_card(self, card: Card):
         if card.value == SKILL_REVERSE:
             self.game.toggle_turn_direction()
+            self.game.next_turn()
 
-        self.game.next_turn()
+        elif card.value == SKILL_JUMP:
+            self.game.skip_turn()
+
 
     def check_time(self):
         if self.stop_timer_enabled:  # 일시정지 상태

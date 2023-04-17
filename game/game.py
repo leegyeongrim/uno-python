@@ -24,6 +24,7 @@ class UnoGame:
         self.current_card = None
         self.turn_time = 10
         self.uno_count = 2  # TODO 우노 버튼을 클릭해야 할 카드 개수: 기본2
+        self.skip_direction = 1
 
         self.turn_start_time = None
         self.is_turn_start = False
@@ -63,8 +64,10 @@ class UnoGame:
         self.is_turn_start = True
         # 이전 플레이어 저장
         self.previous_player_index = self.current_player_index
-
         direction = -turn if self.reverse_direction else turn
+        self.skip_direction = direction
+        print(direction)
+
         self.current_player_index = (self.current_player_index + direction) % len(self.players)
         self.turn_counter += 1
 
@@ -93,7 +96,16 @@ class UnoGame:
 
     # 다음 턴 스킵 : 
     def skip_turn(self, skip=1):
+        print('스킵')
         self.next_turn(skip + 1)
+
+    def get_skipped_player_indexs(self):
+        temp = []
+        if abs(self.skip_direction) != 1:
+            for direction in list(range(1, abs(self.skip_direction))) if self.skip_direction > 0 else list(range(-1, self.skip_direction, -1)):
+                temp.append((self.previous_player_index + direction) % len(self.players))
+
+        return temp
 
     # 턴 이동 방향 변경
     def toggle_turn_direction(self):
