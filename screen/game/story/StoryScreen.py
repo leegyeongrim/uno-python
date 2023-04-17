@@ -20,7 +20,6 @@ class StoryScreen:
         self.is_story_enabled = True
 
         # 선택할 수 있는 스토리 최대 인덱스
-        self.cleared_idx = 3
         self.current_position = 0
         self.confirm_idx = 0
 
@@ -50,7 +49,7 @@ class StoryScreen:
     def draw_stories(self, screen):
         width = screen.get_width() / (len(self.stories) + 1)
         for idx, story in enumerate(self.stories):
-            color = story['color'] if idx <= self.cleared_idx else COLOR_GRAY
+            color = story['color'] if idx <= self.game.story_index else COLOR_GRAY
             story['rect'] = pygame.draw.circle(screen, color, (width * (idx + 1), screen.get_height() // 2), 20, 3)
 
             # 현재 위치
@@ -135,7 +134,7 @@ class StoryScreen:
             self.is_story_enabled = True
 
     def update_current_position(self, direction):
-        self.current_position = (self.current_position + direction) % (self.cleared_idx + 1)
+        self.current_position = (self.current_position + direction) % (self.game.story_index + 1)
 
     def update_confirm_idx(self, direction):
         self.confirm_idx = (self.confirm_idx + direction) % 2
@@ -151,7 +150,7 @@ class StoryScreen:
     def run_story_click_event(self, pos):
         for idx, story in enumerate(self.stories):
             if story['rect'].collidepoint(pos):
-                if idx <= self.cleared_idx:
+                if idx <= self.game.story_index:
                     self.current_position = idx
                     self.toggle_confirm_dialog()
 

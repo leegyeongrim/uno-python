@@ -49,6 +49,8 @@ class UnoGame:
         self.region_c = RegionC(self)
         self.region_d = RegionD(self)
 
+        self.story_index = 0
+
 
     def start_game(self, play_type, players):
         print('게임 시작')
@@ -179,13 +181,16 @@ class UnoGame:
         # TODO: 색상 카드 선택 시 다음 플레이어는 바뀐 색의 카드나 또 다른 색 변경 카드만 낼 수 있음
         if self.current_card.value == SKILL_COLOR:
             if new_card.color == CARD_COLOR_NONE:
+                print('유효성 검사1', new_card.value == SKILL_COLOR)
                 return new_card.value == SKILL_COLOR
             
-        # 이전 카드가 미색상 기술 카드이면서 새로운 카드가 미색상 카드가 아닌 경우 
-        return self.current_color == CARD_COLOR_NONE or \
+        # 이전 카드가 미색상 기술 카드이면서 새로운 카드가 미색상 카드가 아닌 경우
+        temp = self.current_color == CARD_COLOR_NONE or \
             new_card.color == CARD_COLOR_NONE or \
             self.current_color == new_card.color or \
-            self.current_color == new_card.value
+            self.current_card.value == new_card.value
+        print('유효성 검사2', temp)
+        return temp
 
     def update_uno_enabled(self):
         self.uno_enabled = len(self.get_current_player().hands) == self.uno_count
@@ -198,6 +203,16 @@ class UnoGame:
         return False
     
     def set_winner(self, player):
+        # 스토리 과련 코드 추가
+        if player == self.get_board_player():
+            if self.play_type == TYPE_STORY_A:
+                self.story_index = 1
+            elif self.play_type == TYPE_STORY_B:
+                self.story_index = 2
+            elif self.play_type == TYPE_STORY_C:
+                self.story_index = 3
+            elif self.play_type == TYPE_STORY_D:
+                self.story_index = 3
         self.winner = player
 
     def get_winner(self):
