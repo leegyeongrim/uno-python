@@ -108,12 +108,12 @@ class ScreenController:
                 CARD_COLOR_SET[CARD_COLOR_RED] = (239, 159, 0),
                 CARD_COLOR_SET[CARD_COLOR_YELLOW] = (240, 228, 66),
                 CARD_COLOR_SET[CARD_COLOR_GREEN] = (0, 158, 116),
-                CARD_COLOR_SET[CARD_COLOR_BLUE] = (182, 180, 233),
+                CARD_COLOR_SET[CARD_COLOR_BLUE] = (86, 180, 233),
 
                 COLOR_SET[CARD_COLOR_RED] = (239, 159, 0),
                 COLOR_SET[CARD_COLOR_YELLOW] = (240, 228, 66),
                 COLOR_SET[CARD_COLOR_GREEN] = (0, 158, 116),
-                COLOR_SET[CARD_COLOR_BLUE] = (182, 180, 233),
+                COLOR_SET[CARD_COLOR_BLUE] = (86, 180, 233),
 
 
 
