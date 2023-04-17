@@ -1,16 +1,20 @@
-from game.game import UnoGame
-from util.globals import *
-import random
+from __future__ import annotations
+from typing import TYPE_CHECKING
+from game.model.computer import Computer
+if TYPE_CHECKING:
+   from game.game import UnoGame
 
-class regionB:
-   def __init__(self):
-      self.game=UnoGame()
-      self.game.init()
-      self.game.add_computer("computer1")
-      self.game.add_computer("computer2")
-      self.game.add_computer("computer3")
-      self.num=0 #player들에게 분배할 카드 수
 
-   def num_decision(self): #player들에게 분배할 카드수 지정
-      n=len(self.game.players)
-      self.num=len(self.game.deck.cards)//n
+
+class RegionB:
+   def __init__(self, game: UnoGame):
+      self.game = game
+
+      self.computers = [Computer(f"Computer{i}") for i in range(3)]
+
+
+   def init(self):
+      self.game.players.extend(self.computers)
+
+      cnt = len(self.game.deck.cards) // len(self.game.players)
+      self.game.deal(cnt)

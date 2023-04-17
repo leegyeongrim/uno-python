@@ -15,23 +15,23 @@ class Deck:
     def create_cards(self):
         color = list(CARD_COLOR_SET.keys())
         value = [i for i in range(1,10)] + SKILL_SET
-        # value = [SKILL_JUMP_RANDOM] * 5 + [SKILL_REVERSE] * 5 + [SKILL_JUMP] * 5
 
         # 무색상 +4 기술 카드
         cards=[]
         cards.extend([Card(CARD_COLOR_NONE, SKILL_PLUS_4)])
         # 무색상 색상 기술 카드
-        cards.extend([Card(CARD_COLOR_NONE, SKILL_COLOR)] * 100)
+        cards.extend([Card(CARD_COLOR_NONE, SKILL_COLOR)])
 
         for c in color[1:]:
             for v in value[:14]:
                 cards.append(Card(c,v))
+        print(len(cards))
         self.cards = cards
         
     def shuffle(self):
         random.shuffle(self.cards)
 
-    # 카드 분해 TODO: 범위 체크
+    # 카드 분배
     def deal(self, n = 1):
         return [self.draw() for _ in range(n)]
 

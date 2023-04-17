@@ -1,6 +1,7 @@
 from game.model.player import *
 from game.model.deck import Deck
 from game.model.card import *
+from game.story.regionB import RegionB
 from util.globals import *
 import random
 import time
@@ -40,6 +41,8 @@ class UnoGame:
         self.uno_clicked_player_index = None
 
 
+        self.region_b = RegionB(self)
+
 
     def start_game(self, play_type, players):
         print('게임 시작')
@@ -59,8 +62,12 @@ class UnoGame:
 
         self.deck = Deck()
         self.deck.shuffle()
+
         if self.play_type == TYPE_SINGLE:
             self.deal()
+        elif self.play_type == TYPE_STORY_B:
+            self.region_b.init()
+
         self.current_card = self.deck.draw()
         self.current_color = self.current_card.color
 
@@ -135,10 +142,10 @@ class UnoGame:
     def toggle_turn_direction(self):
         self.reverse_direction = not self.reverse_direction
 
-    # 카드 분배 #수정부분: idx 받아서 특정 player에게만 deal 해주기
-    def deal(self, idx=None, n=7):
+    # 카드 분배
+    def deal(self, n=7):
         for player in self.players:
-            player.deal(self.deck.deal(7))
+            player.deal(self.deck.deal(n))
 
     # 플레이어에게 패널티 카드 n장 부여
     def penalty(self, player_index, n=1):
