@@ -24,6 +24,8 @@ SKILL_OMIT = "skill_again"
 SKILL_PLUS_4 = "skill_card_4"
 SKILL_COLOR = "skill_color"
 
+SKILL_COMBO = "skill_combo"
+
 SKILL_SET = [
     SKILL_JUMP,
     SKILL_REVERSE,

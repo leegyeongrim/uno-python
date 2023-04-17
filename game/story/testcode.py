@@ -1,10 +1,12 @@
 import random
 
+
 from game.game import UnoGame
 from game.model.card import Card
 from game.story.regionA import RegionA
 
 if __name__ == '__main__':
+    # pyinstaller main.py --onefile --noconsole
     game = UnoGame()
     game.start_game("", [])
     game.deck.shuffle()

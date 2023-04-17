@@ -1,6 +1,7 @@
 import random
 
 from game.model.player import Player
+from util.globals import *
 
 
 class Computer(Player):
@@ -18,3 +19,19 @@ class Computer(Player):
         else:
             return None
         return self.hands.index(card)
+
+    def get_special_cards(self):
+        special_cards = []
+        for card in self.hands:
+            if card.value == "skill_reverse":
+                if len(special_cards) == 0:
+                    special_cards.append(card)
+            elif card.value == "skill_card_2":
+                if len(special_cards) == 1:
+                    special_cards.append(card)
+            elif card.value == "skill_jump_random":
+                if len(special_cards) == 2:
+                    special_cards.append(card)
+            if len(special_cards) == 3:
+                break
+        return special_cards if len(special_cards) == 3 else []

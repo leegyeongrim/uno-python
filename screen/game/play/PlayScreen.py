@@ -22,6 +22,7 @@ class PlayScreen:
     def __init__(self, screen_controller: ScreenController):
 
         # 의존성 객체
+
         self.screen_controller = screen_controller
         self.animate_controller = AnimateController()
         self.game = screen_controller.game
@@ -46,7 +47,9 @@ class PlayScreen:
         self.card_select_enabled = False  # 카드 선택 가능 상태
 
         self.select_color_enabled = False
-        
+
+        self.combo_enabled = False
+
         # 애니메이션 관련
         self.animate_view = None
         
@@ -155,7 +158,8 @@ class PlayScreen:
                     if self.game.skill_plus_cnt > 0:
                         self.on_deck_selected()
                     else:
-                        self.game.next_turn()
+                        turn = 0 if self.combo_enabled else 1
+                        self.game.next_turn(turn)
                         self.animate_deck_to_player_enabled = False
                         self.continue_game()
                 else:
@@ -219,6 +223,11 @@ class PlayScreen:
             self.game.skip_turn(random.randint(1, len(self.game.players) - 1))
         elif card.value == SKILL_COLOR:
             self.select_color_enabled = True
+        elif card.value == SKILL_COMBO:
+            self.combo_enabled = True
+            self.game.toggle_turn_direction() # 리버스
+            self.game.skill_plus_cnt = 2
+            self.on_deck_selected()
         else:
             self.game.next_turn()
 
@@ -418,6 +427,14 @@ class PlayScreen:
                 return
 
             self.to_computer_play_idx = computer.to_play(self.game)
+
+            if self.game.play_type == TYPE_STORY_A:
+                temp = computer.get_special_cards()
+                if len(temp) > 0:
+                    for card in temp:
+                        computer.hands.remove(card)
+                    computer.hands.append(Card(CARD_COLOR_NONE, SKILL_COMBO))
+                    self.to_computer_play_idx = len(computer.hands) - 1
 
             if self.to_computer_play_idx is not None:
                 self.screen_controller.play_effect()

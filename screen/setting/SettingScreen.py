@@ -33,6 +33,8 @@ class SettingScreen:
         # 모든 선택 상태
         self.mode_select_enabled = False
 
+
+
     def draw(self, screen: pygame.Surface):
         screen.fill(COLOR_WHITE)
         self.draw_title(screen)
