@@ -2,14 +2,14 @@ class AnimateController:
     def __init__(self):
         self.enabled = False
 
-        self.speed = 20
+        self.speed = 10
 
         self.start_x = None
         self.start_y = None
         self.end_x = None
         self.end_y = None
 
-    def init_pos(self, view, rect, start_x, start_y, end_x, end_y):
+    def start(self, view, rect, start_x, start_y, end_x, end_y):
         self.enabled = True
 
         self.view = view

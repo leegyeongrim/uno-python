@@ -42,7 +42,7 @@ class CardBoard:
             screen.blit(get_card(self.cards[idx], 1.5), rect)
 
             # 하이라이트
-            if self.play_screen.my_cards_select_enabled and not self.play_screen.deck_select_enabled and idx == self.play_screen.my_cards_selected_index:
+            if self.play_screen.card_select_enabled and not self.play_screen.deck_select_enabled and idx == self.play_screen.my_cards_selected_index:
                 pygame.draw.rect(screen, COLOR_BLACK, rect, 5)
 
         txt_card_cnt = get_medium_font().render(str(len(self.card_rects)), True, COLOR_BLACK)

@@ -35,7 +35,7 @@ class Board:
         pygame.draw.circle(screen, CARD_COLOR_SET[current_card.color], *self.color_circle)
         screen.blit(self.deck, self.deck_rect)
 
-        if self.play_screen.my_cards_select_enabled and self.play_screen.deck_select_enabled:
+        if self.play_screen.card_select_enabled and self.play_screen.deck_select_enabled:
             screen.blit(self.deck_highlight, self.deck_rect)
 
         screen.blit(get_card(current_card, 2), self.current_card_rect)

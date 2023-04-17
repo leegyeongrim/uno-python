@@ -43,13 +43,14 @@ class PlayScreen:
         self.pause_temp_time = None  # 일시정지 임시 시간 저장 변수
         
         self.deck_select_enabled = False  # 덱 선택 가능 상태
-        self.my_cards_select_enabled = False  # 카드 선택 가능 상태
+        self.card_select_enabled = False  # 카드 선택 가능 상태
+        
+        # 애니메이션 관련
+        self.animate_view = None
         
         self.animate_deck_to_player_enabled = False
         self.animate_board_player_to_current_card_enabled = False
         self.animate_current_player_to_current_card_enabled = False
-
-        self.uno_enabled_in_turn = False
 
     def pause_game(self):  # 일시정지
         self.stop_timer_enabled = True
@@ -118,16 +119,18 @@ class PlayScreen:
                 self.pause_game()
                 self.animate_controller.draw(screen)
             else:
-                if self.game.uno_enabled:
-                    # 패널티 부여 결과
+                if self.game.can_uno_penalty:
                     self.game.penalty(self.game.previous_player_index)
                     self.game.uno_enabled = False
                     self.game.uno_clicked = False
+                    self.game.can_uno_penalty = False
                 else:
                     self.game.draw()
                     self.game.next_turn()
-                # 일시정지 해제
+
                 self.animate_deck_to_player_enabled = False
+
+                # 일시정지 해제
                 self.continue_game()
 
             # 카드 제출 애니메이션
@@ -154,7 +157,6 @@ class PlayScreen:
                 self.game.play(self.to_computer_play_idx)
                 self.animate_current_player_to_current_card_enabled = False
                 self.continue_game()
-
         else:
             self.run_computer()
 
@@ -168,15 +170,16 @@ class PlayScreen:
             self.on_deck_selected()
         
         # 나의 턴 확인
-        self.my_cards_select_enabled = self.game.board_player_index == self.game.current_player_index
+        self.card_select_enabled = self.game.board_player_index == self.game.current_player_index
 
     def check_uno_clicked(self):
         if self.game.uno_enabled:
             if self.game.uno_clicked:
+                print('턴 시작 시 패널티 미부여')
                 self.game.uno_enabled = False
                 self.game.uno_clicked = False
             else:
-                print('check_uno_clicked', 'on_deck_selected')
+                self.game.can_uno_penalty = True
                 self.on_deck_selected()
 
     def run_events(self, events):
@@ -194,18 +197,14 @@ class PlayScreen:
         if self.game.is_game_over():
             self.game_over_dialog.run_key_event(key)
 
-        if key == pygame.K_ESCAPE:
+        elif key == pygame.K_ESCAPE:
             self.toggle_escape_dialog()
 
-        # 일시정지
-        if self.escape_dialog.enabled:
+
+        if self.escape_dialog.enabled:  # 일시정지 다이얼로그
             self.escape_dialog.run_key_event(key)
-
-        # 카드 선택
-        elif self.my_cards_select_enabled:
+        elif self.card_select_enabled:  #
             self.card_board.run_my_cards_select_key_event(key)
-
-        # 플레이어 선택
         elif self.players_layout.select_enabled:
             self.players_layout.run_select_key_event(key)
 
@@ -215,10 +214,10 @@ class PlayScreen:
         if self.game.is_game_over():
             self.game_over_dialog.run_click_event(None)
 
-        if self.escape_dialog.enabled:
+        elif self.escape_dialog.enabled:
             self.escape_dialog.run_click_event(pos)
 
-        elif self.my_cards_select_enabled:
+        elif self.card_select_enabled:
             self.board.run_deck_click_event(pos)
             self.card_board.run_board_cards_select_click_event(pos)
 
@@ -249,7 +248,7 @@ class PlayScreen:
             rect = surface.get_rect()
             rect.topleft = start_x, start_y
 
-            self.animate_controller.init_pos(surface, rect, start_x, start_y, end_x, end_y)
+            self.animate_controller.start(surface, rect, start_x, start_y, end_x, end_y)
 
     # 에러 방지를 위한 함수
     def resolve_error(self):
@@ -260,37 +259,40 @@ class PlayScreen:
     # 덱 선택
     def on_deck_selected(self):
         self.screen_controller.play_effect()
-
         self.animate_deck_to_player_enabled = True
 
-        self.set_animate_view()
+        self.set_animate_view_to_card_back()
+        
+        # 출발지 지정
         start_x, start_y = self.animate_view_rect.topleft
 
-        # 애니메이션 목적지
-        if self.game.current_player_index == self.game.board_player_index:
-            self.set_board_destination()
-        # 내가 아닌 플레이어
-        else:
-            player_rect = self.players_layout.players[self.game.current_player_index - 1]
-            self.animate_destination_x, self.animate_destination_y = player_rect.topleft
-
-        # 이전 플레이어 패널티
-        if self.game.uno_enabled:
+        # 목적지 지정
+        if self.game.can_uno_penalty:
+            # 이전 플레이어 목적지 지정
             if self.game.previous_player_index == self.game.board_player_index:
                 self.set_board_destination()
             else:
                 player_rect = self.players_layout.players[self.game.previous_player_index - 1]
                 self.animate_destination_x, self.animate_destination_y = player_rect.topleft
+        else:
+            # 현재 플레이어 목적지 지정
+            if self.game.current_player_index == self.game.board_player_index:
+                self.set_board_destination()
+            else:
+                player_rect = self.players_layout.players[self.game.current_player_index - 1]
+                self.animate_destination_x, self.animate_destination_y = player_rect.topleft
 
-        # 애니메이션 정보 초기화
-        self.animate_controller.init_pos(self.animate_view, self.animate_view_rect, start_x, start_y,
-                                         self.animate_destination_x, self.animate_destination_y)
+        # 애니메이션 시작
+        self.animate_controller.start(
+            self.animate_view, 
+            self.animate_view_rect, 
+            start_x, 
+            start_y,
+            self.animate_destination_x, self.animate_destination_y
+        )
 
-    def set_animate_view(self):
-        self.animate_view = pygame.image.load('./resource/card_back.png')  # TODO: 카드 수정
-        self.animate_view = pygame.transform.scale(self.animate_view, (
-            get_card_width() * MY_BOARD_CARD_PERCENT, get_card_height() * MY_BOARD_CARD_PERCENT))
-
+    def set_animate_view_to_card_back(self):
+        self.animate_view = get_card_back(MY_BOARD_CARD_PERCENT)
         self.animate_view_rect = get_center_rect(self.animate_view, self.board.background_rect,
                                                  -self.animate_view.get_width() // MY_BOARD_CARD_PERCENT - get_medium_margin())
 
@@ -332,7 +334,7 @@ class PlayScreen:
                 rect = surface.get_rect()
                 rect.topleft = start_x, start_y
 
-                self.animate_controller.init_pos(surface, rect, start_x, start_y, end_x, end_y)
+                self.animate_controller.start(surface, rect, start_x, start_y, end_x, end_y)
             else:
                 # 낼 카드 없을 떄
                 self.on_deck_selected()
