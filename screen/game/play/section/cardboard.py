@@ -58,7 +58,22 @@ class CardBoard:
                 surface.fill(COLOR_TRANSPARENT_RED)
                 screen.blit(surface, self.background_rect.topleft)
 
+        if self.play_screen.select_color_enabled and self.game.board_player_index == self.game.current_player_index:
+            self.draw_select_color(screen)
 
+
+    def draw_select_color(self, screen: pygame.Surface):
+        surface = pygame.Surface(self.background_rect.size, pygame.SRCALPHA)
+        surface.fill(COLOR_TRANSPARENT_WHITE)
+        screen.blit(surface, self.background_rect.topleft)
+
+
+
+    def run_select_color_click_event(self, pos):
+        pass
+
+    def run_slect_color_key_event(self, key):
+        pass
 
     # 나의 카드
     def draw_my_cards(self, screen: pygame.Surface, cards):

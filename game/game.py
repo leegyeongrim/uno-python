@@ -23,6 +23,8 @@ class UnoGame:
 
         self.deck = None
         self.current_card = None
+        self.current_color = None
+
         self.turn_time = 10
         self.uno_count = 2  # TODO 우노 버튼을 클릭해야 할 카드 개수: 기본2
         self.skip_direction = 1
@@ -36,6 +38,8 @@ class UnoGame:
         self.uno_enabled = False
         self.uno_clicked = False
         self.uno_clicked_player_index = None
+
+
 
     def start_game(self, play_type, players):
         print('게임 시작')
@@ -58,6 +62,7 @@ class UnoGame:
         if self.play_type == TYPE_SINGLE:
             self.deal()
         self.current_card = self.deck.draw()
+        self.current_color = self.current_card.color
 
         self.turn_start_time = time.time()
         self.is_turn_start = False
@@ -143,6 +148,7 @@ class UnoGame:
     # 현재 카드 변경
     def set_current_card(self, card):
         self.current_card = card
+        self.current_color = card.color
 
     # 카드 검증
     def verify_new_card(self, new_card: Card) -> bool:
@@ -152,10 +158,10 @@ class UnoGame:
                 return new_card.value == SKILL_COLOR
             
         # 이전 카드가 미색상 기술 카드이면서 새로운 카드가 미색상 카드가 아닌 경우 
-        return self.current_card.color == CARD_COLOR_NONE or \
+        return self.current_color == CARD_COLOR_NONE or \
             new_card.color == CARD_COLOR_NONE or \
-            self.current_card.color == new_card.color or \
-            self.current_card.value == new_card.value
+            self.current_color == new_card.color or \
+            self.current_color == new_card.value
 
     def update_uno_enabled(self):
         self.uno_enabled = len(self.get_current_player().hands) == self.uno_count

@@ -32,7 +32,7 @@ class Board:
         self.current_card_rect = get_center_rect(self.current_card, self.background_rect, self.current_card.get_width() // 2 + get_medium_margin())
 
         pygame.draw.rect(screen, COLOR_BOARD, self.background_rect)
-        pygame.draw.circle(screen, CARD_COLOR_SET[current_card.color], *self.color_circle)
+        pygame.draw.circle(screen, CARD_COLOR_SET[self.game.current_color], *self.color_circle)
         screen.blit(self.deck, self.deck_rect)
 
         if self.play_screen.card_select_enabled and self.play_screen.deck_select_enabled:

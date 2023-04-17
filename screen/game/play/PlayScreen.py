@@ -44,6 +44,8 @@ class PlayScreen:
         
         self.deck_select_enabled = False  # 덱 선택 가능 상태
         self.card_select_enabled = False  # 카드 선택 가능 상태
+
+        self.select_color_enabled = False
         
         # 애니메이션 관련
         self.animate_view = None
@@ -69,6 +71,8 @@ class PlayScreen:
 
         self.deck_select_enabled = False  # 덱 선택 가능 상태
         self.card_select_enabled = False  # 카드 선택 가능 상태
+
+        self.select_color_enabled = False
 
         self.animate_deck_to_player_enabled = False
         self.animate_board_player_to_current_card_enabled = False
@@ -110,6 +114,7 @@ class PlayScreen:
 
         # 턴 시작 시 단 1번 동작
         if self.game.is_turn_start:
+            self.select_color_enabled = False
             self.check_uno_clicked()
             self.game.is_turn_start = False
 
@@ -122,13 +127,8 @@ class PlayScreen:
             self.escape_dialog.draw(screen)
             return
 
-
-
         # 애니메이션
         self.draw_animation(screen)
-
-
-
 
 
     def draw_animation(self, screen):
@@ -172,7 +172,6 @@ class PlayScreen:
             else:
                 # 한 장 제출
                 self.game.play(self.board_player_to_current_card_idx)
-                # TODO: 기술 카드 실행
                 self.run_card(self.game.current_card)
 
                 self.animate_board_player_to_current_card_enabled = False
@@ -187,7 +186,6 @@ class PlayScreen:
             else:
                 # 한 장 제출
                 self.game.play(self.to_computer_play_idx)
-                # TODO: 기술 카드 실행
                 self.run_card(self.game.current_card)
                 
                 self.animate_current_player_to_current_card_enabled = False
@@ -215,6 +213,8 @@ class PlayScreen:
             self.game.next_turn(0)
         elif card.value == SKILL_JUMP_RANDOM:
             self.game.skip_turn(random.randint(1, len(self.game.players) - 1))
+        elif card.value == SKILL_COLOR:
+            self.select_color_enabled = True
         else:
             self.game.next_turn()
 
@@ -227,6 +227,7 @@ class PlayScreen:
 
         elif (time.time() - self.game.turn_start_time) > self.game.turn_time:  # 턴 종료
             self.on_deck_selected()
+
         
         # 나의 턴 확인
         self.card_select_enabled = self.game.board_player_index == self.game.current_player_index
@@ -273,6 +274,8 @@ class PlayScreen:
 
         if self.escape_dialog.enabled:  # 일시정지 다이얼로그
             self.escape_dialog.run_key_event(key)
+        elif self.select_color_enabled and self.game.board_player_index == self.game.current_player_index:
+            self.card_board.run_slect_color_key_event(key)
         elif self.card_select_enabled:  #
             self.card_board.run_my_cards_select_key_event(key)
         elif self.players_layout.select_enabled:
@@ -286,6 +289,9 @@ class PlayScreen:
 
         elif self.escape_dialog.enabled:
             self.escape_dialog.run_click_event(pos)
+
+        elif self.select_color_enabled and self.game.board_player_index == self.game.current_player_index:
+            self.card_board.run_board_cards_select_click_event(pos)
 
         elif self.card_select_enabled:
             self.board.run_deck_click_event(pos)
@@ -399,6 +405,13 @@ class PlayScreen:
                 return
 
             computer = self.game.get_current_player()
+
+            if self.select_color_enabled:
+                colors = list(COLOR_SET.keys())
+                color = random.choice(colors)
+                self.game.current_color = color
+                self.game.next_turn()
+                return
 
             self.to_computer_play_idx = computer.to_play(self.game)
 
