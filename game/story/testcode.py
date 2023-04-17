@@ -1,28 +1,20 @@
 import random
 
+from game.game import UnoGame
 from game.model.card import Card
-
-
-def roulette_wheel_selection(cards):
-    non_int_values = [card for card in cards if not isinstance(card.value, int)]
-    int_values = [card for card in cards if isinstance(card.value, int)]
-
-    total_weight = sum([len(non_int_values) * 1.5, len(int_values)])
-
-    pick = random.uniform(0, total_weight)
-
-    if pick < len(int_values):
-        return random.choice(int_values)
-    else:
-        return random.choice(non_int_values)
+from game.story.regionA import RegionA
 
 if __name__ == '__main__':
-    cards = [Card('red', 1), Card('blue', 'skill1'), Card('green', 2), Card('yellow', 'skill2'), Card('white', 'skill3'), Card('black', 5)]
+    game = UnoGame()
+    game.start_game("", [])
+    game.deck.shuffle()
+
+    region = RegionA(game)
 
     skill_cnt = 0
     num_cnt = 0
     for i in range(1000):
-        if not isinstance(roulette_wheel_selection(cards).value, int):
+        if not isinstance(region.roulette_wheel_selection(game.deck.cards).value, int):
             skill_cnt += 1
         else:
             num_cnt += 1

@@ -36,11 +36,11 @@ class RegionA:
       non_int_values = [card for card in cards if not isinstance(card.value, int)]
       int_values = [card for card in cards if isinstance(card.value, int)]
 
-      total_weight = sum([len(non_int_values) * 1.5, len(int_values)])
+      sample=[0,0,1,1,1]
+      idx = random.randint(0, len(sample) - 1)
 
-      pick = random.uniform(0, total_weight)
 
-      if pick < len(int_values):
-         return random.choice(int_values)
-      else:
+      if sample[idx]:
          return random.choice(non_int_values)
+      else:
+         return random.choice(int_values)
