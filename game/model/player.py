@@ -13,6 +13,3 @@ class Player:
     # 카드를 냄
     def play(self, game, idx):
         return self.hands.pop(idx)
-    
-    def press_uno(self):
-        pass

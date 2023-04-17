@@ -1,17 +1,36 @@
-from game.story.regionA import regionA
+import random
 
-#TODO main에서는 돌아가는데 testcode.py에서는 안돌아감
+from game.model.card import Card
 
-test=regionA()
-func_li=[]
-num_li=[]
-        
-for i in range(1000):
-    test.split_cards()
-    test.computer_deal(1)
-    if type(test.example[i].value)==int:
-        num_li.append(test.example)
+
+def roulette_wheel_selection(cards):
+    non_int_values = [card for card in cards if not isinstance(card.value, int)]
+    int_values = [card for card in cards if isinstance(card.value, int)]
+
+    total_weight = sum([len(non_int_values) * 1.5, len(int_values)])
+
+    pick = random.uniform(0, total_weight)
+
+    if pick < len(int_values):
+        return random.choice(int_values)
     else:
-        func_li.append(test.example)
-    
-print("기술카드:"+str(len(func_li))+", 숫자카드:"+str(len(num_li)))
+        return random.choice(non_int_values)
+
+if __name__ == '__main__':
+    cards = [Card('red', 1), Card('blue', 'skill1'), Card('green', 2), Card('yellow', 'skill2'), Card('white', 'skill3'), Card('black', 5)]
+
+    skill_cnt = 0
+    num_cnt = 0
+    for i in range(1000):
+        if not isinstance(roulette_wheel_selection(cards).value, int):
+            skill_cnt += 1
+        else:
+            num_cnt += 1
+
+    skill_ratio = skill_cnt / 1000
+    print(skill_ratio)
+    error = abs(skill_ratio - 0.6) / 0.6
+    print(f'오차: {error}')
+    print(f'테스트 통과 여부: {error <= 0.05}')
+
+    print(skill_cnt, num_cnt)

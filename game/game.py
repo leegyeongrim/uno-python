@@ -71,7 +71,6 @@ class UnoGame:
 
 
         self.deck = Deck(self)
-        self.deck.shuffle()
 
         if self.play_type == TYPE_SINGLE:
             self.deal()
@@ -178,7 +177,6 @@ class UnoGame:
 
     # 카드 검증
     def verify_new_card(self, new_card: Card) -> bool:
-        # TODO: 색상 카드 선택 시 다음 플레이어는 바뀐 색의 카드나 또 다른 색 변경 카드만 낼 수 있음
         if self.current_card.value == SKILL_COLOR:
             if new_card.color == CARD_COLOR_NONE:
                 print('유효성 검사1', new_card.value == SKILL_COLOR)
