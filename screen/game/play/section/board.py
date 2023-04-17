@@ -16,7 +16,8 @@ class Board:
         self.play_screen = play_screen
         self.game = play_screen.game
 
-    def draw(self, screen: pygame.Surface, current_card: Card):
+    def draw(self, screen: pygame.Surface):
+        current_card = self.game.current_card
 
         self.background_rect = pygame.Rect((0, 0, screen.get_width() - self.play_screen.players_layout.width, screen.get_height() - screen.get_height() // 3))
         self.color_circle = (self.background_rect.center, self.background_rect.width // 4, 20)

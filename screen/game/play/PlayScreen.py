@@ -23,44 +23,40 @@ class PlayScreen:
         self.screen_controller = screen_controller
         self.animate_controller = AnimateController()
         self.game = screen_controller.game
+        
+        # 레이아웃 모음
+        self.players_layout = PlayersLayout(self)
+        self.board = Board(self)
+        self.card_board = CardBoard(self)
 
         self.escape_dialog = EscapeDialog(self)
         self.game_over_dialog = GameOverDialog(self)
-        self.players_layout = PlayersLayout(self)
 
-        # 나의 카드 레이아웃
+        # 카드보드 관련 변수 TODO: 나중에 분리
         self.my_cards_selected_index = 0
         self.cards_line_size = 0  # 한 줄 당 카드 개수
 
-        self.my_cards_select_enabled = False  # 카드 선택 가능 상태
-
         # 게임 관련
         self.game_started = False
-        self.stop_timer_enabled = False
-        self.deck_select_enabled = False
+        
+        self.stop_timer_enabled = False  # 일시정지 상태
+        self.pause_temp_time = None  # 일시정지 임시 시간 저장 변수
+        
+        self.deck_select_enabled = False  # 덱 선택 가능 상태
+        self.my_cards_select_enabled = False  # 카드 선택 가능 상태
+        
         self.animate_deck_to_player_enabled = False
         self.animate_board_player_to_current_card_enabled = False
         self.animate_current_player_to_current_card_enabled = False
+
         self.uno_enabled_in_turn = False
 
-        # 보드 값
-        self.board_width = self.screen_controller.screen.get_width() - self.players_layout.width
-        self.board = Board(self)
-
-        # 카드 레이아웃
-        self.card_board = CardBoard(self)
-
-    # 타이머 일시정지
-    def pause_timer(self):
+    def pause_game(self):  # 일시정지
         self.stop_timer_enabled = True
         self.pause_temp_time = time.time()
 
-    def continue_timer(self):
+    def continue_game(self):  # 다시 시작
         self.stop_timer_enabled = False
-
-    def start_game(self):
-        self.game.is_started = True
-        self.game.turn_start_time = time.time()
 
     # 초기화 함수
     def init(self):
@@ -68,9 +64,9 @@ class PlayScreen:
         self.escape_dialog.menu_idx = 0
 
         if self.escape_dialog.enabled:
-            self.pause_timer()
+            self.pause_game()
         else:
-            self.continue_timer()
+            self.continue_game()
 
     # 다이얼로그 표시 상태 변경
     def toggle_escape_dialog(self):
@@ -78,55 +74,66 @@ class PlayScreen:
 
         # 일시정지 시간 처리
         if self.escape_dialog.enabled:
-            self.pause_timer()
+            self.pause_game()
         else:
-            self.continue_timer()
+            self.continue_game()
 
     # 모든 View
     def draw(self, screen):
         screen.fill(COLOR_WHITE)
-        self.my_cards_layout_height = screen.get_height() // 3
+        if not self.game.is_started:
+            return
 
-        if self.game.is_started:
-            self.resolve_error()
+        # 인덱스 에러 해결을 위한 함수 모음
+        self.resolve_error()
 
-            self.board.draw(screen, self.game.current_card)
+        # 화면 섹션 그리기
+        self.board.draw(screen)
+        self.card_board.draw(screen)
+        self.players_layout.draw(screen)
 
-            self.card_board.draw(screen)
+        # 턴 시작 시 단 1번 동작
+        if self.game.is_turn_start:
+            self.check_uno_clicked()
+            self.game.is_turn_start = False
 
-            self.players_layout.draw(screen)
-            self.check_time()
+        # 게임 관련 동작 업데이트
+        self.check_time() # 타이머 관련 동작
+        self.game.update_uno_enabled()  # 우노 상태 확인
 
-            # 턴 시작 시 단 1번 동작
-            if self.game.is_turn_start:
-                self.check_uno_clicked()
-                self.game.is_turn_start = False
+        # 애니메이션
+        self.draw_animation(screen)
 
-            self.game.update_uno_enabled()
-
-
+        # 게임 종료
         if self.game.is_game_over():
             self.game_over_dialog.draw(screen, self.game.get_winner())
-        elif self.escape_dialog.enabled:
-            pass
-        elif self.animate_deck_to_player_enabled:
+
+        # 일시정지 다이얼로그
+        if self.escape_dialog.enabled:
+            self.escape_dialog.draw(screen)
+
+    def draw_animation(self, screen):
+        if self.animate_deck_to_player_enabled:
             if self.animate_controller.enabled:
-                self.pause_timer()
+                self.pause_game()
                 self.animate_controller.draw(screen)
             else:
-                self.game.draw()  # 애니메이션 종료 후 한장 가져옴
+                if self.game.uno_enabled:
+                    # 패널티 부여 결과
+                    self.game.penalty(self.game.previous_player_index)
+                    self.game.uno_enabled = False
+                    self.game.uno_clicked = False
+                else:
+                    self.game.draw()
+                    self.game.next_turn()
+                # 일시정지 해제
                 self.animate_deck_to_player_enabled = False
+                self.continue_game()
 
-                # 일시정해 해제
-                self.continue_timer()
-
-                # 턴 전환
-                self.game.next_turn()
-
-        # 카드 제출 애니메이션
+            # 카드 제출 애니메이션
         elif self.animate_board_player_to_current_card_enabled:
             if self.animate_controller.enabled:
-                self.pause_timer()
+                self.pause_game()
                 self.animate_controller.draw(screen)
 
             # 애니메이션 종료 시 호출
@@ -134,11 +141,11 @@ class PlayScreen:
                 # 한 장 제출
                 self.game.play(self.board_player_to_current_card_idx)
                 self.animate_board_player_to_current_card_enabled = False
-                self.continue_timer()
+                self.continue_game()
 
         elif self.animate_current_player_to_current_card_enabled:
             if self.animate_controller.enabled:
-                self.pause_timer()
+                self.pause_game()
                 self.animate_controller.draw(screen)
 
             # 애니메이션 종료 시 호출
@@ -146,74 +153,64 @@ class PlayScreen:
                 # 한 장 제출
                 self.game.play(self.to_computer_play_idx)
                 self.animate_current_player_to_current_card_enabled = False
-                self.continue_timer()
+                self.continue_game()
 
         else:
             self.run_computer()
 
-        if self.escape_dialog.enabled:
-            self.escape_dialog.draw(screen)
-
     def check_time(self):
-        if self.stop_timer_enabled:
+        if self.stop_timer_enabled:  # 일시정지 상태
             current_time = time.time()
             self.game.turn_start_time = self.game.turn_start_time + (current_time - self.pause_temp_time)
             self.pause_temp_time = current_time
 
-        elif (time.time() - self.game.turn_start_time) > self.game.turn_time:
-            # 시간 내 미선택 시 카드 드로우
+        elif (time.time() - self.game.turn_start_time) > self.game.turn_time:  # 턴 종료
             self.on_deck_selected()
-
-        self.check_my_turn()
-
-    def check_my_turn(self):
+        
+        # 나의 턴 확인
         self.my_cards_select_enabled = self.game.board_player_index == self.game.current_player_index
 
     def check_uno_clicked(self):
         if self.game.uno_enabled:
             if self.game.uno_clicked:
-                print('우노버튼 클릭으로 부여되지 않음')
                 self.game.uno_enabled = False
                 self.game.uno_clicked = False
             else:
-                print('패널티 부여')
-                # 패널티
-                self.game.uno_enabled = False
-                self.game.uno_clicked = False
+                print('check_uno_clicked', 'on_deck_selected')
+                self.on_deck_selected()
 
-    # 이벤트 처리 함수
     def run_events(self, events):
-        if self.game.is_started:
-            for event in events:
-                if event.type == pygame.KEYDOWN:
-                    self.process_key_event(event.key)
+        if not self.game.is_started:
+            return
 
-                elif event.type == pygame.MOUSEBUTTONUP:
-                    self.process_click_event(pygame.mouse.get_pos())
+        for event in events:
+            if event.type == pygame.KEYDOWN:
+                self.run_key_event(event.key)
 
-    # 키보드 입력 이벤트 처리
-    def process_key_event(self, key):
-        if self.game.is_started:
-            if self.game.is_game_over():
-                self.game_over_dialog.run_key_event(key)
+            elif event.type == pygame.MOUSEBUTTONUP:
+                self.run_click_event(pygame.mouse.get_pos())
 
-            if key == pygame.K_ESCAPE:
-                self.toggle_escape_dialog()
+    def run_key_event(self, key):
+        if self.game.is_game_over():
+            self.game_over_dialog.run_key_event(key)
 
-            # 일시정지
-            if self.escape_dialog.enabled:
-                self.escape_dialog.run_key_event(key)
+        if key == pygame.K_ESCAPE:
+            self.toggle_escape_dialog()
 
-            # 카드 선택
-            elif self.my_cards_select_enabled:
-                self.card_board.run_my_cards_select_key_event(key)
+        # 일시정지
+        if self.escape_dialog.enabled:
+            self.escape_dialog.run_key_event(key)
 
-            # 플레이어 선택
-            elif self.players_layout.select_enabled:
-                self.players_layout.run_select_key_event(key)
+        # 카드 선택
+        elif self.my_cards_select_enabled:
+            self.card_board.run_my_cards_select_key_event(key)
+
+        # 플레이어 선택
+        elif self.players_layout.select_enabled:
+            self.players_layout.run_select_key_event(key)
 
     # 클릭 이벤트
-    def process_click_event(self, pos):
+    def run_click_event(self, pos):
 
         if self.game.is_game_over():
             self.game_over_dialog.run_click_event(None)
@@ -234,7 +231,6 @@ class PlayScreen:
 
     # 카드 선택 분기
     def on_card_selected(self, idx):
-
         hands = self.game.get_board_player().hands
         card = hands[idx]
         # 유효성 확인
@@ -258,7 +254,6 @@ class PlayScreen:
     # 에러 방지를 위한 함수
     def resolve_error(self):
         # 보드 카드 이전 인덱스 초과 시 처리
-
         if self.my_cards_selected_index >= len(self.game.get_board_player().hands):
             self.my_cards_selected_index -= 1
 
@@ -268,37 +263,52 @@ class PlayScreen:
 
         self.animate_deck_to_player_enabled = True
 
+        self.set_animate_view()
+        start_x, start_y = self.animate_view_rect.topleft
+
+        # 애니메이션 목적지
+        if self.game.current_player_index == self.game.board_player_index:
+            self.set_board_destination()
+        # 내가 아닌 플레이어
+        else:
+            player_rect = self.players_layout.players[self.game.current_player_index - 1]
+            self.animate_destination_x, self.animate_destination_y = player_rect.topleft
+
+        # 이전 플레이어 패널티
+        if self.game.uno_enabled:
+            if self.game.previous_player_index == self.game.board_player_index:
+                self.set_board_destination()
+            else:
+                player_rect = self.players_layout.players[self.game.previous_player_index - 1]
+                self.animate_destination_x, self.animate_destination_y = player_rect.topleft
+
+        # 애니메이션 정보 초기화
+        self.animate_controller.init_pos(self.animate_view, self.animate_view_rect, start_x, start_y,
+                                         self.animate_destination_x, self.animate_destination_y)
+
+    def set_animate_view(self):
         self.animate_view = pygame.image.load('./resource/card_back.png')  # TODO: 카드 수정
         self.animate_view = pygame.transform.scale(self.animate_view, (
             get_card_width() * MY_BOARD_CARD_PERCENT, get_card_height() * MY_BOARD_CARD_PERCENT))
 
         self.animate_view_rect = get_center_rect(self.animate_view, self.board.background_rect,
                                                  -self.animate_view.get_width() // MY_BOARD_CARD_PERCENT - get_medium_margin())
-        start_x, start_y = self.animate_view_rect.topleft
 
-        # 애니메이션 목적지
-        if self.game.current_player_index == self.game.board_player_index:
-            self.animate_destination_x, self.animate_destination_y = self.card_board.next_card_start_x, self.card_board.next_card_start_y
-            if self.card_board.next_card_start_x + (
-                    get_card_width(MY_BOARD_CARD_PERCENT) // 1 + get_extra_small_margin()) + get_card_width(
-                MY_BOARD_CARD_PERCENT) >= self.board.background_rect.width:
-                self.animate_destination_y -= get_card_height(MY_BOARD_CARD_PERCENT) + get_extra_small_margin()
-                self.animate_destination_x = get_small_margin()
-            else:
-                self.animate_destination_x = self.card_board.next_card_start_x + (
-                        get_card_width(MY_BOARD_CARD_PERCENT) // 1 + get_extra_small_margin())
-
-        # 내가 아닌 플레이어
+    # 목적지 지정
+    def set_board_destination(self):
+        self.animate_destination_x, self.animate_destination_y = self.card_board.next_card_start_x, self.card_board.next_card_start_y
+        if self.card_board.next_card_start_x + (
+                get_card_width(MY_BOARD_CARD_PERCENT) // 1 + get_extra_small_margin()) + get_card_width(
+            MY_BOARD_CARD_PERCENT) >= self.board.background_rect.width:
+            self.animate_destination_y -= get_card_height(MY_BOARD_CARD_PERCENT) + get_extra_small_margin()
+            self.animate_destination_x = get_small_margin()
         else:
-            player_rect = self.players_layout.players[self.game.current_player_index - 1]
-            self.animate_destination_x, self.animate_destination_y = player_rect.topleft
-
-        # 애니메이션 정보 초기화
-        self.animate_controller.init_pos(self.animate_view, self.animate_view_rect, start_x, start_y,
-                                         self.animate_destination_x, self.animate_destination_y)
+            self.animate_destination_x = self.card_board.next_card_start_x + (
+                    get_card_width(MY_BOARD_CARD_PERCENT) // 1 + get_extra_small_margin())
 
     def run_computer(self):
         if type(self.game.get_current_player()) is Computer:
+
             # 컴퓨터 딜레이
             if time.time() - self.game.turn_start_time < Computer.DELAY:
                 return

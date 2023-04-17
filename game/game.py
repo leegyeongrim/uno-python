@@ -23,6 +23,7 @@ class UnoGame:
         self.deck = None
         self.current_card = None
         self.turn_time = 10
+        self.uno_count = 5  # 우노 버튼을 클릭해야 할 카드 개수: 기본2
 
         self.turn_start_time = None
         self.is_turn_start = False
@@ -101,7 +102,7 @@ class UnoGame:
             player.deal(self.deck.deal(7))
 
     # 플레이어에게 패널티 카드 n장 부여
-    def penalty(self, player_index, n):
+    def penalty(self, player_index, n=1):
         for _ in range(n):
             self.players[player_index].draw(self.deck.draw())
 
@@ -123,7 +124,7 @@ class UnoGame:
             self.current_card.value == new_card.value
 
     def update_uno_enabled(self):
-        self.uno_enabled = len(self.get_current_player().hands) == 2
+        self.uno_enabled = len(self.get_current_player().hands) == self.uno_count
 
 
     # TODO: 우노 버튼 클릭
