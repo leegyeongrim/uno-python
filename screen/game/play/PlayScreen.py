@@ -153,6 +153,9 @@ class PlayScreen:
             else:
                 # 한 장 제출
                 self.game.play(self.board_player_to_current_card_idx)
+                # TODO: 기술 카드 실행
+                self.run_card(self.game.current_card)
+
                 self.animate_board_player_to_current_card_enabled = False
                 self.continue_game()
 
@@ -165,10 +168,20 @@ class PlayScreen:
             else:
                 # 한 장 제출
                 self.game.play(self.to_computer_play_idx)
+                # TODO: 기술 카드 실행
+                self.run_card(self.game.current_card)
+                
                 self.animate_current_player_to_current_card_enabled = False
                 self.continue_game()
         else:
             self.run_computer()
+
+    # 카드 실행
+    def run_card(self, card: Card):
+        if card.value == SKILL_REVERSE:
+            self.game.toggle_turn_direction()
+
+        self.game.next_turn()
 
     def check_time(self):
         if self.stop_timer_enabled:  # 일시정지 상태

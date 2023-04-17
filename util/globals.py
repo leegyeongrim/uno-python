@@ -140,7 +140,7 @@ def get_uno_height(percent = 1):
     return UNO_HEIGHT * percent
 
 def get_card_back(scale = 1):
-    card_back = pygame.image.load('./resource/card_back.png') # TODO: 카드 수정
+    card_back = pygame.image.load('./resource/card_back.png')
     card_back = pygame.transform.scale(card_back, (get_card_width(scale), get_card_height(scale)))
     return card_back
 
@@ -158,3 +158,8 @@ def get_card(card: Card, scale = 1):
         skill = pygame.transform.scale(skill, (get_card_width(scale) // 1.5, get_card_width(scale) // 1.5))
         surface.blit(skill, get_center_rect(skill, surface.get_rect()))
     return surface
+
+def get_skill(value, scale = 1):
+    skill = pygame.image.load(f'./resource/{value}.png')
+    skill = pygame.transform.scale(skill, (get_card_width(scale) // 1.5, get_card_width(scale) // 1.5))
+    return skill

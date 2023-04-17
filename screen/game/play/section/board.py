@@ -41,6 +41,7 @@ class Board:
         screen.blit(get_card(current_card, 2), self.current_card_rect)
 
         self.draw_uno_button(screen)
+        self.draw_reverse(screen)
 
         if self.game.uno_clicked:
             self.draw_uno(screen)
@@ -52,6 +53,11 @@ class Board:
         uno_rect = uno.get_rect(topright=self.background_rect.topright)
         screen.blit(uno, uno_rect)
 
+    def draw_reverse(self, screen):
+        if self.game.reverse_direction:
+            surface = get_skill(SKILL_REVERSE)
+            rect = surface.get_rect(bottomright=self.background_rect.bottomright)
+            screen.blit(surface, rect)
 
     def draw_uno_button(self, screen):
         self.uno = pygame.image.load('./resource/uno_btn.png')

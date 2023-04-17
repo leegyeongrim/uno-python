@@ -67,6 +67,7 @@ class UnoGame:
         direction = -turn if self.reverse_direction else turn
         self.current_player_index = (self.current_player_index + direction) % len(self.players)
         self.turn_counter += 1
+
         self.reset_turn_start_time()
 
     # 현재 플레이어 반환
@@ -83,10 +84,9 @@ class UnoGame:
         print(f'드로우 {self.current_player_index}')
         self.get_current_player().draw(self.deck.draw())
 
+    # 카드 제출
     def play(self, idx=None):
         self.set_current_card(self.get_current_player().play(self, idx))
-        self.next_turn()
-        self.reset_turn_start_time()
     
     def reset_turn_start_time(self):
         self.turn_start_time = time.time()
@@ -143,13 +143,13 @@ class UnoGame:
     def get_winner(self):
         return self.winner
 
-    # TODO: 특별 카드 실행
     # SKILL_JUMP 수행
     def runJUMP(self):
         self.skip_turn() #다음차례 턴이 skip
-    # SKILL_REVERSE 수행
-    def runREVERSE(self):    
+
+    def run_reverse_skill(self):
         self.toggle_turn_direction()
+
     # SKILL_runPLUS_2 수행
     def runPLUS_2(self):    
         if self.reverse_direction:
