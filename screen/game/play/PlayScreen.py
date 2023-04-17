@@ -1,4 +1,6 @@
 from __future__ import annotations
+
+import random
 from typing import TYPE_CHECKING
 
 from game.model.player import Computer
@@ -175,10 +177,17 @@ class PlayScreen:
     def check_uno_clicked(self):
         if self.game.uno_enabled:
             if self.game.uno_clicked:
-                print('턴 시작 시 패널티 미부여')
-                self.game.uno_enabled = False
-                self.game.uno_clicked = False
+                if self.game.uno_clicked_player_index == self.game.previous_player_index:
+                    print('우노 버튼 해당 플레이어 클릭: 패널티 미부여')
+                    print(f'{self.game.uno_clicked_player_index} {self.game.previous_player_index}')
+                    self.game.uno_enabled = False
+                    self.game.uno_clicked = False
+                else:
+                    print('다른 플레이어로 인한 패널티 부여')
+                    self.game.can_uno_penalty = True
+                    self.on_deck_selected()
             else:
+                print('우노 미선택으로 인한 패널티 부여')
                 self.game.can_uno_penalty = True
                 self.on_deck_selected()
 
@@ -309,6 +318,12 @@ class PlayScreen:
                     get_card_width(MY_BOARD_CARD_PERCENT) // 1 + get_extra_small_margin())
 
     def run_computer(self):
+        if self.game.uno_enabled and not self.game.uno_clicked:
+            if time.time() - self.game.turn_start_time >= Computer.UNO_DELAY:
+                self.game.uno_clicked = True
+                self.game.uno_clicked_player_index = random.randint(1, len(self.game.players) - 1)  # 랜덤 컴퓨터가 우노 버튼 클릭
+                print(f'컴퓨터가 우노 버튼 클릭 {self.game.uno_clicked_player_index}')
+
         if type(self.game.get_current_player()) is Computer:
 
             # 컴퓨터 딜레이

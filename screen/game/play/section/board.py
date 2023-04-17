@@ -65,5 +65,6 @@ class Board:
 
     def run_uno_click_event(self, pos):
         if self.uno_rect.collidepoint(pos):
-            self.game.uno_clicked = True
-            print('우노!!!')
+            if not self.game.uno_clicked:
+                self.game.uno_clicked = True
+                self.game.uno_clicked_player_index = self.game.board_player_index

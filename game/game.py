@@ -23,7 +23,7 @@ class UnoGame:
         self.deck = None
         self.current_card = None
         self.turn_time = 10
-        self.uno_count = 2  # 우노 버튼을 클릭해야 할 카드 개수: 기본2
+        self.uno_count = 5  # TODO 우노 버튼을 클릭해야 할 카드 개수: 기본2
 
         self.turn_start_time = None
         self.is_turn_start = False
@@ -31,6 +31,7 @@ class UnoGame:
         self.can_uno_penalty = False
         self.uno_enabled = False
         self.uno_clicked = False
+        self.uno_clicked_player_index = None
 
     def start_game(self, play_type, players):
 
