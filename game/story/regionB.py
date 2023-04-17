@@ -9,7 +9,6 @@ if TYPE_CHECKING:
 class RegionB:
    def __init__(self, game: UnoGame):
       self.game = game
-
       self.computers = [Computer(f"Computer{i}") for i in range(3)]
 
 

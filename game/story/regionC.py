@@ -1,16 +1,21 @@
-from game.game import UnoGame
-from util.globals import *
+from __future__ import annotations
+
 import random
+from typing import TYPE_CHECKING
+from game.model.computer import Computer
+from util.globals import COLOR_SET
 
-class regionC:
-   def __init__(self):
-      self.game=UnoGame()
-      self.game.init()
-      self.game.add_computer("computer1")
-      self.game.add_computer("computer2")
+if TYPE_CHECKING:
+   from game.game import UnoGame
+class RegionC:
+   def __init__(self, game: UnoGame):
+      self.game = game
+      self.computers = [Computer(f"Computer{i}") for i in range(2)]
 
-   def color_change(self): #5턴 마다 낼 수 있는 카드 색상 변화
-      idx=random.randint(0,len(CARD_COLOR_SET)-1) #바뀌는 색상 랜덤 설정
-      if self.game.turn_counter%5==0:
-         self.game.current_card.color=list(CARD_COLOR_SET.keys())[idx]
+   def init(self):
+      self.game.players.extend(self.computers)
+
+   def color_change(self):
+      if self.game.turn_counter % 5 == 0:
+         self.game.current_color = random.choice(list(COLOR_SET.keys()))
    

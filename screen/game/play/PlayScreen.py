@@ -116,6 +116,7 @@ class PlayScreen:
         if self.game.is_turn_start:
             self.select_color_enabled = False
             self.check_uno_clicked()
+            self.check_type()
             self.game.is_turn_start = False
 
         # 게임 관련 동작 업데이트
@@ -130,6 +131,9 @@ class PlayScreen:
         # 애니메이션
         self.draw_animation(screen)
 
+    def check_type(self):
+        if self.game.play_type == TYPE_STORY_C:
+            self.game.region_c.color_change()
 
     def draw_animation(self, screen):
         if self.animate_deck_to_player_enabled:

@@ -2,6 +2,7 @@ from game.model.player import *
 from game.model.deck import Deck
 from game.model.card import *
 from game.story.regionB import RegionB
+from game.story.regionC import RegionC
 from util.globals import *
 import random
 import time
@@ -42,6 +43,7 @@ class UnoGame:
 
 
         self.region_b = RegionB(self)
+        self.region_c = RegionC(self)
 
 
     def start_game(self, play_type, players):
@@ -67,6 +69,9 @@ class UnoGame:
             self.deal()
         elif self.play_type == TYPE_STORY_B:
             self.region_b.init()
+        elif self.play_type == TYPE_STORY_C:
+            self.region_c.init()
+            self.deal()
 
         self.current_card = self.deck.draw()
         self.current_color = self.current_card.color
