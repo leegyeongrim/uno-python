@@ -1,6 +1,7 @@
 from game.model.player import *
 from game.model.deck import Deck
 from game.model.card import *
+from game.story.regionA import RegionA
 from game.story.regionB import RegionB
 from game.story.regionC import RegionC
 from util.globals import *
@@ -42,6 +43,7 @@ class UnoGame:
         self.uno_clicked_player_index = None
 
 
+        self.region_a = RegionA(self)
         self.region_b = RegionB(self)
         self.region_c = RegionC(self)
 
@@ -72,6 +74,8 @@ class UnoGame:
         elif self.play_type == TYPE_STORY_C:
             self.region_c.init()
             self.deal()
+        elif self.play_type == TYPE_STORY_A:
+            self.region_a.init()
 
         self.current_card = self.deck.draw()
         self.current_color = self.current_card.color
