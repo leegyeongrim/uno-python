@@ -213,6 +213,8 @@ class PlayScreen:
             self.on_deck_selected()
         elif card.value == SKILL_OMIT:
             self.game.next_turn(0)
+        elif card.value == SKILL_JUMP_RANDOM:
+            self.game.skip_turn(random.randint(1, len(self.game.players) - 1))
         else:
             self.game.next_turn()
 
