@@ -3,7 +3,7 @@ from __future__ import annotations
 import random
 from typing import TYPE_CHECKING
 
-from game.model.player import Computer
+from game.model.computer import Computer
 from screen.game.play.section.escapeDialog import EscapeDialog
 from screen.game.play.section.gameOverDialog import GameOverDialog
 from screen.game.play.section.playersLayout import PlayersLayout
@@ -95,6 +95,11 @@ class PlayScreen:
         self.card_board.draw(screen)
         self.players_layout.draw(screen)
 
+        # 게임 종료
+        if self.game.is_game_over():
+            self.game_over_dialog.draw(screen, self.game.get_winner())
+            return
+
         # 턴 시작 시 단 1번 동작
         if self.game.is_turn_start:
             self.check_uno_clicked()
@@ -108,13 +113,13 @@ class PlayScreen:
         if self.escape_dialog.enabled:
             self.escape_dialog.draw(screen)
             return
-        
+
+
+
         # 애니메이션
         self.draw_animation(screen)
 
-        # 게임 종료
-        if self.game.is_game_over():
-            self.game_over_dialog.draw(screen, self.game.get_winner())
+
 
 
 

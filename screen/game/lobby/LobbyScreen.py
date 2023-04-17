@@ -3,6 +3,7 @@ from typing import TYPE_CHECKING
 
 import pygame.draw
 
+from game.model.computer import Computer
 from game.model.player import *
 from util.globals import *
 
