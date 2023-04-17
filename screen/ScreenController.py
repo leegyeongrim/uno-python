@@ -79,6 +79,13 @@ class ScreenController:
     def update_setting(self):
         if self.screen.get_size() != self.setting.get_resolution():
             self.screen = pygame.display.set_mode(self.setting.get_resolution())
+
+        if self.bgm.get_volume() != self.setting.get_background_volume():
+            self.bgm.set_volume(self.setting.get_background_volume())
+
+        if self.effect.get_volume() != self.setting.get_effect_volume():
+            self.effect.set_volume(self.setting.get_effect_volume())
+            
     def update_bgm(self):
         if self.screen_type == TYPE_PLAY:
             if not self.is_bgm_playing:
