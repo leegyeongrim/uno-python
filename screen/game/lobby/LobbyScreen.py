@@ -117,12 +117,12 @@ class LobbyScreen:
                              self.computer_layout_width - get_small_margin() * 2, self.computer_height
                             )
 
-            self.computer_layout_list.append({'name': f'Computer{idx}', 'view': computer_rect, 'enabled': False if idx >= 1 else True})
+            self.computer_layout_list.append({'name': f'Computer{idx}', 'rect': computer_rect, 'enabled': False if idx >= 1 else True})
 
     def draw_computer(self, screen):
         for idx, computer in enumerate(self.computer_layout_list):
             if computer['enabled']:
-                layout = pygame.draw.rect(screen, COLOR_PLAYER, computer['view'])
+                layout = pygame.draw.rect(screen, COLOR_PLAYER, computer['rect'])
 
                 # 컴퓨터 이름
                 name = get_small_font().render(computer['name'], True, COLOR_BLACK)
@@ -175,17 +175,7 @@ class LobbyScreen:
             return self.toggle_input_name_dialog()
 
         if key == pygame.K_RETURN:
-            # 이름 설정
-            players = [Player(self.input_name_text)]
-            # 컴퓨터 플레이어 설정 적용
-            for idx, computer in enumerate(self.computer_layout_list):
-                if computer['enabled']:
-                    players.append(Computer(computer['name']))
-
-
-            # 화면 이동
-            self.screen_controller.set_screen_type(TYPE_PLAY)
-            self.screen_controller.game.start_game(TYPE_SINGLE, players)
+            self.update_name_and_start_game()
 
         # 키보드 입력
         elif key == pygame.K_BACKSPACE:
@@ -197,6 +187,18 @@ class LobbyScreen:
         else:
             pass
             #TODO: 알파벳 숫자만 입력가능합니다.
+
+    def update_name_and_start_game(self):
+        # 이름 설정
+        players = [Player(self.input_name_text)]
+        # 컴퓨터 플레이어 설정 적용
+        for idx, computer in enumerate(self.computer_layout_list):
+            if computer['enabled']:
+                players.append(Computer(computer['name']))
+
+        # 화면 이동
+        self.screen_controller.set_screen_type(TYPE_PLAY)
+        self.screen_controller.game.start_game(TYPE_SINGLE, players)
 
     def run_computer_select_key_event(self, key):
         if key == pygame.K_UP:
@@ -212,4 +214,25 @@ class LobbyScreen:
         self.computer_layout_list[self.computer_index]['enabled'] = not self.computer_layout_list[self.computer_index]['enabled']
 
     def run_click_event(self, event, pos):
-        pass
+        if self.input_name_dialog_enabled:
+            self.run_input_name_dialog_click_event(pos)
+        else:
+            self.run_menu_click_event(pos)
+            self.run_computer_select_click_event(pos)
+
+
+    def run_menu_click_event(self, pos):
+        for menu in self.menus:
+            if menu['rect'].collidepoint(pos):
+                menu['action']()
+
+    def run_computer_select_click_event(self, pos):
+        for computer_layout in self.computer_layout_list:
+            if computer_layout['rect'].collidepoint(pos):
+                computer_layout['enabled'] = not computer_layout['enabled']
+
+
+    def run_input_name_dialog_click_event(self, pos):
+        if self.submit_rect.collidepoint(pos):
+            self.update_name_and_start_game()
+
