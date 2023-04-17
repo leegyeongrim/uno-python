@@ -18,6 +18,7 @@ class UnoGame:
         self.current_player_index = 0
         self.board_player_index = 0
         self.previous_player_index = 0
+        self.next_player_index = 0
         self.turn_counter = None
 
         self.deck = None
@@ -25,6 +26,8 @@ class UnoGame:
         self.turn_time = 10
         self.uno_count = 2  # TODO 우노 버튼을 클릭해야 할 카드 개수: 기본2
         self.skip_direction = 1
+
+        self.skill_plus_cnt = 0
 
         self.turn_start_time = None
         self.is_turn_start = False
@@ -35,7 +38,7 @@ class UnoGame:
         self.uno_clicked_player_index = None
 
     def start_game(self, play_type, players):
-
+        print('게임 시작')
         self.is_started = True
         self.play_type = play_type
         self.players = players
@@ -43,9 +46,12 @@ class UnoGame:
         self.reverse_direction = False
         self.current_player_index = 0
         self.board_player_index = 0
+        self.next_player_index = 1
         self.previous_player_index = None
         self.turn_counter = 1
-        self.is_turn_start = False
+        self.skip_direction = 1
+
+        self.skill_plus_cnt = 0
 
         self.deck = Deck()
         self.deck.shuffle()
@@ -54,9 +60,15 @@ class UnoGame:
         self.current_card = self.deck.draw()
 
         self.turn_start_time = time.time()
+        self.is_turn_start = False
+
+        self.can_uno_penalty = False
+        self.uno_enabled = False
         self.uno_clicked = False
+        self.uno_clicked_player_index = None
 
     def finish_game(self):
+        self.is_started = False
         self.players: list[Player] = []
 
     # 다음 턴
@@ -65,12 +77,15 @@ class UnoGame:
         # 이전 플레이어 저장
         self.previous_player_index = self.current_player_index
         direction = -turn if self.reverse_direction else turn
+        next_direction = -(turn + 1) if self.reverse_direction else (turn + 1)
+
         self.skip_direction = direction
-        print(direction)
 
+        self.next_player_index = (self.current_player_index + next_direction) % len(self.players)
         self.current_player_index = (self.current_player_index + direction) % len(self.players)
-        self.turn_counter += 1
 
+
+        self.turn_counter += 1
         self.reset_turn_start_time()
 
     # 현재 플레이어 반환
@@ -79,6 +94,9 @@ class UnoGame:
     
     def get_board_player(self):
         return self.players[self.board_player_index]
+
+    def get_next_player(self):
+        return self.players[self.next_player_index]
 
     def get_previous_player(self):
         return self.players[self.previous_player_index]
@@ -119,7 +137,6 @@ class UnoGame:
 
     # 플레이어에게 패널티 카드 n장 부여
     def penalty(self, player_index, n=1):
-        print(f'패널티 부여 {player_index}')
         for _ in range(n):
             self.players[player_index].draw(self.deck.draw())
 
@@ -156,15 +173,8 @@ class UnoGame:
     def get_winner(self):
         return self.winner
 
-    # SKILL_JUMP 수행
-    def runJUMP(self):
-        self.skip_turn() #다음차례 턴이 skip
-
-    def run_reverse_skill(self):
-        self.toggle_turn_direction()
-
     # SKILL_runPLUS_2 수행
-    def runPLUS_2(self):    
+    def run_plus_2(self):
         if self.reverse_direction:
             self.penalty(self.current_player_index+1,2) 
         else:

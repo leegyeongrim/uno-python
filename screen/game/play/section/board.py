@@ -67,6 +67,8 @@ class Board:
 
     def run_deck_click_event(self, pos):
         if self.deck_rect.collidepoint(pos):
+            if self.play_screen.animate_board_player_to_current_card_enabled or self.play_screen.animate_deck_to_player_enabled:
+                return
             self.play_screen.on_deck_selected()
 
     def run_uno_click_event(self, pos):

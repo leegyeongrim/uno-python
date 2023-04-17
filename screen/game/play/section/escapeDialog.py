@@ -33,6 +33,7 @@ class EscapeDialog:
              )},
             {'text': '종료', 'view': None, 'rect': None, 'action': lambda: (
                 self.play_screen.init(),
+                self.play_screen.game.finish_game(),
                 self.screen_controller.set_screen(TYPE_START),
             )
              }

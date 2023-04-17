@@ -39,8 +39,6 @@ class PlayScreen:
         self.cards_line_size = 0  # 한 줄 당 카드 개수
 
         # 게임 관련
-        self.game_started = False
-        
         self.stop_timer_enabled = False  # 일시정지 상태
         self.pause_temp_time = None  # 일시정지 임시 시간 저장 변수
         
@@ -65,6 +63,16 @@ class PlayScreen:
     def init(self):
         self.escape_dialog.enabled = False
         self.escape_dialog.menu_idx = 0
+
+        self.stop_timer_enabled = False  # 일시정지 상태
+        self.pause_temp_time = None  # 일시정지 임시 시간 저장 변수
+
+        self.deck_select_enabled = False  # 덱 선택 가능 상태
+        self.card_select_enabled = False  # 카드 선택 가능 상태
+
+        self.animate_deck_to_player_enabled = False
+        self.animate_board_player_to_current_card_enabled = False
+        self.animate_current_player_to_current_card_enabled = False
 
         if self.escape_dialog.enabled:
             self.pause_game()
@@ -134,14 +142,25 @@ class PlayScreen:
                     self.game.uno_enabled = False
                     self.game.uno_clicked = False
                     self.game.can_uno_penalty = False
+                    self.animate_deck_to_player_enabled = False
+                    self.continue_game()
+                elif self.game.skill_plus_cnt > 0:
+                    self.game.penalty(self.game.next_player_index)
+                    print('기술 1장 부여')
+                    self.game.skill_plus_cnt -= 1
+                    if self.game.skill_plus_cnt > 0:
+                        self.on_deck_selected()
+                    else:
+                        self.game.next_turn()
+                        self.animate_deck_to_player_enabled = False
+                        self.continue_game()
                 else:
                     self.game.draw()
                     self.game.next_turn()
+                    self.animate_deck_to_player_enabled = False
+                    self.continue_game()
 
-                self.animate_deck_to_player_enabled = False
 
-                # 일시정지 해제
-                self.continue_game()
 
             # 카드 제출 애니메이션
         elif self.animate_board_player_to_current_card_enabled:
@@ -184,6 +203,10 @@ class PlayScreen:
 
         elif card.value == SKILL_JUMP:
             self.game.skip_turn()
+
+        elif card.value == SKILL_PLUS_2:
+            self.game.skill_plus_cnt = 2
+            self.on_deck_selected()
         else:
             self.game.next_turn()
 
@@ -216,6 +239,10 @@ class PlayScreen:
                 print('우노 미선택으로 인한 패널티 부여')
                 self.game.can_uno_penalty = True
                 self.on_deck_selected()
+    
+    def check_plus_skill(self):
+        if self.game.skill_plus_cnt != 0:
+            self.on_deck_selected()
 
     def run_events(self, events):
         if not self.game.is_started:
@@ -308,6 +335,13 @@ class PlayScreen:
                 self.set_board_destination()
             else:
                 player_rect = self.players_layout.players[self.game.previous_player_index - 1]
+                self.animate_destination_x, self.animate_destination_y = player_rect.topleft
+        elif self.game.skill_plus_cnt > 0:
+            # 다음 플레이어 목적지 지정
+            if self.game.next_player_index == self.game.board_player_index:
+                self.set_board_destination()
+            else:
+                player_rect = self.players_layout.players[self.game.next_player_index - 1]
                 self.animate_destination_x, self.animate_destination_y = player_rect.topleft
         else:
             # 현재 플레이어 목적지 지정

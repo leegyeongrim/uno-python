@@ -1,7 +1,7 @@
 {
-    "mode_screen": 1,
-    "mode_blind": 1,
-    "mode_master_volume": 8,
-    "mode_background_volume": 10,
-    "mode_effect_volume": 9
+    "mode_screen": 2,
+    "mode_blind": 0,
+    "mode_master_volume": 4,
+    "mode_background_volume": 4,
+    "mode_effect_volume": 4
 }
