@@ -99,6 +99,7 @@ class UnoGame:
         print('스킵')
         self.next_turn(skip + 1)
 
+    # 스킵된 플레이어 인덱스 리스트를 반환하는 함수
     def get_skipped_player_indexs(self):
         temp = []
         if abs(self.skip_direction) != 1:

@@ -184,6 +184,8 @@ class PlayScreen:
 
         elif card.value == SKILL_JUMP:
             self.game.skip_turn()
+        else:
+            self.game.next_turn()
 
 
     def check_time(self):

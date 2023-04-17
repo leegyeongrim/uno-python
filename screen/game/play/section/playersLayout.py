@@ -90,7 +90,6 @@ class PlayersLayout:
                 # 스킵된 플레이어 표시
                 skipped = self.game.get_skipped_player_indexs()
                 for skipped_index in skipped:
-                    print(skipped_index)
                     if idx == skipped_index:
                         surface = pygame.Surface(
                             (self.width - get_small_margin() * 2, self.player_height),
