@@ -1,17 +1,20 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 
+
 from util.globals import *
 import time
 import pygame
 
 if TYPE_CHECKING:
+    from screen.game.play.PlayScreen import PlayScreen
     from game.game import UnoGame
     from screen.ScreenController import ScreenController
 
 class Board:
-    def __init__(self, play_screen):
+    def __init__(self, play_screen: PlayScreen):
         self.play_screen = play_screen
+        self.game = play_screen.game
 
     def draw(self, screen: pygame.Surface, current_card: Card):
 
@@ -27,10 +30,6 @@ class Board:
         self.current_card = get_card_back(2)
         self.current_card_rect = get_center_rect(self.current_card, self.background_rect, self.current_card.get_width() // 2 + get_medium_margin())
 
-        self.uno = pygame.image.load('./resource/uno_btn.png')
-        self.uno = pygame.transform.scale(self.uno, (get_uno_width(), get_uno_height()))
-        self.uno_rect = get_center_rect(self.uno, self.background_rect, y = self.background_rect.width // 4 - 10)
-
         pygame.draw.rect(screen, COLOR_BOARD, self.background_rect)
         pygame.draw.circle(screen, CARD_COLOR_SET[current_card.color], *self.color_circle)
         screen.blit(self.deck, self.deck_rect)
@@ -40,8 +39,30 @@ class Board:
 
         screen.blit(get_card(current_card, 2), self.current_card_rect)
 
+        self.draw_uno_button(screen)
+
+        if self.game.uno_clicked:
+            self.draw_uno(screen)
+
+    # 우노 상태
+    def draw_uno(self, screen):
+        uno = pygame.image.load('./resource/uno_btn.png')
+        uno = pygame.transform.scale(self.uno, (get_uno_width(), get_uno_height()))
+        uno_rect = uno.get_rect(topright=self.background_rect.topright)
+        screen.blit(uno, uno_rect)
+
+
+    def draw_uno_button(self, screen):
+        self.uno = pygame.image.load('./resource/uno_btn.png')
+        self.uno = pygame.transform.scale(self.uno, (get_uno_width(), get_uno_height()))
+        self.uno_rect = get_center_rect(self.uno, self.background_rect, y = self.background_rect.width // 4 - 10)
         screen.blit(self.uno, self.uno_rect)
 
     def run_deck_click_event(self, pos):
         if self.deck_rect.collidepoint(pos):
             self.play_screen.on_deck_selected()
+
+    def run_uno_click_event(self, pos):
+        if self.uno_rect.collidepoint(pos):
+            self.game.uno_clicked = True
+            print('우노!!!')

@@ -11,20 +11,24 @@ class UnoGame:
     def __init__(self):
         self.is_started = False
 
-
         self.play_type = None
-        self.players = []
+        self.players: list[Player] = []
 
         self.reverse_direction = False
         self.current_player_index = 0
         self.board_player_index = 0
+        self.previous_player_index = 0
         self.turn_counter = None
 
         self.deck = None
         self.current_card = None
         self.turn_time = 10
 
-        self.turn_start_time = time.time()
+        self.turn_start_time = None
+        self.is_turn_start = False
+
+        self.uno_enabled = False
+        self.uno_clicked = False
 
     def start_game(self, play_type, players):
 
@@ -35,7 +39,9 @@ class UnoGame:
         self.reverse_direction = False
         self.current_player_index = 0
         self.board_player_index = 0
+        self.previous_player_index = None
         self.turn_counter = 1
+        self.is_turn_start = False
 
         self.deck = Deck()
         self.deck.shuffle()
@@ -44,12 +50,17 @@ class UnoGame:
         self.current_card = self.deck.draw()
 
         self.turn_start_time = time.time()
+        self.uno_clicked = False
 
     def finish_game(self):
         self.players: list[Player] = []
 
     # 다음 턴
     def next_turn(self, turn=1):
+        self.is_turn_start = True
+        # 이전 플레이어 저장
+        self.previous_player_index = self.current_player_index
+
         direction = -turn if self.reverse_direction else turn
         self.current_player_index = (self.current_player_index + direction) % len(self.players)
         self.turn_counter += 1
@@ -61,6 +72,9 @@ class UnoGame:
     
     def get_board_player(self):
         return self.players[self.board_player_index]
+
+    def get_previous_player(self):
+        return self.players[self.previous_player_index]
     
     def draw(self):
         self.get_current_player().draw(self.deck.draw())
@@ -108,7 +122,9 @@ class UnoGame:
             self.current_card.color == new_card.color or \
             self.current_card.value == new_card.value
 
-        
+    def update_uno_enabled(self):
+        self.uno_enabled = len(self.get_current_player().hands) == 2
+
 
     # TODO: 우노 버튼 클릭
     def click_uno(self, idx):

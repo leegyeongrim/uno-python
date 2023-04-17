@@ -41,6 +41,7 @@ class PlayScreen:
         self.animate_deck_to_player_enabled = False
         self.animate_board_player_to_current_card_enabled = False
         self.animate_current_player_to_current_card_enabled = False
+        self.uno_enabled_in_turn = False
 
         # 보드 값
         self.board_width = self.screen_controller.screen.get_width() - self.players_layout.width
@@ -96,6 +97,14 @@ class PlayScreen:
             self.players_layout.draw(screen)
             self.check_time()
 
+            # 턴 시작 시 단 1번 동작
+            if self.game.is_turn_start:
+                self.check_uno_clicked()
+                self.game.is_turn_start = False
+
+            self.game.update_uno_enabled()
+
+
         if self.game.is_game_over():
             self.game_over_dialog.draw(screen, self.game.get_winner())
         elif self.escape_dialog.enabled:
@@ -135,7 +144,6 @@ class PlayScreen:
             # 애니메이션 종료 시 호출
             else:
                 # 한 장 제출
-                print('컴퓨터 제출')
                 self.game.play(self.to_computer_play_idx)
                 self.animate_current_player_to_current_card_enabled = False
                 self.continue_timer()
@@ -160,6 +168,18 @@ class PlayScreen:
 
     def check_my_turn(self):
         self.my_cards_select_enabled = self.game.board_player_index == self.game.current_player_index
+
+    def check_uno_clicked(self):
+        if self.game.uno_enabled:
+            if self.game.uno_clicked:
+                print('우노버튼 클릭으로 부여되지 않음')
+                self.game.uno_enabled = False
+                self.game.uno_clicked = False
+            else:
+                print('패널티 부여')
+                # 패널티
+                self.game.uno_enabled = False
+                self.game.uno_clicked = False
 
     # 이벤트 처리 함수
     def run_events(self, events):
@@ -207,6 +227,10 @@ class PlayScreen:
 
         elif self.players_layout.select_enabled:
             self.players_layout.run_select_click_event(pos)
+
+        # 우노 버튼 클릭 이벤트
+        if self.game.uno_enabled:
+            self.board.run_uno_click_event(pos)
 
     # 카드 선택 분기
     def on_card_selected(self, idx):
@@ -300,5 +324,5 @@ class PlayScreen:
 
                 self.animate_controller.init_pos(surface, rect, start_x, start_y, end_x, end_y)
             else:
-                print('컴퓨터 낼 카드 없음')
+                # 낼 카드 없을 떄
                 self.on_deck_selected()
