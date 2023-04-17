@@ -15,7 +15,7 @@ class Deck:
     def create_cards(self):
         color = list(CARD_COLOR_SET.keys())
         value = [i for i in range(1,10)] + SKILL_SET
-        value = [SKILL_PLUS_4] * 5 + [SKILL_REVERSE] * 5
+        value = [SKILL_OMIT] * 5 + [SKILL_REVERSE] * 5 + [SKILL_JUMP] * 5
 
         # 무색상 +4 기술 카드
         cards=[]

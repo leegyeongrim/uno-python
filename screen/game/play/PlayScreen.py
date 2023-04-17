@@ -211,6 +211,8 @@ class PlayScreen:
         elif card.value == SKILL_PLUS_4:
             self.game.skill_plus_cnt = 4
             self.on_deck_selected()
+        elif card.value == SKILL_OMIT:
+            self.game.next_turn(0)
         else:
             self.game.next_turn()
 
