@@ -291,7 +291,7 @@ class PlayScreen:
             self.escape_dialog.run_click_event(pos)
 
         elif self.select_color_enabled and self.game.board_player_index == self.game.current_player_index:
-            self.card_board.run_board_cards_select_click_event(pos)
+            self.card_board.run_select_color_click_event(pos)
 
         elif self.card_select_enabled:
             self.board.run_deck_click_event(pos)

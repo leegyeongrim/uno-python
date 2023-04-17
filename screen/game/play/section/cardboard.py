@@ -18,6 +18,14 @@ class CardBoard:
         self.board = play_screen.board
 
         self.next_card_start_x = get_extra_small_margin()
+
+        self.color_index = 0
+        self.select_colors = [
+            {'color': COLOR_RED, 'rect': None, 'type': CARD_COLOR_RED},
+            {'color': COLOR_BLUE, 'rect': None, 'type': CARD_COLOR_BLUE},
+            {'color': COLOR_GREEN, 'rect': None, 'type': CARD_COLOR_GREEN},
+            {'color': COLOR_YELLOW, 'rect': None, 'type': CARD_COLOR_YELLOW},
+        ]
     
     def draw(self, screen):
         background_height = screen.get_height() // 3
@@ -63,17 +71,40 @@ class CardBoard:
 
 
     def draw_select_color(self, screen: pygame.Surface):
+        size = 50
+
         surface = pygame.Surface(self.background_rect.size, pygame.SRCALPHA)
         surface.fill(COLOR_TRANSPARENT_WHITE)
-        screen.blit(surface, self.background_rect.topleft)
+
+        surface_rect = screen.blit(surface, self.background_rect.topleft)
+
+        for idx, color in enumerate(self.select_colors):
+            rect = pygame.Rect(0, 0, size, size)
+            rect.center = surface_rect.center
+            rect.left += (idx - 1.5) * size
+            color['rect'] = rect
+            pygame.draw.rect(screen, color['color'], rect)
+
+            if idx == self.color_index:
+                pygame.draw.rect(screen, COLOR_BLACK, rect, 2)
 
 
 
     def run_select_color_click_event(self, pos):
-        pass
+        for color in self.select_colors:
+            if color['rect'].collidepoint(pos):
+                print('충돌')
+                self.game.current_color = color['type']
+                self.game.next_turn()
 
     def run_slect_color_key_event(self, key):
-        pass
+        if key == pygame.K_RIGHT:
+            self.color_index = (self.color_index + 1) % len(self.select_colors)
+        elif key == pygame.K_LEFT:
+            self.color_index = (self.color_index - 1) % len(self.select_colors)
+        elif key == pygame.K_RETURN:
+            self.game.current_color = self.select_colors[self.color_index]['type']
+            self.game.next_turn()
 
     # 나의 카드
     def draw_my_cards(self, screen: pygame.Surface, cards):

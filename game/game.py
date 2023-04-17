@@ -178,29 +178,3 @@ class UnoGame:
 
     def get_winner(self):
         return self.winner
-
-    # SKILL_runPLUS_2 수행
-    def run_plus_2(self):
-        if self.reverse_direction:
-            self.penalty(self.current_player_index+1,2) 
-        else:
-            self.penalty(self.current_player_index-1,2)
-    # SKILL_MINUS_1 수행
-    def runMINUS_1(self):
-        card_idx=random.randint(0,len(self.players[self.current_player_index].hands)-1)
-        self.players[self.current_player_index].hands.pop(card_idx)
-    # SKILL_OMIT 수행
-    def runOMIT(self):
-        if self.reverse_direction: #역방향
-            self.current_player_index=(self.current_player_index+1)%len(self.players) #미리 index 증가시켜놓고, next_turn 수행시 다시 자기 차례로 돌아오게함 
-        else: #정방향이면
-            self.current_player_index=(self.current_player_index-1)%len(self.players) #미리 index 감소시켜놓고, next_turn 수행시 다시 자기 차례로 돌아오게함
-    # SKILL_runPLUS_4 수행
-    def runPLUS_4(self):
-        if self.reverse_direction:
-            self.penalty(self.current_player_index+1,4)
-        else:
-            self.penalty(self.current_player_index-1,4)
-    # SKILL_COLOR 수행
-    def runCOLOR(self, idx):
-        self.current_card.color=CARD_COLOR_SET[idx]
