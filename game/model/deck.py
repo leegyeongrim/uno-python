@@ -3,7 +3,8 @@ from util.globals import *
 import random
 
 class Deck:
-    def __init__(self):
+    def __init__(self, game):
+        self.game = game
         self.cards = []
 
         self.init_deck()
@@ -17,7 +18,7 @@ class Deck:
         value = [i for i in range(1,10)] + SKILL_SET
 
         # 무색상 +4 기술 카드
-        cards=[]
+        cards = []
         cards.extend([Card(CARD_COLOR_NONE, SKILL_PLUS_4)])
         # 무색상 색상 기술 카드
         cards.extend([Card(CARD_COLOR_NONE, SKILL_COLOR)])
@@ -25,8 +26,15 @@ class Deck:
         for c in color[1:]:
             for v in value[:14]:
                 cards.append(Card(c,v))
-        print(len(cards))
+
         self.cards = cards
+        cards = []
+        if self.game.play_type == TYPE_STORY_D:
+            for c in color[1:]:
+                for v in range(1,10):
+                    cards.append(Card(c, v))
+        self.cards = cards
+
         
     def shuffle(self):
         random.shuffle(self.cards)

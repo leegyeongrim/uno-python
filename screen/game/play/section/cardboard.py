@@ -162,9 +162,6 @@ class CardBoard:
             elif self.cards_line_size != 0 and self.play_screen.my_cards_selected_index - self.cards_line_size >= 0:
                 self.play_screen.my_cards_selected_index = self.play_screen.my_cards_selected_index - self.cards_line_size
         elif key == pygame.K_RETURN:
-            # 중복 클릭 방지
-            if self.play_screen.animate_board_player_to_current_card_enabled or self.play_screen.animate_deck_to_player_enabled:
-                return
 
             if self.play_screen.deck_select_enabled:
                 self.play_screen.on_deck_selected()
@@ -174,6 +171,4 @@ class CardBoard:
     def run_board_cards_select_click_event(self, pos):
         for idx, rect in enumerate(self.card_rects):
             if rect.collidepoint(pos):
-                if self.play_screen.animate_board_player_to_current_card_enabled or self.play_screen.animate_deck_to_player_enabled:
-                    return
                 self.play_screen.on_card_selected(idx)

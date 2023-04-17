@@ -20,16 +20,16 @@ class StoryScreen:
         self.is_story_enabled = True
 
         # 선택할 수 있는 스토리 최대 인덱스
-        self.cleared_idx = 2
+        self.cleared_idx = 3
         self.current_position = 0
         self.confirm_idx = 0
 
         # 스토리 목록
         self.stories = [
-            {'type': TYPE_STORY_A, 'rect': None, 'action': None, 'hover': None, 'color': COLOR_RED, 'features': ['컴퓨터 플레이어 기술 카드 확률 50% 상승', '컴퓨터 플레이어 기술 카드 콤보 사용(2-3장)']},
+            {'type': TYPE_STORY_A, 'rect': None, 'action': None, 'hover': None, 'color': COLOR_RED, 'features': ['컴퓨터 플레이어 첫 분배 기술 카드 확률 50% 상승', '컴퓨터 플레이어 기술 카드 콤보 사용(2-3장)']},
             {'type': TYPE_STORY_B, 'rect': None, 'action': None, 'hover': None, 'color': COLOR_BLUE, 'features': ['컴퓨터 플레이어 3명', '모든 카드를 같은 수만큼 분배']},
             {'type': TYPE_STORY_C, 'rect': None, 'action': None, 'hover': None, 'color': COLOR_GREEN, 'features': ['컴퓨터 플레이어 2명', '매 5턴마다 낼 수 있는 카드 색상 무작위 변경']},
-            {'type': TYPE_STORY_D, 'rect': None, 'action': None, 'hover': None, 'color': COLOR_YELLOW, 'features': ['각 턴을 2번 씩 진행']},
+            {'type': TYPE_STORY_D, 'rect': None, 'action': None, 'hover': None, 'color': COLOR_YELLOW, 'features': ['컴퓨터 플레이어 5명', '숫자 카드로만 진행']},
         ]
 
         # 확인 다이얼로그
