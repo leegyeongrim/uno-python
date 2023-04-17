@@ -86,6 +86,37 @@ class ScreenController:
         if self.effect.get_volume() != self.setting.get_effect_volume():
             self.effect.set_volume(self.setting.get_effect_volume())
 
+        self.update_color_set()
+
+    def update_color_set(self):
+        global CARD_COLOR_SET
+        global COLOR_SET
+        if self.setting.get(MODE_BLIND) == 0:
+            CARD_COLOR_SET[CARD_COLOR_NONE] = COLOR_WHITE
+            CARD_COLOR_SET[CARD_COLOR_RED] = COLOR_RED
+            CARD_COLOR_SET[CARD_COLOR_YELLOW] = COLOR_YELLOW
+            CARD_COLOR_SET[CARD_COLOR_GREEN] = COLOR_GREEN
+            CARD_COLOR_SET[CARD_COLOR_BLUE] = COLOR_BLUE
+
+            COLOR_SET[CARD_COLOR_RED] = COLOR_RED
+            COLOR_SET[CARD_COLOR_YELLOW] = COLOR_YELLOW
+            COLOR_SET[CARD_COLOR_GREEN] = COLOR_GREEN
+            COLOR_SET[CARD_COLOR_BLUE] = COLOR_BLUE
+        else: # 색맹 모드
+
+                CARD_COLOR_SET[CARD_COLOR_NONE] = (204, 121, 167)
+                CARD_COLOR_SET[CARD_COLOR_RED] = (239, 159, 0),
+                CARD_COLOR_SET[CARD_COLOR_YELLOW] = (240, 228, 66),
+                CARD_COLOR_SET[CARD_COLOR_GREEN] = (0, 158, 116),
+                CARD_COLOR_SET[CARD_COLOR_BLUE] = (182, 180, 233),
+
+                COLOR_SET[CARD_COLOR_RED] = (239, 159, 0),
+                COLOR_SET[CARD_COLOR_YELLOW] = (240, 228, 66),
+                COLOR_SET[CARD_COLOR_GREEN] = (0, 158, 116),
+                COLOR_SET[CARD_COLOR_BLUE] = (182, 180, 233),
+
+
+
     def update_bgm(self):
         if self.screen_type == TYPE_PLAY:
             if not self.is_bgm_playing:

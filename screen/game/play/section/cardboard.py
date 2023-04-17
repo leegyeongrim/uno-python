@@ -21,10 +21,10 @@ class CardBoard:
 
         self.color_index = 0
         self.select_colors = [
-            {'color': COLOR_RED, 'rect': None, 'type': CARD_COLOR_RED},
-            {'color': COLOR_BLUE, 'rect': None, 'type': CARD_COLOR_BLUE},
-            {'color': COLOR_GREEN, 'rect': None, 'type': CARD_COLOR_GREEN},
-            {'color': COLOR_YELLOW, 'rect': None, 'type': CARD_COLOR_YELLOW},
+            {'color': COLOR_SET[CARD_COLOR_RED], 'rect': None, 'type': CARD_COLOR_RED},
+            {'color': COLOR_SET[CARD_COLOR_BLUE], 'rect': None, 'type': CARD_COLOR_BLUE},
+            {'color': COLOR_SET[CARD_COLOR_GREEN], 'rect': None, 'type': CARD_COLOR_GREEN},
+            {'color': COLOR_SET[CARD_COLOR_YELLOW], 'rect': None, 'type': CARD_COLOR_YELLOW},
         ]
     
     def draw(self, screen):
@@ -83,7 +83,7 @@ class CardBoard:
             rect.center = surface_rect.center
             rect.left += (idx - 1.5) * size
             color['rect'] = rect
-            pygame.draw.rect(screen, color['color'], rect)
+            pygame.draw.rect(screen, COLOR_SET[color['type']], rect)
 
             if idx == self.color_index:
                 pygame.draw.rect(screen, COLOR_BLACK, rect, 2)
