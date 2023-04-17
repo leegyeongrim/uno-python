@@ -67,11 +67,15 @@ class SettingScreen:
 
             # 모드 박스
             box_size = 20
+            setting['mode_rects'] = []
             for mode in range(setting['max']):
 
+                # 모드 박스
                 color = COLOR_BLACK if mode == self.setting.get(setting['type']) else COLOR_GRAY
-                pygame.draw.rect(screen, color, (self.max_text_right + box_size * mode * 1.1, text_rect.y + (text_rect.height - box_size) // 2, 20, 20))
+                mode_rect = pygame.draw.rect(screen, color, (self.max_text_right + box_size * mode * 1.1, text_rect.y + (text_rect.height - box_size) // 2, 20, 20))
+                setting['mode_rects'].append(mode_rect)
 
+                # 선택된 모드
                 if idx == self.selected_setting_idx and self.mode_select_enabled and mode == setting['selected_mode']:
                     pygame.draw.rect(screen, COLOR_RED, (self.max_text_right + box_size * mode * 1.1, text_rect.y + (text_rect.height - box_size) // 2, 20, 20), 2)
 
@@ -81,6 +85,8 @@ class SettingScreen:
                 self.run_key_events(event.key)
             elif event.type == pygame.MOUSEBUTTONUP:
                 pos = pygame.mouse.get_pos()
+                self.run_setting_click_event(pos)
+                self.run_mode_click_event(pos)
 
     def run_key_events(self, key):
         if self.setting_select_enabled:
@@ -122,6 +128,25 @@ class SettingScreen:
             self.setting.set(self.get_selected_type(), self.settings[self.selected_setting_idx]['selected_mode'])
             self.mode_select_enabled = False
             self.setting_select_enabled = True
+
+    def run_setting_click_event(self, pos):
+        for setting in self.settings:
+            if setting['rect'].collidepoint(pos):
+                if setting['type'] == MODE_CLEAR:
+                    self.setting.clear()
+                elif setting['type'] == MODE_RETURN:
+                    if self.controller.is_paused:
+                        self.controller.set_screen(TYPE_PLAY)
+                        self.controller.is_paused = False
+                    else:
+                        self.controller.set_screen(TYPE_START)
+
+    def run_mode_click_event(self, pos):
+        for setting in self.settings:
+            if setting['max'] > 0:
+                for mode_idx, mode_rect in enumerate(setting['mode_rects']):
+                    if mode_rect.collidepoint(pos):
+                        self.setting.set(setting['type'], mode_idx)
 
     def updateSettingSelectIndex(self, direction):
         self.selected_setting_idx = (self.selected_setting_idx + direction) % len(self.settings)

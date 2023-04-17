@@ -23,7 +23,7 @@ class UnoGame:
         self.deck = None
         self.current_card = None
         self.turn_time = 10
-        self.uno_count = 5  # TODO 우노 버튼을 클릭해야 할 카드 개수: 기본2
+        self.uno_count = 2  # TODO 우노 버튼을 클릭해야 할 카드 개수: 기본2
 
         self.turn_start_time = None
         self.is_turn_start = False
@@ -130,12 +130,6 @@ class UnoGame:
     def update_uno_enabled(self):
         self.uno_enabled = len(self.get_current_player().hands) == self.uno_count
 
-
-    # TODO: 우노 버튼 클릭
-    def click_uno(self, idx):
-        pass
-    
-    # TODO: 게임이 끝났는지 확인
     def is_game_over(self) -> bool:
         for idx, player_hands in enumerate([player.hands for player in self.players]):
             if len(player_hands) == 0:
