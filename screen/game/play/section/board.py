@@ -55,7 +55,7 @@ class Board:
 
     def draw_reverse(self, screen):
         if self.game.reverse_direction:
-            surface = get_skill(SKILL_REVERSE)
+            surface = get_skill(SKILL_REVERSE, 2)
             rect = surface.get_rect(bottomright=self.background_rect.bottomright)
             screen.blit(surface, rect)
 
