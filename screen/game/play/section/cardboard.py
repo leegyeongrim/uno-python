@@ -167,6 +167,8 @@ class CardBoard:
                 self.play_screen.on_deck_selected()
             else:
                 self.play_screen.on_card_selected(self.play_screen.my_cards_selected_index)
+        elif key == self.play_screen.screen_controller.setting.get(MODE_DECK_KEY):
+            self.play_screen.on_deck_selected()
 
     def run_board_cards_select_click_event(self, pos):
         for idx, rect in enumerate(self.card_rects):

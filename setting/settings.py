@@ -1,6 +1,8 @@
 import json
 import os
 
+import pygame
+
 from util.globals import *
 
 
@@ -25,6 +27,8 @@ class Setting:
             MODE_MASTER_VOLUME: 4,
             MODE_BACKGROUND_VOLUME: 4,
             MODE_EFFECT_VOLUME: 4,
+            MODE_UNO_KEY: pygame.K_u,
+            MODE_DECK_KEY: pygame.K_d,
         }
 
     def clear(self):

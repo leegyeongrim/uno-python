@@ -294,6 +294,9 @@ class PlayScreen:
         elif self.players_layout.select_enabled:
             self.players_layout.run_select_key_event(key)
 
+        if self.game.uno_enabled:
+            self.board.run_uno_key_event(key)
+
     # 클릭 이벤트
     def run_click_event(self, pos):
 

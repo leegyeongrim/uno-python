@@ -68,6 +68,10 @@ MODE_BLIND = "mode_blind"
 MODE_MASTER_VOLUME = "mode_master_volume"
 MODE_BACKGROUND_VOLUME = "mode_background_volume"
 MODE_EFFECT_VOLUME = "mode_effect_volume"
+MODE_KEY = "mode_key"
+MODE_UNO_KEY = "mode_uno_key"
+MODE_DECK_KEY = "mode_deck_key"
+
 MODE_CLEAR = "mode_clear"
 MODE_RETURN = "mode_return"
 

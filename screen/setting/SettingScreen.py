@@ -24,7 +24,8 @@ class SettingScreen:
             {'text': '전체볼륨', 'rect': None, 'result': None, 'selected_mode': 0, 'mode_rects': [], 'max': 11, 'type': MODE_MASTER_VOLUME},
             {'text': '배경볼륨', 'rect': None, 'result': None, 'selected_mode': 0, 'mode_rects': [], 'max': 11, 'type': MODE_BACKGROUND_VOLUME},
             {'text': '효과음볼륨', 'rect': None, 'result': None, 'selected_mode': 0, 'mode_rects': [], 'max': 11, 'type': MODE_EFFECT_VOLUME},
-            {'text': '키 설정', 'rect': None, 'result': None, 'selected_mode': 0, 'mode_rects': [], 'max': 0, 'type': None},
+            {'text': '우노 키 설정', 'rect': None, 'result': None, 'selected_mode': 0, 'mode_rects': [], 'max': 0, 'type': MODE_UNO_KEY},
+            {'text': '덱 키 설정', 'rect': None, 'result': None, 'selected_mode': 0, 'mode_rects': [], 'max': 0, 'type': MODE_DECK_KEY},
             {'text': '초기화', 'rect': None, 'result': None, 'selected_mode': 0, 'mode_rects': [], 'max': 0, 'type': MODE_CLEAR},
             {'text': '돌아가기', 'rect': None, 'result': None, 'selected_mode': 0, 'mode_rects': [], 'max': 0, 'type': MODE_RETURN},
         ]
@@ -61,6 +62,9 @@ class SettingScreen:
                 temp_value = str(self.setting.get_resolution())
             elif setting['type'] == MODE_BLIND:
                 temp_value = 'OFF' if temp_value == '0' else 'ON'
+            elif setting['type'] == MODE_UNO_KEY or setting['type'] == MODE_DECK_KEY:
+                temp_value = chr(int(temp_value))
+
 
             if temp_value != 'None':
                 value = get_medium_font().render(temp_value, True, COLOR_BLACK)
@@ -84,20 +88,20 @@ class SettingScreen:
     def run_events(self, events):
         for event in events:
             if event.type == pygame.KEYDOWN:
-                self.run_key_events(event.key)
+                self.run_key_events(event, event.key)
             elif event.type == pygame.MOUSEBUTTONUP:
                 pos = pygame.mouse.get_pos()
                 self.run_setting_click_event(pos)
                 self.run_mode_click_event(pos)
 
-    def run_key_events(self, key):
+    def run_key_events(self, event, key):
         if self.setting_select_enabled:
-            self.run_select_settings_event(key)
+            self.run_select_settings_event(event, key)
 
         elif self.mode_select_enabled:
             self.run_select_mode_event(key)
 
-    def run_select_settings_event(self, key):
+    def run_select_settings_event(self, event, key):
         if key == pygame.K_UP:
             self.updateSettingSelectIndex(-1)
         elif key == pygame.K_DOWN:
@@ -115,6 +119,11 @@ class SettingScreen:
                     self.controller.set_screen(TYPE_START)
             elif self.get_selected_type() == MODE_CLEAR:
                 self.setting.clear()
+        else:
+            if self.get_selected_type() == MODE_UNO_KEY or self.get_selected_type() == MODE_DECK_KEY:
+                if event.unicode.isalnum():
+                    self.setting.set(self.get_selected_type(), ord(event.unicode))
+
 
 
     def run_select_mode_event(self, key):
