@@ -39,4 +39,5 @@ def disconnect_from_server():
     
 # 서버에 연결하는 메인 함수
 if __name__ == '__main__':
-    client.connect(server_url)
+    connect_to_server()
+    send_message("client connected")

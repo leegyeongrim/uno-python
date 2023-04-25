@@ -9,7 +9,7 @@ SERVER_PORT = 10000 # ~12000
 server = socketio.Server()
 
 # 연결된 플레이어들의 정보를 저장할 변수.
-players = {}
+players = []
 
 # 클라이언트(sid)가 연결되었을 때 호출되는 이벤트 핸들러
 @server.on('connect')
